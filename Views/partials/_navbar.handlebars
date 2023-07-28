@@ -1,0 +1,56 @@
+{{#if user}}
+
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/painel"><img src="/img/icon.png" width="60" height="30" class="d-inline-block align-top" alt=""></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/guias">Guias</a>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Relatorios
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="/consultas/por_empresa">Por Empresa</a></li>                           
+              <li><a class="dropdown-item" href="/consultas/por_usuario">Por Usuario</a></li>
+              <li><a class="dropdown-item" href="#">Por Cliente</a></li>
+              <li><a class="dropdown-item" href="/consultas/comissao">Comissao por periodo</a></li>               
+            </ul>
+          </li>
+        
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Administrador
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="/administracao/users">Cadastrar Usuarios</a></li>            
+              <li><a class="dropdown-item" href="#">Log dos Usuarios</a></li>
+            </ul>
+          </li>          
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/validation/sobre">Sobre</a>
+          </li>
+          <li class="  nav-item dropdown">
+            <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              {{user.nome}}
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="/user/reset_pass">Alterar Senha</a></li>
+              <li><a class="dropdown-item" href="/user/logout">Sair</a></li>            
+            </ul>
+          </li>
+      </ul>
+      <form class="d-flex" role="search" action="/guias/buscar" method="post">
+        <input name="numero" class="form-control me-2" type="search" placeholder="Conhecimento" aria-label="Conhecimento">
+        <button class="btn btn-outline-success" type="submit">Buscar</button>
+      </form>
+    </div>
+  </div>
+</nav>
+{{else}}
+{{/if}}

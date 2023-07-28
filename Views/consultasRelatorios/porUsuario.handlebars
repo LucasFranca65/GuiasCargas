@@ -1,0 +1,70 @@
+<form action="/consultas/por_usuario/pesquisar" method="POST" >
+  <h3>Guias lançadas por Usuario</h3>
+    <div class="table-responsive-xl">
+    <table class="table">
+        <thead class="table-dark">
+        <tr>
+            <th scope="col">Usuario</th>
+            <th scope="col">Data Inicial</th>
+            <th scope="col">Data Final</th>      
+        </tr>
+        </thead>  
+        
+            <tbody>
+            <td>
+            <div class="form-floating">
+            <select name="user" class="form-select" id="floatingSelect2" aria-label="Usuario">                
+                <option value="selecione">---Selecione---</option>
+                {{#each users}}
+                <option value="{{nome}}">{{nome}}</option>                
+                {{else}}
+                {{/each}}
+            </select>
+            <label for="floatingSelect">Usuario</label>
+            </div>
+            </td>
+            <td><input type="date" class="form-control" name="dateMin"></td>
+            <td><input type="date" class="form-control" name="dateMax"></td>      
+        </tr>          
+        </tbody> 
+    </table>
+    <button type="submit" class="btn btn-outline-success">Buscar</button>
+</form>
+<hr>
+{{#each dados}} 
+<div class="table-responsive-xl fs-6">  
+      <table class="table table-bordered">
+          <thead class="table-dark">
+            <tr>
+              <th scope="col">Nº</th>
+              <th scope="col">Origem</th>
+              <th scope="col">Destino</th>
+              <th scope="col">Cliente</th>
+              <th scope="col">Empresa</th>
+              <th scope="col">Entrada</th>
+              <th scope="col">Pagamento</th>
+              <th scope="col">Valor</th>
+              <th scope="col">Status </th>
+              <th scope="col">Baixa </th>
+              <th scope="col">#</th>
+            </tr>
+          </thead>          
+            
+          <tbody>
+            <tr>
+              <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
+              <td>{{origem}}</td>
+              <td>{{destino}}</td>
+              <td>{{cliente}}</td>
+              <td>{{empresa}}</td>
+              <td>{{date_entrada}}</td>
+              <td>{{date_pagamento}}</td>
+              <td>{{valor_exib}}</td>
+              <td>{{statusPag}}</td>  
+              <td>{{statusBaixa}}</td>             
+              <td><input type="checkbox" name="id" value="{{_id}}"></td>
+            </tr>    
+          </tbody>  
+          {{else}}                    
+          {{/each}}
+        </table>
