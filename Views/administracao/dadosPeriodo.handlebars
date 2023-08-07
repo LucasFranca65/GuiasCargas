@@ -1,8 +1,11 @@
-<div class="table-responsive-xl">        
-    
-    <table class="table">
+<div  class="table-responsive-xl">        
+    <div id="content">
+    <table  class="table">
+    <p style="font-weight: bold;">Periodo: {{periodo.nome}}</p>
+    <small>Empresa: {{periodo.empresa}}</small><br>
+    <small>Inicio: {{periodo.inicio}}</small><br>
+    <small>Final: {{periodo.final}}</small><br>
     <hr>
-    <p style="font-weight: bold;">Dados do Periodo : {{periodo.nome}}</p>
         <thead class="table-dark">
             <tr>
                 <th scope="col">Agencia</th>
@@ -33,5 +36,20 @@
                     </tr>                                    
                 </tbody>  
         {{/each}}
-        </table>   
+            <tbody>
+                <tr>
+                    <td>Geral</td>
+                    <td>{{TotalGpg}}</td>
+                    <td>{{totalGcc}}</td>
+                    <td>{{TotalGac}}</td>
+                    <td>{{TotalG}}</td>                               
+                    </tr>                                    
+                </tbody>  
+        
+
+        </table>
+        </div>
+        <button onclick="downloadPDF()" class="btn btn-secondary">Imprimir</button>
+        <a href="/administracao/controle"><button class="btn btn-outline-secondary">Voltar</button></a> 
+          
 </div>

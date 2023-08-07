@@ -2,7 +2,7 @@
 
         <form action="/administracao/controle/gerar" method="post">
             <table class="table">
-                <p style="font-weight: bold;" >Criar Controle do Periodo</p>
+                <p style="font-weight: bold;" >Criar Periodo de Controle</p>
                 <thead class="table-dark">
                     <tr>                            
                         <th scope="col">Empresa</th>
@@ -14,7 +14,7 @@
                     <tr>
                         <td>                                
                         <div class="form-floating">
-                            <select name="empresa" class="form-select" id="floatingSelect2" aria-label="Agencia Destino">
+                            <select name="empresa" class="form-select" id="floatingSelect2" aria-label="Agencia Destino" required>
                                 <option value="selecione">---Selecione---</option>
                                 <option value="REGIONAL">REGIONAL</option>
                                 <option value="JAUA">JAUA</option>
@@ -24,13 +24,13 @@
                         </td>
                         <td>
                             <div class="form-floating mb-3">
-                            <input type="number" class="form-control" name="mes" min="01" max="12" placeholder="00">
+                            <input type="number" class="form-control" name="mes" min="01" max="12" placeholder="00" required>
                             <label for="floatingInput">Mês</label>
                             </div>
                         </td>
                         <td>
                             <div class="form-floating mb-3">
-                            <input type="number" class="form-control" min="2000" max="2999" name="ano" placeholder="0000">
+                            <input type="number" class="form-control" min="2000" max="2999" name="ano" placeholder="0000" required>
                             <label for="floatingInput">Ano</label>
                             </div>
                         </td>
@@ -45,7 +45,7 @@
         <form action="/administracao/controle/excluir" method="post">
         <table class="table">
                 <hr>
-                        <p style="font-weight: bold;">Controles Gerados</p>
+                        <p style="font-weight: bold;">Periodos de Controle Gerados</p>
                         <thead class="table-dark">
                             <tr>
                                 <th scope="col">Nome</th>
@@ -58,7 +58,7 @@
                         {{#each periodos}}
                         <tbody>
                             <tr>                                
-                                <td> <a href="/administracao/referencia/{{nome}}">{{nome}}</a></td>
+                                <td> <a href="/administracao/dadosPeriododeControle/{{nome}}">{{nome}}</a></td>
                                 <td>{{empresa}}</td>
                                 <td>{{date_init}}</td>
                                 <td>{{date_fin}}</td>

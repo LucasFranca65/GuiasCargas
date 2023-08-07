@@ -221,7 +221,7 @@ const Controle = mongoose.model('controles')
             res.redirect('/painel')
         })        
     })
-
+    //Rota para cadastrar agencia no banco de dados 
     router.post('/agencias/add_agencia',eAdmin,(req,res)=>{
         let error = []
         if(!req.body.cidade || typeof req.body.cidade == undefined || req.body.cidade == null){
@@ -263,7 +263,7 @@ const Controle = mongoose.model('controles')
             })
         }
     })
-
+    //Rota que exclui agencias selecionadas
     router.post('/agencias/excluir',eAdmin,(req,res)=>{
         if(req.body.ident == undefined){
             req.flash('error_msg',"Nenhuma Agencia Selecionado para exclusão")
@@ -295,14 +295,19 @@ const Controle = mongoose.model('controles')
             res.render('administracao/controle')
         })
     })
-
+    //Rota que gera periodo de controle
     router.post('/controle/gerar',eAdmin,(req,res)=>{
-        let reference = (req.body.empresa+"-"+req.body.mes+"-"+req.body.ano)
+        
+        if(req.body.empresa == "selecione"){
+            req.flash('error_msg',"Selecione uma empresa mês e ano para gerar um periodo de controle")
+            res.redirect('/administracao/controle')
+        }else{
+            let reference = (req.body.empresa+"-"+req.body.mes+"-"+req.body.ano)
         
         Periodo.findOne({nome: reference}).then((periodo)=>{
             if(periodo){
                 console.log(periodo)
-                res.redirect('/administracao/referencia/'+periodo.nome)
+                res.redirect('/administracao/dadosPeriododeControle/'+periodo.nome)
             }else{             
                 let uDia                
                 if(req.body.mes == 2){
@@ -328,7 +333,7 @@ const Controle = mongoose.model('controles')
                 new Periodo(newPeriodo).save().then(()=>{
                     console.log("Periodo "+newPeriodo.nome+" Criado com sucesso")
                     req.flash('success_msg',"Periodo "+newPeriodo.nome+" Criado com sucesso")
-                    res.redirect('/administracao/referencia/'+newPeriodo.nome)                    
+                    res.redirect('/administracao/dadosPeriododeControle/'+newPeriodo.nome)                    
                 }).catch((err)=>{
                     req.flash('error_msg',"Erro ao criar periodo "+err)
                     res.redirect('/administracao/controle')
@@ -336,8 +341,9 @@ const Controle = mongoose.model('controles')
                 
             }
         })
+        }        
     })
-
+    //Rota que exclui periodo de controle e todos os seus dados
     router.post('/controle/excluir',eAdmin,(req,res)=>{
         if(req.body.ident == undefined){
             req.flash('error_msg',"Nenhum Perido Selecionado para exclusão")
@@ -347,38 +353,39 @@ const Controle = mongoose.model('controles')
                     Periodo.find(query).then((periodos)=>{
                         for(var i=0; i<periodos.length; i++){
                             Controle.deleteMany({periodo: periodos[i].nome }).then(()=>{
-                                console.log('Guias do periodo '+periodos[i].nome+'excluidas com sucesso')
+                                console.log('Guias do periodo excluidas com sucesso')
                             }).catch((err)=>{
                                 console.log("Erro ao tentar exluirir controles do periodo: "+err)
                             })
-                        }
-                        Periodo.deleteMany(query).then(()=>{
-                            req.flash('success_msg',"Periodos selecionados excluidos com sucesso, Obs: Todos os controles criados seram excluidos juntamente com o periodo")
-                            res.redirect('/administracao/controle')
-                        }).catch((err)=>{
-                            req.flash('error_msg',"Não foi encontrados periodos para exclusão"+err)
-                            res.redirect('/administracao/controle')
-                        }) 
-                       req.flash('success_msg',"Agencias selecionadas Excluidas com sucesso")
-                       res.redirect('/administracao/controle')
+                        }                        
                    }).catch((err)=>{
                        req.flash('error_msg',"Não foi encontradas agencias para exclusão" +err)
                        res.redirect('/administracao/controle')
                    })
+                    Periodo.deleteMany(query).then(()=>{
+                        req.flash('success_msg',"Periodos selecionados excluidos com sucesso, Obs: Todos os controles criados seram excluidos juntamente com o periodo")
+                        res.redirect('/administracao/controle')
+                    }).catch((err)=>{
+                        req.flash('error_msg',"Não foi encontrados periodos para exclusão"+err)
+                        res.redirect('/administracao/controle')
+                    })                 
            }
     })
+    //Rota que exibe dados do periodo de controle
+    router.get('/dadosPeriododeControle/:nome',eAdmin,(req,res)=>{
 
-    router.get('/referencia/:nome',eAdmin,(req,res)=>{
-        
         Periodo.findOne({nome: req.params.nome}).then((periodo)=>{
+            periodo['inicio'] = moment(periodo.dateInit).format('DD/MM/YYYY')
+            periodo['final'] = moment(periodo.dateFin).format('DD/MM/YYYY')
             Controle.find({periodo: periodo.nome }).then((dados)=>{
-                if(dados.length > 0){
-                    
+                
+                if(dados.length > 0){                    
                     for(let i = 0; i < dados.length; i++){
                         dados[i]["pgExib"] = dados[i].pg.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
                         dados[i]["acExib"] = dados[i].ac.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
                         dados[i]["ccExib"] = dados[i].cc.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
                         dados[i]["totalexib"] = dados[i].total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                        
                     }
                     res.render('administracao/dadosPeriodo',{dados,periodo})
                 }else{
@@ -390,6 +397,7 @@ const Controle = mongoose.model('controles')
                         let totalAc = []
                         let totalCc = []
                         let total = []
+                                               
                         for(let j = 0; j<agencia.length; j ++){                               
                             GuiaCarga.find({dateEntrada: {$gte: dateMin, $lt: dateMax}, statusPag: "PAGO", origem: agencia[j].cidade}).then((guiasPg)=>{                                    
                                 GuiaCarga.find({dateEntrada: {$gte: dateMin, $lt: dateMax}, empresa: empresa, statusPag: "A COBRAR", origem: agencia[j].cidade}).then((guiasAc)=>{                                        
@@ -420,13 +428,13 @@ const Controle = mongoose.model('controles')
                                             dateInit: dateMin,
                                             dateFin: dateMax,
                                             user: req.user.nome
-                                        } 
-                                        console.log(newControle)                                      
-                                            new Controle(newControle).save().then(()=>{
-                                                console.log('Controle da agencia: '+newControle.agencia +' criada com suceso ')
-                                            }).catch((err)=>{
-                                                console.log('Controle da agencia: '+newControle.agencia + ' erro ao criar '+err)    
-                                            })                                   
+                                        }                                        
+                                        //console.log(newControle)                                      
+                                        new Controle(newControle).save().then(()=>{
+                                            console.log('Controle da agencia: '+newControle.agencia +' criada com suceso ')
+                                        }).catch((err)=>{
+                                            console.log('Controle da agencia: '+newControle.agencia + ' erro ao criar '+err)    
+                                        })                                   
                                     }).catch((err)=>{
                                         console.log("Falha ao localizar Guias CONTA CORRENTE para a agencia "+agencia[j].cidade+"Erro: " + err) 
                                     })           
@@ -437,7 +445,7 @@ const Controle = mongoose.model('controles')
                                 console.log("Falha ao localizar Guias PAGAS para a agencia "+agencia[j].cidade+"Erro: " + err)                                 
                             }) 
                         }                            
-                        res.redirect('/administracao/referencia/'+periodo.nome)
+                        res.redirect('/administracao/dadosPeriododeControle/'+periodo.nome)
                         
                     }).catch((err)=>{
                         req.flash('error_msg',"Falha ao localizar agencias" + err)

@@ -3,7 +3,8 @@ const { default: mongoose, model } = require('mongoose')
 const router = express.Router()
 const moment = require('moment')
 const {lOgado} = require('../helpers/eAdmin')
-
+const { route } = require('./rotasAdministrador')
+const pdf = require('html-pdf')
 //Mongoose Models
 require('../Models/User')
 const User = mongoose.model('users')
