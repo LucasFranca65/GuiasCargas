@@ -1,13 +1,16 @@
 const express = require('express')
-const { default: mongoose } = require('mongoose')
+const { default: mongoose, model } = require('mongoose')
 const router = express.Router()
+const moment = require('moment')
+const {lOgado} = require('../helpers/eAdmin')
+
+//Mongoose Models
 require('../Models/User')
 const User = mongoose.model('users')
 require('../Models/GuiaCarga')
 const GuiaCarga = mongoose.model('guiascargas')
-const moment = require('moment')
-const {lOgado} = require('../helpers/eAdmin')
-
+require('../Models/Agencia')
+const Agencia = mongoose.model('agencias')
 
 router.get('/por_empresa',lOgado,(req,res)=>{
     res.render('consultasRelatorios/porEmpresa')
@@ -57,6 +60,7 @@ router.get('/por_usuario',lOgado,(req,res)=>{
     })
     
 })
+
 router.post('/por_usuario/pesquisar',lOgado,(req,res)=>{
        
     var dateMax = moment(req.body.dateMax).format("YYYY-MM-DDT23:59:59.SSSZ")
@@ -94,7 +98,20 @@ router.post('/por_usuario/pesquisar',lOgado,(req,res)=>{
 })
 
 router.get('/comissao',lOgado,(req,res)=>{
+    Agencia.find().then((agencias)=>{
+        let i = 0
+        while(agencias.length){
+            GuiaCarga.find({origem: agencias[i].nome}).then((guias)=>{
+                console.log(guias)
+            })
+        }
+    }).catch((err)=>{
+        req.flash('error_msg',"Erro ao carregar agencias"+err)
+        res.redirect('/painel')
+    })
+        
     
+
     res.render('consultasRelatorios/comissao')   
     
 })

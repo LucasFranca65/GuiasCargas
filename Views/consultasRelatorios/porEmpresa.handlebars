@@ -29,7 +29,7 @@
     <button type="submit" class="btn btn-outline-success">Buscar</button>
 </form>
 <hr>
-{{#each dados}} 
+
 <div class="table-responsive-xl fs-6">  
       <table class="table table-bordered">
           <thead class="table-dark">
@@ -47,7 +47,7 @@
               <th scope="col">#</th>
             </tr>
           </thead>          
-            
+         {{#each dados}}    
           <tbody>
             <tr>
               <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>

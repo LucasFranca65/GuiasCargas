@@ -9,8 +9,8 @@ const {lOgado} = require('../helpers/eAdmin')
 
 //Painel principal das guias
 router.get('/',lOgado,(req,res)=>{
-    GuiaCarga.find({empresa:'REGIONAL', statusPag:'A COBRAR' }).sort({dateEntrada: 1}).then((guiReg)=>{
-        GuiaCarga.find({empresa:'JAUA', statusPag:'A COBRAR' }).then((guiJau)=>{
+    GuiaCarga.find({empresa:'REGIONAL', baixa: false }).limit(30).sort({dateEntrada: 1}).then((guiReg)=>{
+        GuiaCarga.find({empresa:'JAUA', baixa: false }).limit(30).sort({dateEntrada: 1}).then((guiJau)=>{
             let i=0
             let totalReg = 0, totalJau = 0
             
@@ -19,6 +19,11 @@ router.get('/',lOgado,(req,res)=>{
                 guiReg[i]["date_pagamento"] = moment(guiReg[i].datePagamento).format('DD/MM/YYYY')
                 guiReg[i]["valor_exib"] = guiReg[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
                 totalReg = totalReg + guiReg[i].valor
+                if(guiReg[i].baixa == true){
+                    guiReg[i]["statusBaixa"] = "BAIXADO"
+                }else{
+                    guiReg[i]["statusBaixa"] = "PENDENTE"
+                }                
                 i++                
             }
             i=0
@@ -27,6 +32,11 @@ router.get('/',lOgado,(req,res)=>{
                 guiJau[i]["date_pagamento"] = moment(guiJau[i].datePagamento).format('DD/MM/YYYY')
                 guiJau[i]["valor_exib"]= guiJau[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
                 totalJau = totalJau + guiJau[i].valor
+                if(guiJau[i].baixa == true){
+                    guiJau[i]["statusBaixa"] = "BAIXADO"
+                }else{
+                    guiJau[i]["statusBaixa"] = "PENDENTE"
+                } 
                 i++
             }
             totalReg = totalReg.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })

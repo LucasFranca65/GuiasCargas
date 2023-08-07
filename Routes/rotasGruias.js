@@ -2,33 +2,40 @@ const express = require('express')
 const router = express.Router()
 const mongoose = require('mongoose')
 const moment = require('moment')
-require('../Models/GuiaCarga')
-const GuiaCarga = mongoose.model('guiascargas')
 const flash = require('connect-flash')
 const {lOgado} = require('../helpers/eAdmin')
 
+//Models
+require('../Models/GuiaCarga')
+const GuiaCarga = mongoose.model('guiascargas')
+require('../Models/Agencia')
+const Agencia = mongoose.model('agencias')
 
 //Painel principal das guias
 router.get('/',lOgado,(req,res)=>{
-    
-    GuiaCarga.find().limit(20).sort({date: 1}).then((guias)=>{
-        var i=0
-        while(i < guias.length){                   
-            guias[i]["date_entrada"] = moment(guias[i].dateEntrada).format('DD/MM/YYYY')
-            guias[i]["date_pagamento"] = moment(guias[i].datePagamento).format('DD/MM/YYYY')
-            if(guias[i].baixa==true){
-                guias[i]["statusBaixa"] = "BAIXADO"
-            }else{
-                guias[i]["statusBaixa"] = "PENDENTE"
+    Agencia.find().sort({cidade: 1}).then((agencias)=>{
+        GuiaCarga.find().limit(20).sort({date: 1}).then((guias)=>{
+            var i=0
+            while(i < guias.length){                   
+                guias[i]["date_entrada"] = moment(guias[i].dateEntrada).format('DD/MM/YYYY')
+                guias[i]["date_pagamento"] = moment(guias[i].datePagamento).format('DD/MM/YYYY')
+                if(guias[i].baixa==true){
+                    guias[i]["statusBaixa"] = "BAIXADO"
+                }else{
+                    guias[i]["statusBaixa"] = "PENDENTE"
+                }
+                i++
             }
-            i++
-        }
-        res.render('guiasDeCargas/index',{guias})
+            res.render('guiasDeCargas/index',{guias,agencias})
+        }).catch((err)=>{
+            console.log("erros ao caregar guias, ERRO: ",err)
+            res.render('guiasDeCargas/index')
+        })
+        
     }).catch((err)=>{
         console.log("erros ao caregar guias, ERRO: ",err)
         res.render('guiasDeCargas/index')
     })
-    
 })
 
 //Rota de adição de guia
@@ -117,14 +124,25 @@ router.post('/adicionar',lOgado,(req,res)=>{
 //Rotas de edição de guia
     //Selecionando guia
     router.get('/selectEdit/:id',lOgado,(req,res)=>{
-        GuiaCarga.findOne({_id: req.params.id}).then((guia)=>{        
-            guia["date_entrada"] = moment(guia.dateEntrada).format('YYYY-MM-DD')
-            guia["date_pagamento"] = moment(guia.datePagamento).format('YYYY-MM-DD')
-            res.render('guiasDeCargas/vizualizar',{guia})
+
+        Agencia.find().sort({cidade: 1}).then((agencias)=>{        
+            GuiaCarga.findOne({_id: req.params.id}).then((guia)=>{        
+                guia["date_entrada"] = moment(guia.dateEntrada).format('YYYY-MM-DD')
+                guia["date_pagamento"] = moment(guia.datePagamento).format('YYYY-MM-DD')
+                if(guia.baixa == true){
+                    guia["check"] = "checked"
+                }
+                res.render('guiasDeCargas/vizualizar',{guia,agencias})
+            }).catch((err)=>{
+                req.flash('error_msg',"Guia não encontrada "+err)
+                res.redirect('/guias')
+            })
         }).catch((err)=>{
-            req.flash('error_msg',"Guia não encontrada "+err)
+            req.flash('error_msg',"Falha ao carregar agencias"+err)
             res.redirect('/guias')
         })
+        
+        
         
     })
     //Editando Guia
@@ -156,36 +174,55 @@ router.post('/adicionar',lOgado,(req,res)=>{
                 erro.push({text: "Data de Pagamento iinformada é invalida"})
             }
             if(erro.length > 0){
-                GuiaCarga.find().limit(20).sort({date: 1}).then((guias)=>{
-                    var i=0
-                    while(i < guias.length){                   
-                    guias[i]["date_entrada"] = moment(guias[i].dateEntrada).format('DD/MM/YYYY')
-                    guias[i]["date_pagamento"] = moment(guias[i].datePagamento).format('DD/MM/YYYY')
-                    i++
-                    }
-                    res.render('guiasDeCargas/index',{guias, erro})
+                Agencia.find().sort({cidade: 1}).then((agencias)=>{
+                    GuiaCarga.find().limit(20).sort({date: 1}).then((guias)=>{
+                        var i=0
+                        while(i < guias.length){                   
+                            guias[i]["date_entrada"] = moment(guias[i].dateEntrada).format('DD/MM/YYYY')
+                            guias[i]["date_pagamento"] = moment(guias[i].datePagamento).format('DD/MM/YYYY')
+                            if(guias[i].baixa==true){
+                                guias[i]["statusBaixa"] = "BAIXADO"
+                            }else{
+                                guias[i]["statusBaixa"] = "PENDENTE"
+                            }
+                            i++
+                        }
+                        res.render('guiasDeCargas/index',{guias,agencias,erro})
+                    }).catch((err)=>{
+                        console.log("erros ao caregar guias, ERRO: ",err)
+                        res.render('guiasDeCargas/index')
+                    })
+                    
                 }).catch((err)=>{
                     console.log("erros ao caregar guias, ERRO: ",err)
-                        res.render('guiasDeCargas/index')
-                    })                
+                    res.render('guiasDeCargas/index')
+                })                
             }else{
+                let baixa                    
+                    if(req.body.baixa == "true"){
+                        baixa = true
+                    }else{
+                        baixa = false
+                    }
+                
                 GuiaCarga.findOne({_id: req.body.id}).then((guia)=>{
-                        
-                    guia.origem=req.body.origem,
-                    guia.destino= req.body.destino,
-                    guia.cliente= req.body.cliente,
-                    guia.empresa= req.body.empresa,
-                    guia.baixa=req.body.baixa,
-                    guia.dateEntrada= moment(req.body.dateEntrada).format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
-                    guia.datePagamento= moment(req.body.datePagamento).format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
-                    guia.valor= req.body.valor,
-                    guia.statusPag= req.body.statusPagamento
+                    
+                    guia.user = req.user.nome,
+                    guia.origem = req.body.origem,
+                    guia.destino = req.body.destino,
+                    guia.cliente = req.body.cliente,
+                    guia.empresa = req.body.empresa,
+                    guia.baixa = baixa,
+                    guia.dateEntrada = moment(req.body.dateEntrada).format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
+                    guia.datePagamento = moment(req.body.datePagamento).format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
+                    guia.valor = req.body.valor,
+                    guia.statusPag = req.body.statusPagamento
 
                 guia.save().then(()=>{
                     req.flash('success_msg',"Edição da Guia Realizada com sucesso")
                     res.redirect('/guias/selectEdit/'+guia._id)
                 }).catch((err)=>{
-                    req.flash('error_msg',"Erro ao realizar a Edição da Categoria")
+                    req.flash('error_msg',"Erro ao realizar a Edição da Guia"+ err)
                     res.redirect('/guias/selectEdit/'+guia._id)
                 })
                         

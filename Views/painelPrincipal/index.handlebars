@@ -16,7 +16,7 @@
 <div class="tab-content" id="myTabContent">
   <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
       <h3 class="mt-4">Viação Regional</h3>
-      <p>Total Pendente: {{totalReg}} </p>
+      <p>30 Guias mais antigas com pendencia de baixa</p>
     <div class="table-responsive-xl ">  
       <table class="table table-bordered fs-6">
           <thead class="table-dark">
@@ -24,12 +24,12 @@
               <th scope="col">Nº</th>
               <th scope="col">Origem</th>
               <th scope="col">Destino</th>
-              <th scope="col">Cliente</th>
               <th scope="col">Empresa</th>
               <th scope="col">Entrada</th>
               <th scope="col">Pagamento</th>
               <th scope="col">Valor</th>
-              <th scope="col">Status </th>
+              <th scope="col">Cond Pagamento</th>
+              <th scope="col">Baixa</th>
               <th scope="col">#</th>
             </tr>
           </thead>
@@ -39,25 +39,24 @@
             <tr>
               <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
               <td>{{origem}}</td>
-              <td>{{destino}}</td>
-              <td>{{cliente}}</td>
+              <td>{{destino}}</td>              
               <td>{{empresa}}</td>
               <td>{{date_entrada}}</td>
               <td>{{date_pagamento}}</td>
               <td>{{valor_exib}}</td>
               <td>{{statusPag}}</td>
-              <form action="/guias/excluir" method="get"></form>
+              <td>{{statusBaixa}}</td>
+              <form action="/guias/baixar" method="get"></form>
               <td><input type="checkbox" name="id" value="{{_id}}"></td>
             </tr>    
           </tbody>  
           {{else}}
           <tbody>
             <p>Não existem guias pendentes de pagamento</p>
-          </tbody>
-          
+          </tbody>          
           {{/each}}
         </table>
-        <button class="btn btn-sm btn-outline-danger" type="submit">Excluir Selecionados</button>
+        <button class="btn btn-sm btn-outline-danger" type="submit">Baixar Selecionados</button>
       </form>
     </div>
 
@@ -65,7 +64,7 @@
 
   <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
     <h3 class="mt-4">Viação Jaua</h3>
-    <p>Total Pendente: {{totalJau}} </p>
+    <p>30 Guias mais antigas com pendencia de baixa</p>
     <div class="table-responsive-xl fs-6">  
       <table class="table table-bordered">
           <thead class="table-dark">
@@ -73,28 +72,29 @@
               <th scope="col">Nº</th>
               <th scope="col">Origem</th>
               <th scope="col">Destino</th>
-              <th scope="col">Cliente</th>
               <th scope="col">Empresa</th>
               <th scope="col">Entrada</th>
               <th scope="col">Pagamento</th>
               <th scope="col">Valor</th>
-              <th scope="col">Status </th>
+              <th scope="col">Cond Pagamento</th>
+              <th scope="col">Baixa</th>
               <th scope="col">#</th>
             </tr>
           </thead>
-          <form action="/administracao/guias/excluir" method="get"></form>
+          
           {{#each guiJau}}   
           <tbody>
             <tr>
               <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
               <td>{{origem}}</td>
-              <td>{{destino}}</td>
-              <td>{{cliente}}</td>
+              <td>{{destino}}</td>              
               <td>{{empresa}}</td>
               <td>{{date_entrada}}</td>
               <td>{{date_pagamento}}</td>
               <td>{{valor_exib}}</td>
-              <td>{{statusPag}}</td>              
+              <td>{{statusPag}}</td>
+              <td>{{statusBaixa}}</td>
+              <form action="/guias/baixar" method="get"></form>
               <td><input type="checkbox" name="id" value="{{_id}}"></td>
             </tr>    
           </tbody>  
@@ -105,7 +105,7 @@
           
           {{/each}}
         </table>
-        <button class="btn btn-sm btn-outline-danger" type="submit">Excluir Selecionados</button>
+        <button class="btn btn-sm btn-outline-danger" type="submit">Baixar Selecionados</button>
       </form>
     </div>
   </div>

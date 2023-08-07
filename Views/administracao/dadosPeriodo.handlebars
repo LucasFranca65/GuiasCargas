@@ -1,0 +1,37 @@
+<div class="table-responsive-xl">        
+    
+    <table class="table">
+    <hr>
+    <p style="font-weight: bold;">Dados do Periodo : {{periodo.nome}}</p>
+        <thead class="table-dark">
+            <tr>
+                <th scope="col">Agencia</th>
+                <th scope="col">Total Pago</th>
+                <th scope="col">Total C Corrente</th>
+                <th scope="col">Total A Cobrar</th> 
+                <th scope="col">Total</th>                                                                                               
+            </tr>
+        </thead>
+        {{#each dados}}
+        <tbody>
+            <tr>                                
+                <td>{{agencia}}</td>
+                <td>{{pgExib}}</td>
+                <td>{{ccExib}}</td>
+                <td>{{acExib}}</td>
+                <td>{{totalexib}}</td>                                                      
+            </tr>                                    
+            </tbody>                                        
+        {{else}}            
+            <tbody>
+                <tr>
+                    <td>---</td>
+                    <td>---</td>
+                    <td>---</td>
+                    <td>---</td>
+                    <td>---</td>                               
+                    </tr>                                    
+                </tbody>  
+        {{/each}}
+        </table>   
+</div>
