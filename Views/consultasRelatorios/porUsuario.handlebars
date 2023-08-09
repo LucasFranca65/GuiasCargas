@@ -1,4 +1,4 @@
-<form action="/consultas/por_usuario/pesquisar" method="POST" >
+<form action="/consultas/por_usuario/pesquisar" method="get">
   <h3>Guias lançadas por Usuario</h3>
     <div class="table-responsive-xl">
     <table class="table">
@@ -13,7 +13,7 @@
             <tbody>
             <td>
             <div class="form-floating">
-            <select name="user" class="form-select" id="floatingSelect2" aria-label="Usuario">                
+            <select name="usuario" class="form-select" id="floatingSelect2" aria-label="Usuario">                
                 <option value="selecione">---Selecione---</option>
                 {{#each users}}
                 <option value="{{nome}}">{{nome}}</option>                
@@ -37,6 +37,7 @@
           <thead class="table-dark">
             <tr>
               <th scope="col">Nº</th>
+              <th scope="col">Conhen.</th>
               <th scope="col">Origem</th>
               <th scope="col">Destino</th>
               <th scope="col">Cliente</th>
@@ -68,3 +69,14 @@
           {{else}}                    
           {{/each}}
         </table>
+        <nav aria-label="Page navigation example">
+          <ul class="pagination justify-content-center">
+            <li class="page-item {{prev}}">
+              <a class="page-link " href="/consultas/por_usuario/pesquisar?usuario={{prevUrl.user}}&dateMin={{prevUrl.dmin}}&dateMax={{prevUrl.dmax}}&offset={{prevUrl.ofst}}&page={{prevUrl.pag}}">Anterior</a>
+            </li>
+            <li class="page-item"><a class="page-link">-- {{page}} --</a></li>
+            <li class="page-item {{next}}">
+              <a class="page-link " href="/consultas/por_usuario/pesquisar?agencia={{nextUrl.user}}&dateMin={{nextUrl.dmin}}&dateMax={{nextUrl.dmax}}&offset={{nextUrl.ofst}}&page={{nextUrl.pag}}">Proximo</a>
+            </li>
+          </ul>
+        </nav>

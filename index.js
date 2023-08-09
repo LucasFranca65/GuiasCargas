@@ -86,10 +86,10 @@ require('./config/alth')(passport)
    app.get('/',(req,res)=>{
     res.redirect('/validation')
    })
-   app.use((req,res,next)=>{
+   /*app.use((req,res,next)=>{
     req.flash('error_msg',"Algo deu errado, Pagina não encontrada")
     res.redirect('/error')
-})
+    })*/
 
 //Outros
 app.listen(PORT,()=>{
