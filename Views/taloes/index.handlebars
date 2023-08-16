@@ -1,0 +1,108 @@
+<div style="padding: ;">
+{{#each erro}}
+    <div class="alert alert-danger">{{text}}</div>
+{{else}}
+{{/each}}
+<form action="/talao/adicionar" method="POST" >
+  <h3>Adicionar Talões</h3>
+<div class="table-responsive-xl">
+  <table class="table">
+    <thead class="table-dark">
+      <tr>
+        <th scope="col">NºControle</th>
+        <th scope="col">Empresa</th>
+        <th scope="col">Agencia</th>
+        <th scope="col">Nº Inicial</th>
+        <th scope="col">Nº Final</th>
+      </tr>
+    </thead>  
+    <tbody>
+      <tr>
+        <td>
+          <div class="form-floating mb-3">
+          <p>Nº de Controle</p>
+          <p>{{numCont}}</p>
+          <input type="hidden" name="numCont" value="{{numCont}}">          
+          </div>
+        </td>
+        
+        <td>
+          <div class="form-floating">
+          <select name="empresa" class="form-select" id="floatingSelect2" aria-label="Agencia Destino">
+            <option value="selecione">---Selecione---</option>
+            <option value="REGIONAL">REGIONAL</option>
+            <option value="JAUA">JAUA</option>
+          </select>
+          <label for="floatingSelect">Empresa</label>
+          </div>
+        </td>
+        
+        <td>
+          <div class="form-floating">
+          <select name="agencia" class="form-select" id="floatingSelect" aria-label="Agencia Origem">        
+            <option value="selecione">---Selecione---</option>
+            {{#each agencias}}
+            <option value="{{cidade}}">{{cidade}}-{{uf}}</option>
+            {{else}}
+            {{/each}}                              
+          </select>
+          <label for="floatingSelect">Agencia</label> 
+          </div>
+        </td>
+
+        <td>
+          <div class="form-floating mb-3">
+          <input type="number" class="form-control" name="numInit" min="10000" max="99999" placeholder="00000">
+          <label for="floatingInput">Número Inicial</label>
+          </div>
+        </td>
+
+        <td>
+          <div class="form-floating mb-3">
+          <input type="number" class="form-control" name="numFin" min="10000" max="99999" placeholder="00000">
+          <label for="floatingInput">Número Final</label>
+          </div>
+        </td>  
+
+      </tr>          
+    </tbody> 
+  </table>
+
+  <button class="btn btn-secondary" type="submit">Gravar</button>
+  <button class="btn btn-outline-secondary" type="reset">Limpar</button>
+</form>
+<hr>
+<h3>Taloes Cadastraddos</h3>
+<div class="table-responsive-xl">  
+    <table class="table table-bordered fs-6">
+      <thead class="table-dark">
+        <tr>
+        <th scope="col">Nº</th>
+        <th scope="col">Empresa</th>
+        <th scope="col">Agencia</th>
+        <th scope="col">Nº Inicial</th>
+        <th scope="col">Nº Final</th>
+        <th scope="col">Cadastro</th>
+        <th scope="col">#</th>
+      </tr>
+      </thead>
+      <form action="/talao/excluir" method="get">
+      {{#each taloes}}   
+      <tbody>
+        <tr>
+          <th scope="row"><a href="/talao/guias?ident={{_id}}">{{numeroControle}}</a></th>
+          <td>{{empresa}}</td>
+          <td>{{agencia}}</td>
+          <td>{{numeroInicial}}</td>
+          <td>{{numeroFinal}}</td>
+          <td>{{date_exib}}</td>
+          <td><input type="checkbox" name="ident" value="{{_id}}"></td>
+        </tr>    
+      </tbody>  
+      {{else}}
+      {{/each}}
+    </table>
+    <button class="btn btn-sm btn-outline-danger" type="submit">Excluir Selecionados</button>
+  </form>
+</div>
+</div>

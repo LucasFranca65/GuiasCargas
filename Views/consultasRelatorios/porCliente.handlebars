@@ -51,11 +51,11 @@
         <nav aria-label="Page navigation example">
             <ul class="pagination justify-content-center">
             <li class="page-item {{prev}}">
-                <a class="page-link " href="/consultas/por_agencia/pesquisar?cliente={{prevUrl.client}}&dateMin={{prevUrl.dmin}}&dateMax={{prevUrl.dmax}}&offset={{prevUrl.ofst}}&page={{prevUrl.pag}}">Anterior</a>
+                <a class="page-link " href="/consultas/por_cliente/pesquisar?cliente={{prevUrl.client}}&offset={{prevUrl.ofst}}&page={{prevUrl.pag}}">Anterior</a>
             </li>
             <li class="page-item"><a class="page-link">-- {{page}} --</a></li>
             <li class="page-item {{next}}">
-                <a class="page-link " href="/consultas/por_agencia/pesquisar?cliente={{nextUrl.client}}&offset={{nextUrl.ofst}}&page={{nextUrl.pag}}">Proximo</a>
+                <a class="page-link " href="/consultas/por_cliente/pesquisar?cliente={{nextUrl.client}}&offset={{nextUrl.ofst}}&page={{nextUrl.pag}}">Proximo</a>
             </li>
             </ul>
         </nav>

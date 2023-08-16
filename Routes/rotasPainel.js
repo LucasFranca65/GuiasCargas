@@ -9,6 +9,7 @@ const {lOgado} = require('../helpers/eAdmin')
 
 //Painel principal das guias
 router.get('/',lOgado,(req,res)=>{
+
     GuiaCarga.find({empresa:'REGIONAL', baixa: false }).limit(30).sort({dateEntrada: 1}).then((guiReg)=>{
         GuiaCarga.find({empresa:'JAUA', baixa: false }).limit(30).sort({dateEntrada: 1}).then((guiJau)=>{
             let i=0
@@ -49,8 +50,7 @@ router.get('/',lOgado,(req,res)=>{
     }).catch((err)=>{
         req.flash('error_msg',"Erro interno 003 "+err)
         res.redirect('/error')
-    })
-        
+    })        
 })
 
 module.exports = router

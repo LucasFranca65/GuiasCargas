@@ -18,7 +18,8 @@ router.get('/',(req,res)=>{
             const novoInfo = new System({
                 firt_conection: moment(new Date()).format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
                 version: "V1.1",
-                by: "Lucas Oliveira França"
+                by: "Lucas Oliveira França",
+                nTalao: 0
             })
     
             novoInfo.save().then(()=>{

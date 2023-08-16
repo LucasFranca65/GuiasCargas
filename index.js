@@ -20,6 +20,7 @@ require('./config/alth')(passport)
     const painel = require('./Routes/rotasPainel')
     const consultas=require('./Routes/rotasConsultas')
     const users = require('./Routes/rotasUsuarios')
+    const talao = require('./Routes/rotasTaloes')
 //Configurações
 
     //Sessão
@@ -80,16 +81,17 @@ require('./config/alth')(passport)
    app.use('/painel',painel)
    app.use('/consultas',consultas)
    app.use('/user',users)
+   app.use('/talao',talao)
    app.get('/error',(req,res)=>{
     res.render('404')
    })
    app.get('/',(req,res)=>{
     res.redirect('/validation')
    })
-   /*app.use((req,res,next)=>{
+   app.use((req,res,next)=>{
     req.flash('error_msg',"Algo deu errado, Pagina não encontrada")
     res.redirect('/error')
-    })*/
+    })
 
 //Outros
 app.listen(PORT,()=>{

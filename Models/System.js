@@ -14,6 +14,10 @@ const System = new Schema({
     by:{
         type: String,
         required: true
+    },
+    nTalao:{
+        type: Number,
+        required: true
     }
 
 })

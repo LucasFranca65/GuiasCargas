@@ -13,6 +13,7 @@ const GuiaCarga = mongoose.model('guiascargas')
 require('../Models/Agencia')
 const Agencia = mongoose.model('agencias')
 
+//BUSCA POR EMPRESA 
 router.get('/por_empresa',lOgado,(req,res)=>{
     let next="disabled", prev="disabled"
     res.render('consultasRelatorios/porEmpresa',{next,prev})
@@ -54,7 +55,7 @@ router.get('/por_empresa/pesquisar',lOgado,(req,res)=>{
                 if(page == 1){
                     prev = "disabled"
                 }
-                if(dados.length<limit){
+                if(dados.length<=limit){
                     next = "disabled"
                 }
                 var nextUrl = {
@@ -80,7 +81,11 @@ router.get('/por_empresa/pesquisar',lOgado,(req,res)=>{
                     dados[i]["n"] = (i+1)+offset
                     if(dados[i].baixa==true){
                         dados[i]["statusBaixa"] = "BAIXADO"
-                    }else{
+                    }
+                    if(dados[i].statusPag= "CANCELADO"){
+                        dados[i]["statusBaixa"] = "CANCELADO"
+                    }
+                    else{
                         dados[i]["statusBaixa"] = "PENDENTE"
                     }
                     i++                      
@@ -94,7 +99,7 @@ router.get('/por_empresa/pesquisar',lOgado,(req,res)=>{
         })
     }
 })
-
+//BUSCA POR USUARIO
 router.get('/por_usuario',lOgado,(req,res)=>{
     let next="disabled", prev="disabled"
     User.find().then((users)=>{
@@ -105,7 +110,6 @@ router.get('/por_usuario',lOgado,(req,res)=>{
     })
     
 })
-
 router.get('/por_usuario/pesquisar',lOgado,(req,res)=>{
     var {usuario ,dateMin , dateMax, offset, page} = req.query
     console.log(usuario ,dateMin , dateMax, offset, page)
@@ -143,7 +147,7 @@ router.get('/por_usuario/pesquisar',lOgado,(req,res)=>{
                 if(page == 1){
                     prev = "disabled"
                 }
-                if(dados.length<limit){
+                if(dados.length<=limit){
                     next = "disabled"
                 }                
                 if(dados.length == 0){
@@ -173,7 +177,11 @@ router.get('/por_usuario/pesquisar',lOgado,(req,res)=>{
                     dados[i]["n"] = (i+1)+offset
                     if(dados[i].baixa==true){
                         dados[i]["statusBaixa"] = "BAIXADO"
-                    }else{
+                    }
+                    if(dados[i].statusPag= "CANCELADO"){
+                        dados[i]["statusBaixa"] = "CANCELADO"
+                    }
+                    else{
                         dados[i]["statusBaixa"] = "PENDENTE"
                     }
                     i++                      
@@ -188,26 +196,7 @@ router.get('/por_usuario/pesquisar',lOgado,(req,res)=>{
         })
     }
 })
-
-router.get('/comissao',lOgado,(req,res)=>{
-    Agencia.find().then((agencias)=>{
-        let i = 0
-        while(agencias.length){
-            GuiaCarga.find({origem: agencias[i].nome}).then((guias)=>{
-                console.log(guias)
-            })
-        }
-    }).catch((err)=>{
-        req.flash('error_msg',"Erro ao carregar agencias"+err)
-        res.redirect('/painel')
-    })
-        
-    
-
-    res.render('consultasRelatorios/comissao')   
-    
-})
-
+//BUSCA POR AGENCIA
 router.get('/por_agencia',lOgado,(req,res)=>{
     let next="disabled", prev="disabled"
     Agencia.find().sort({cidade: 1}).then((agencias)=>{
@@ -218,7 +207,6 @@ router.get('/por_agencia',lOgado,(req,res)=>{
     })
     
 })
-
 router.get('/por_agencia/pesquisar',lOgado,(req,res)=>{    
     let error =[]   
     var {agencia ,dateMin , dateMax, offset, page} = req.query
@@ -266,7 +254,7 @@ router.get('/por_agencia/pesquisar',lOgado,(req,res)=>{
                 if(page == 1){
                     prev = "disabled"
                 }
-                if(dados.length<limit){
+                if(dados.length<=limit){
                     next = "disabled"
                 }
                 var nextUrl = {
@@ -296,7 +284,11 @@ router.get('/por_agencia/pesquisar',lOgado,(req,res)=>{
                         dados[i]["n"] = (i+1)+offset
                         if(dados[i].baixa==true){
                             dados[i]["statusBaixa"] = "BAIXADO"
-                        }else{
+                        }
+                        if(dados[i].statusPag= "CANCELADO"){
+                            dados[i]["statusBaixa"] = "CANCELADO"
+                        }
+                        else{
                             dados[i]["statusBaixa"] = "PENDENTE"
                         }
                         i++                      
@@ -314,12 +306,11 @@ router.get('/por_agencia/pesquisar',lOgado,(req,res)=>{
         })
     }
 })
-
+//BUSCA POR CLIENTE
 router.get('/por_cliente',lOgado,(req,res)=>{
     let next="disabled", prev="disabled"    
     res.render('consultasRelatorios/porCliente',{next, prev}) 
 })
-
 router.get('/por_cliente/pesquisar',lOgado,(req,res)=>{    
     var {cliente, offset, page} = req.query
     const limit = 20
@@ -350,7 +341,7 @@ router.get('/por_cliente/pesquisar',lOgado,(req,res)=>{
         if(page == 1){
             prev = "disabled"
         }
-        if(dados.length<limit){
+        if(dados.length<=limit){
             next = "disabled"
         }
         var nextUrl = {
@@ -360,8 +351,8 @@ router.get('/por_cliente/pesquisar',lOgado,(req,res)=>{
         }
         var prevUrl = {
             client: cliente,            
-            ofst: offset+limit,
-            pag: page+1,                    
+            ofst: offset-limit,
+            pag: page-1,                    
         }
         
         if(dados.length < 1){
@@ -376,7 +367,11 @@ router.get('/por_cliente/pesquisar',lOgado,(req,res)=>{
                 dados[i]["n"] = (i+1)+offset
                 if(dados[i].baixa==true){
                     dados[i]["statusBaixa"] = "BAIXADO"
-                }else{
+                }
+                if(dados[i].statusPag= "CANCELADO"){
+                    dados[i]["statusBaixa"] = "CANCELADO"
+                }
+                else{
                     dados[i]["statusBaixa"] = "PENDENTE"
                 }
                 i++                      
@@ -392,5 +387,23 @@ router.get('/por_cliente/pesquisar',lOgado,(req,res)=>{
 
 })
 
+router.get('/comissao',lOgado,(req,res)=>{
+    Agencia.find().then((agencias)=>{
+        let i = 0
+        while(agencias.length){
+            GuiaCarga.find({origem: agencias[i].nome}).then((guias)=>{
+                console.log(guias)
+            })
+        }
+    }).catch((err)=>{
+        req.flash('error_msg',"Erro ao carregar agencias"+err)
+        res.redirect('/painel')
+    })
+        
+    
+
+    res.render('consultasRelatorios/comissao')   
+    
+})
 
 module.exports = router
