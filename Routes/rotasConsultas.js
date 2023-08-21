@@ -311,6 +311,7 @@ router.get('/por_cliente',lOgado,(req,res)=>{
     let next="disabled", prev="disabled"    
     res.render('consultasRelatorios/porCliente',{next, prev}) 
 })
+
 router.get('/por_cliente/pesquisar',lOgado,(req,res)=>{    
     var {cliente, offset, page} = req.query
     const limit = 20

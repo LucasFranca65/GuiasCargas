@@ -146,7 +146,7 @@ router.post('/adicionar',lOgado,(req,res)=>{
         
     })
     //Editando Guia
-    router.post('/editar',lOgado,(req,res)=>{
+    router.patch('/editar',lOgado,(req,res)=>{
         let erro = []        
            
             if(req.body.origem == "selecione"){
