@@ -13,7 +13,8 @@
                         <th scope="col">Número</th>
                         <th scope="col">UF</th>
                         <th scope="col">Cidade</th>
-                        <th scope="col">Empresa</th>                                                       
+                        <th scope="col">Empresa</th>
+                        <th scope="col">Comissão %</th>                                                        
                     </tr>
                 </thead>
                 <tbody>
@@ -21,6 +22,7 @@
                         <td>
                             <input class="form-control" type="number" name="numero">
                         </td>
+
                         <td>
                             <div class="form-floating">
                             <select name="uf" class="form-select" id="floatingSelect2" aria-label="uf">
@@ -56,9 +58,11 @@
                             <label for="floatingSelect">UF</label>
                             </div>
                         </td>
+                        
                         <td>
                             <input class="form-control" type="text" name="cidade">
                         </td>                        
+                        
                         <td>
                             <div class="form-floating">
                             <select name="empresa" class="form-select" id="floatingSelect2" aria-label="empresa">
@@ -68,6 +72,10 @@
                             </select>
                             <label for="floatingSelect">Empresa</label>
                             </div>
+                        </td>
+
+                        <td>
+                            <input class="form-control" type="number" name="indice">
                         </td>                        
                     </tr>                                    
                 </tbody>
@@ -87,7 +95,8 @@
                                 <th scope="col">Número</th>
                                 <th scope="col">UF</th>
                                 <th scope="col">Cidade</th>
-                                <th scope="col">Empresa</th>                                                            
+                                <th scope="col">Empresa</th>
+                                <th scope="col">Comissão</th>                                                            
                             </tr>
                         </thead>
                         {{#each agencias}}
@@ -97,7 +106,8 @@
                                 <td>{{numero}}</td>
                                 <td>{{uf}}</td>
                                 <td>{{cidade}}</td>
-                                <td>{{empresa}}</td>                                
+                                <td>{{empresa}}</td> 
+                                <td>{{#if indiceComissao}}{{indiceComissao}}%{{else}}{{/if}}</td>                               
                             </tr>                                    
                         </tbody>                                        
                         {{else}}            

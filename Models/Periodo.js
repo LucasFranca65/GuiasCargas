@@ -21,6 +21,14 @@ const Periodo = new Schema({
     date:{
         type: Date,
         default: new Date()
+    },
+    comissao: {
+        type: Boolean,
+        default: false
+    },
+    totalComiss:{
+        type: Number,
+        default: 0
     }
     
 })

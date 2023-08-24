@@ -1,17 +1,13 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
-const Agencia = new Schema({
+const Comissao = new Schema({
 
-    numero:{
-        type: Number,
-        required: true
-    },
-    uf:{
+    periodo:{
         type: String,
         required: true
     },
-    cidade:{
+    agencia:{
         type: String,
         required: true
     },    
@@ -19,6 +15,15 @@ const Agencia = new Schema({
         type: String,
         required: true
     },    
+    dateInit:{
+        type: Date,
+        required: true
+        
+    },
+    dateFin:{
+        type: Date,
+        required: true
+    },
     date:{
         type: Date,
         default: new Date()
@@ -26,7 +31,15 @@ const Agencia = new Schema({
     indiceComissao:{
         type: Number,
         required: true
-    }
+    },
+    valor:{
+        type: Number,
+        required: true
+    },
+    totalVendas:{
+        type: Number,
+        required: true
+    },
 })
 
-mongoose.model('agencias',Agencia)
+mongoose.model('comissoes',Comissao)

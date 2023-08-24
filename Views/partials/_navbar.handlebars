@@ -8,9 +8,15 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="/guias">Cadastrar Guias</a>
-        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Guias 
+            </a>
+            <ul class="dropdown-menu">              
+              <li><a class="dropdown-item" href="/guias">Cadastrar Guias</a></li>
+              <li><a class="dropdown-item" href="/administracao/controle">Encerrar Digitação</a></li>                            
+            </ul>
+          </li>         
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               Buscar Guias
@@ -19,8 +25,18 @@
               <li><a class="dropdown-item" href="/consultas/por_empresa">Por Empresa</a></li>                           
               <li><a class="dropdown-item" href="/consultas/por_usuario">Por Usuario</a></li>
               <li><a class="dropdown-item" href="/consultas/por_agencia">Por Agencia</a></li>
+              <li><a class="dropdown-item" href="/consultas/comissao">Historico Comissão</a></li>
             </ul>
           </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Comissão
+            </a>
+            <ul class="dropdown-menu">              
+              <li><a class="dropdown-item" href="/comissao">Comissão por Agencia</a></li>
+                            
+            </ul>
+          </li> 
         
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -29,8 +45,7 @@
             <ul class="dropdown-menu">
               <li><a class="dropdown-item" href="/administracao/users">Cadastrar Usuarios</a></li>
               <li><a class="dropdown-item" href="/administracao/agencias">Cadastrar Agencias</a></li>
-              <li><a class="dropdown-item" href="/talao">Cadastrar Talão</a></li>
-              <li><a class="dropdown-item" href="/administracao/controle">Balanço Detalhado</a></li>              
+              <li><a class="dropdown-item" href="/talao">Cadastrar Talão</a></li>                            
               <li><a class="dropdown-item" href="#">Log dos Usuarios</a></li>
             </ul>
           </li>          

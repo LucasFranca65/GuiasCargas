@@ -2,7 +2,7 @@
 
         <form action="/administracao/controle/gerar" method="post">
             <table class="table">
-                <p style="font-weight: bold;" >Criar Periodo de Controle</p>
+                <p style="font-weight: bold;" >Encerrar Digitação do Periodo</p>
                 <thead class="table-dark">
                     <tr>                            
                         <th scope="col">Empresa</th>
@@ -37,7 +37,7 @@
                     </tr>                                    
                 </tbody>
             </table>
-            <button class="btn btn-secondary" type="submit">Gerar</button> <button class="btn btn-outline-secondary" type="reset">Limpar</button>
+            <button class="btn btn-secondary" type="submit">Fechar</button> <button class="btn btn-outline-secondary" type="reset">Limpar</button>
         </form>
 </div>
  
@@ -45,7 +45,7 @@
         <form action="/administracao/controle/excluir" method="post">
         <table class="table">
                 <hr>
-                        <p style="font-weight: bold;">Periodos de Controle Gerados</p>
+                        <p style="font-weight: bold;">Periodos Encerados</p>
                         <thead class="table-dark">
                             <tr>
                                 <th scope="col">Nome</th>
@@ -77,7 +77,7 @@
                         </tbody>  
                         {{/each}}
                     </table>    
-            <button class="btn btn-outline-danger" type="submit">Excluir</button> 
+            <button class="btn btn-outline-danger" type="submit">Reabrir</button> 
         </form>
     </div>
 </div>

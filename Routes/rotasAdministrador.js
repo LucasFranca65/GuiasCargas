@@ -223,18 +223,22 @@ const Controle = mongoose.model('controles')
     })
     //Rota para cadastrar agencia no banco de dados 
     router.post('/agencias/add_agencia',eAdmin,(req,res)=>{
+        const {numero, cidade, uf, empresa, indice} = req.body
         let error = []
-        if(!req.body.cidade || typeof req.body.cidade == undefined || req.body.cidade == null){
+        if(!cidade || typeof cidade == undefined || cidade == null){
             error.push({texto:"Nome Invalido"})
         }
-        if(!req.body.numero || typeof req.body.numero == undefined || req.body.numero == null){
+        if(!numero || typeof numero == undefined || numero == null){
             error.push({texto:"Numero Invalido"})
         }
-        if(req.body.uf == "selecione"){
+        if(uf == "selecione"){
             error.push({texto:"Selecione um UF Estado"})
         }
-        if(req.body.empresa == "selecione"){
+        if(empresa == "selecione"){
             error.push({texto:"Selecione uma empresa"})
+        }
+        if(!indice || typeof indice == undefined || indice == null){
+            error.push({texto:"Indice informado é invalido"})
         }
         if(error.length > 0){
             Agencia.find().then((agencias)=>{
@@ -246,11 +250,13 @@ const Controle = mongoose.model('controles')
                     req.flash('error_msg',"Numero ou cidade já cadastrada")
                     res.redirect('/administracao/agencias')
                 }else{
+                    
                     const newAgencia = {
-                        numero: req.body.numero,
-                        cidade:req.body.cidade,
-                        uf: req.body.uf,
-                        empresa: req.body.empresa
+                        numero: numero,
+                        cidade: cidade,
+                        uf: uf,
+                        empresa: empresa,
+                        indiceComissao: indice
                     }
                     new Agencia(newAgencia).save().then(()=>{
                         req.flash('success_msg',"Agencia Cadastrada com sucesso")
@@ -301,46 +307,48 @@ const Controle = mongoose.model('controles')
         if(req.body.empresa == "selecione"){
             req.flash('error_msg',"Selecione uma empresa mês e ano para gerar um periodo de controle")
             res.redirect('/administracao/controle')
-        }else{
-            let reference = (req.body.empresa+"-"+req.body.mes+"-"+req.body.ano)
-        
-        Periodo.findOne({nome: reference}).then((periodo)=>{
-            if(periodo){
-                console.log(periodo)
-                res.redirect('/administracao/dadosPeriododeControle/'+periodo.nome)
-            }else{             
-                let uDia                
-                if(req.body.mes == 2){
-                    if((req.body.ano % 4) > 0){                        
-                        uDia = 28
+        }else{        
+            let reference = (req.body.empresa+"-"+req.body.mes+"-"+req.body.ano)        
+            Periodo.findOne({nome: reference}).then((periodo)=>{
+                if(periodo){
+                    req.flash('error_msg',"Periodo "+reference+" existentes")
+                    res.redirect('/administracao/dadosPeriododeControle/'+periodo.nome)
+                }else{             
+                    let uDia                
+                    if(req.body.mes == 2){
+                        if((req.body.ano % 4) > 0){                        
+                            uDia = 28
+                        }else{
+                            uDia = 29
+                        }
                     }else{
-                        uDia = 29
+                        if(req.body.mes == 4 || req.body.mes == 6|| req.body.mes == 9|| req.body.mes == 11  ){
+                            uDia = 30
+                        }else{
+                            uDia = 31
+                        }                    
+                    }               
+                    const newPeriodo = {
+                        nome: (req.body.empresa+"-"+req.body.mes+"-"+req.body.ano),
+                        empresa: req.body.empresa,
+                        dateInit: moment(req.body.ano+'-'+req.body.mes+'-01').format("YYYY-MM-DDT00:00:00.SSSZ"),
+                        dateFin: moment(req.body.ano+'-'+req.body.mes+'-'+uDia).format("YYYY-MM-DDT23:59:59.SSSZ")
                     }
-                }else{
-                    if(req.body.mes == 4 || req.body.mes == 6|| req.body.mes == 9|| req.body.mes == 11  ){
-                        uDia = 30
-                    }else{
-                        uDia = 31
-                    }                    
-                }               
-                const newPeriodo = {
-                    nome: (req.body.empresa+"-"+req.body.mes+"-"+req.body.ano),
-                    empresa: req.body.empresa,
-                    dateInit: moment(req.body.ano+'-'+req.body.mes+'-01').format("YYYY-MM-DDT00:00:00.SSSZ"),
-                    dateFin: moment(req.body.ano+'-'+req.body.mes+'-'+uDia).format("YYYY-MM-DDT23:59:59.SSSZ")
+                    
+                    new Periodo(newPeriodo).save().then(()=>{
+                        console.log("Periodo "+newPeriodo.nome+" Criado com sucesso")
+                        req.flash('success_msg',"Periodo "+newPeriodo.nome+" Criado com sucesso")
+                        res.redirect('/administracao/dadosPeriododeControle/'+newPeriodo.nome)                    
+                    }).catch((err)=>{
+                        req.flash('error_msg',"Erro ao criar periodo "+err)
+                        res.redirect('/administracao/controle')
+                    })               
+                    
                 }
-                
-                new Periodo(newPeriodo).save().then(()=>{
-                    console.log("Periodo "+newPeriodo.nome+" Criado com sucesso")
-                    req.flash('success_msg',"Periodo "+newPeriodo.nome+" Criado com sucesso")
-                    res.redirect('/administracao/dadosPeriododeControle/'+newPeriodo.nome)                    
-                }).catch((err)=>{
-                    req.flash('error_msg',"Erro ao criar periodo "+err)
-                    res.redirect('/administracao/controle')
-                })               
-                
-            }
-        })
+            }).catch((err)=>{
+                req.flash('error_msg',"Erro ao criar periodo "+err)
+                res.redirect('/administracao/controle')
+            })
         }        
     })
     //Rota que exclui periodo de controle e todos os seus dados
@@ -372,13 +380,12 @@ const Controle = mongoose.model('controles')
            }
     })
     //Rota que exibe dados do periodo de controle
-    router.get('/dadosPeriododeControle/:nome',eAdmin,(req,res)=>{
+    router.get('/dadosPeriododeControle/:nome',eAdmin, async(req,res)=>{
 
-        Periodo.findOne({nome: req.params.nome}).then((periodo)=>{
+        await Periodo.findOne({nome: req.params.nome}).then((periodo)=>{
             periodo['inicio'] = moment(periodo.dateInit).format('DD/MM/YYYY')
             periodo['final'] = moment(periodo.dateFin).format('DD/MM/YYYY')
-            Controle.find({periodo: periodo.nome }).then((dados)=>{
-                
+            Controle.find({periodo: periodo.nome }).then((dados)=>{                
                 if(dados.length > 0){                    
                     for(let i = 0; i < dados.length; i++){
                         dados[i]["pgExib"] = dados[i].pg.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
@@ -396,10 +403,9 @@ const Controle = mongoose.model('controles')
                         let totalPg = []
                         let totalAc = []
                         let totalCc = []
-                        let total = []
-                                               
+                        let total = []                                               
                         for(let j = 0; j<agencia.length; j ++){                               
-                            GuiaCarga.find({dateEntrada: {$gte: dateMin, $lt: dateMax}, statusPag: "PAGO", origem: agencia[j].cidade}).then((guiasPg)=>{                                    
+                             GuiaCarga.find({dateEntrada: {$gte: dateMin, $lt: dateMax}, statusPag: "PAGO", origem: agencia[j].cidade}).then((guiasPg)=>{                                    
                                 GuiaCarga.find({dateEntrada: {$gte: dateMin, $lt: dateMax}, empresa: empresa, statusPag: "A COBRAR", origem: agencia[j].cidade}).then((guiasAc)=>{                                        
                                     GuiaCarga.find({dateEntrada: {$gte: dateMin, $lt: dateMax}, empresa: empresa, statusPag: "CONTA CORRENTE", origem: agencia[j].cidade}).then((guiasCc)=>{                                            
                                         totalPg[j] = 0
@@ -444,13 +450,12 @@ const Controle = mongoose.model('controles')
                             }).catch((err)=>{
                                 console.log("Falha ao localizar Guias PAGAS para a agencia "+agencia[j].cidade+"Erro: " + err)                                 
                             }) 
-                        }                            
-                        res.redirect('/administracao/dadosPeriododeControle/'+periodo.nome)
-                        
+                        }
                     }).catch((err)=>{
                         req.flash('error_msg',"Falha ao localizar agencias" + err)
                         res.redirect('/administracao/controle')  
                     }) 
+                    res.redirect('/administracao/dadosPeriododeControle/'+periodo.nome)
                 }
             }).catch((err)=>{
                 req.flash('error_msg',"Falha ao carregar dados do periodo ou dados inexistentes" + err)

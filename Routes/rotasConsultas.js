@@ -20,7 +20,7 @@ router.get('/por_empresa',lOgado,(req,res)=>{
 })
 router.get('/por_empresa/pesquisar',lOgado,(req,res)=>{
     var {empresa ,dateMin,dateMax,offset,page} = req.query
-    console.log(empresa, dateMin,dateMax, offset, page)
+    //console.log(empresa, dateMin,dateMax, offset, page)
     dateMax = moment(dateMax).format("YYYY-MM-DDT23:59:59.SSSZ")
     dateMin = moment(dateMin).format("YYYY-MM-DDT00:00:00.SSSZ")
     const limit = 20
@@ -112,7 +112,7 @@ router.get('/por_usuario',lOgado,(req,res)=>{
 })
 router.get('/por_usuario/pesquisar',lOgado,(req,res)=>{
     var {usuario ,dateMin , dateMax, offset, page} = req.query
-    console.log(usuario ,dateMin , dateMax, offset, page)
+    //console.log(usuario ,dateMin , dateMax, offset, page)
     //res.redirect('/consultas/por_usuario')
         const limit = 20
         if(!offset){

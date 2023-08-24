@@ -1,0 +1,43 @@
+<div class="table-responsive-xl">        
+        <form action="/administracao/controle/excluir" method="post">
+        <table class="table">
+                <hr>
+                        <p style="font-weight: bold;">Detalhamento</p>
+                        <thead class="table-dark">
+                            <tr>
+                                <th scope="col">Agencia</th>
+                                <th scope="col">Periodo</th>
+                                <th scope="col">Inicio</th>
+                                <th scope="col">Fim</th> 
+                                <th scope="col">Total</th>
+                                <th scope="col">Comissao</th>                                                                                                                               
+                            </tr>
+                        </thead>
+                        {{#each comissoes}}
+                        <tbody>
+                            <tr>                                
+                                <td>{{agencia}}</td>
+                                <td>{{periodo}}</td>
+                                <td>{{dInitExib}}</td>
+                                <td>{{dtFimExib}}</td>
+                                <td>{{totalExib}}</td>
+                                <td>{{valorExib}}</td>
+                                
+                                <th scope="row"><input type="checkbox" name="ident" value="{{_id}}"></th>                               
+                            </tr>                                    
+                        </tbody>                                        
+                        {{else}}            
+                            <tbody>
+                            <tr>
+                                <th scope="row">---</th>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>                               
+                            </tr>                                    
+                        </tbody>  
+                        {{/each}}
+                    </table>    
+            <button class="btn btn-outline-danger" type="submit">Excluir</button> 
+        </form>
+    </div>

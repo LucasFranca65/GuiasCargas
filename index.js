@@ -21,6 +21,7 @@ require('./config/alth')(passport)
     const consultas=require('./Routes/rotasConsultas')
     const users = require('./Routes/rotasUsuarios')
     const talao = require('./Routes/rotasTaloes')
+    const comissao = require('./Routes/rotasComissao')
 //Configurações
 
     //Sessão
@@ -82,6 +83,7 @@ require('./config/alth')(passport)
    app.use('/consultas',consultas)
    app.use('/user',users)
    app.use('/talao',talao)
+   app.use('/comissao',comissao)
    app.get('/error',(req,res)=>{
     res.render('404')
    })

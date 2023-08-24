@@ -90,7 +90,7 @@ router.post('/adicionar',lOgado,(req,res)=>{
         
                     new Talao(newTalao).save().then(()=>{
                         req.flash('success_msg',"Talão "+newTalao.numeroControle+" cadastrado com sucesso")
-                        console.log("Talão "+newTalao.numCont+" cadastrado com sucesso")
+                        //console.log("Talão "+newTalao.numCont+" cadastrado com sucesso")
                         system.nTalao = req.body.numCont
                         system.save().then(()=>{
                         console.log('Número de controle do talao atualizado')   
@@ -117,7 +117,7 @@ router.post('/adicionar',lOgado,(req,res)=>{
     }
 })
 
-router.get('/excluir',eAdmin,(req,res)=>{  
+router.delete('/excluir',eAdmin,(req,res)=>{  
         const {ident} = req.query
         var query = {"_id":{$in: ident}}
         Talao.deleteMany(query).then(()=>{

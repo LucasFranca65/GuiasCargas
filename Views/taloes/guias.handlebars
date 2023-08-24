@@ -18,8 +18,7 @@
               <th scope="col">Pagamento</th>
               <th scope="col">Valor</th>
               <th scope="col">Status </th>
-              <th scope="col">Baixa </th>
-              <th scope="col">#</th>
+              <th scope="col">Baixa </th>              
             </tr>
           </thead>          
          {{#each dados}}    
@@ -35,8 +34,7 @@
               <td>{{date_pagamento}}</td>
               <td>{{valor_exib}}</td>
               <td>{{statusPag}}</td>  
-              <td>{{statusBaixa}}</td>             
-              <td><input type="checkbox" name="id" value="{{_id}}"></td>
+              <td>{{statusBaixa}}</td>
             </tr>    
           </tbody> 
           {{else}}
