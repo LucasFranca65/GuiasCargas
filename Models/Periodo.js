@@ -28,7 +28,7 @@ const Periodo = new Schema({
     },
     totalComiss:{
         type: Number,
-        default: 0
+        default: 0.0
     }
     
 })

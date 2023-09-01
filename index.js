@@ -96,6 +96,10 @@ require('./config/alth')(passport)
     })
 
 //Outros
-app.listen(PORT,()=>{
-    console.log("serviço ROdando na porta" + PORT)
+app.listen(PORT,(error)=>{
+    if(error){
+        console.log("Erro ao iniciar Servidor")
+    }else{
+    console.log("serviço Rodando na porta " + PORT)
+    }
 })

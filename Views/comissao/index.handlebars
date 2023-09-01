@@ -1,5 +1,5 @@
 {{#each error}}
-<div class="alert alert-danger">{{texto}}</div>
+<div class="alert alert-danger">{{text}}</div>
 {{else}}
 {{/each}}
 
@@ -48,7 +48,7 @@
 
 {{#if periodos}} 
 <div class="table-responsive-xl">        
-    <form action="/comissao/excluir">
+    <form action="/comissao/excluir" method="post">
         <table class="table">
             <hr>
             <p style="font-weight: bold;">Comissões Calculadas</p>
@@ -65,11 +65,11 @@
             {{#each periodos}}
             <tbody>
                 <tr>                                
-                    <td>{{nome}}</td>                                
+                    <td><a href="/comissao/detalhado/{{nome}}">{{nome}}</a></td>                                
                     <td>{{dInitExib}}</td>
                     <td>{{dtFimExib}}</td>
                     <td>{{totalExib}}</td>                    
-                    <td><input type="checkbox" name="perido" ></td>
+                    <td><input type="checkbox" name="periodo" value="{{nome}}"></td>
                 </tr>                                    
             </tbody>                                        
             {{else}}
