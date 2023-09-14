@@ -16,12 +16,15 @@ require('./config/alth')(passport)
 //Grupos de Rotas
     const admin = require('./Routes/rotasAdministrador')
     const guias = require('./Routes/rotasGruias')
+    const arrecadacao = require('./Routes/rotasPrestacaoContas')
     const validation = require('./Routes/validation')
     const painel = require('./Routes/rotasPainel')
     const consultas=require('./Routes/rotasConsultas')
     const users = require('./Routes/rotasUsuarios')
     const talao = require('./Routes/rotasTaloes')
     const comissao = require('./Routes/rotasComissao')
+    const periodo = require('./Routes/rotasPeriodos')
+
 //Configurações
 
     //Sessão
@@ -48,7 +51,7 @@ require('./config/alth')(passport)
     //Mongoose
         mongoose.set("strictQuery", true)
         mongoose.Promise = global.Promise
-        mongoose.connect('mongodb://127.0.0.1:27017/GuiasCargas').then(()=>{
+        mongoose.connect('mongodb://127.0.0.1:27017/ContreleAgencias').then(()=>{
             console.log("Conectado ao banco de dados com sucesso")
         }).catch((err)=>{
             console.log("Erro ao se conectar com o bonco"+err)
@@ -84,6 +87,9 @@ require('./config/alth')(passport)
    app.use('/user',users)
    app.use('/talao',talao)
    app.use('/comissao',comissao)
+   app.use('/periodos',periodo)
+   app.use('/arrecadacao', arrecadacao)
+
    app.get('/error',(req,res)=>{
     res.render('404')
    })

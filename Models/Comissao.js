@@ -8,11 +8,13 @@ const Comissao = new Schema({
         required: true
     },
     agencia:{
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: "agencias",
         required: true
     },    
     empresa:{
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: "empresas",
         required: true
     },    
     dateInit:{

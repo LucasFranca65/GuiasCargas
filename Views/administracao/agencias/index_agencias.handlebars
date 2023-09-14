@@ -7,11 +7,10 @@
 
         <form action="/administracao/agencias/add_agencia" method="post">
             <table class="table">
-                <p style="font-weight: bold;" >Cadastrar novo Usuario</p>
+                <p style="font-weight: bold;" >Cadastrar nova Agencia</p>
                 <thead class="table-dark">
                     <tr>                           
-                        <th scope="col">Número</th>
-                        <th scope="col">UF</th>
+                        <th scope="col">Número</th>                        
                         <th scope="col">Cidade</th>
                         <th scope="col">Empresa</th>
                         <th scope="col">Comissão %</th>                                                        
@@ -22,43 +21,7 @@
                         <td>
                             <input class="form-control" type="number" name="numero">
                         </td>
-
-                        <td>
-                            <div class="form-floating">
-                            <select name="uf" class="form-select" id="floatingSelect2" aria-label="uf">
-                                <option value="selecione">---Selecione---</option>
-                                <option value="AC">AC</option>
-                                <option value="AL">AL</option>
-                                <option value="AM">AM</option>
-                                <option value="AP">AP</option>
-                                <option value="BA">BA</option>
-                                <option value="CE">CE</option>
-                                <option value="DF">DF</option>
-                                <option value="ES">ES</option>
-                                <option value="GO">GO</option>
-                                <option value="MA">MA</option>
-                                <option value="MG">MG</option>
-                                <option value="MS">MS</option>
-                                <option value="MT">MT</option>
-                                <option value="PA">PA</option>
-                                <option value="PB">PB</option>
-                                <option value="PE">PE</option>
-                                <option value="PI">PI</option>
-                                <option value="PR">PR</option>
-                                <option value="RJ">RJ</option>
-                                <option value="RN">RN</option>
-                                <option value="RO">RO</option>
-                                <option value="RR">RR</option>
-                                <option value="RS">RS</option>
-                                <option value="SC">SC</option>
-                                <option value="SE">SE</option>
-                                <option value="SP">SP</option>
-                                <option value="TO">TO</option>                                
-                            </select>
-                            <label for="floatingSelect">UF</label>
-                            </div>
-                        </td>
-                        
+                       
                         <td>
                             <input class="form-control" type="text" name="cidade">
                         </td>                        
@@ -67,8 +30,10 @@
                             <div class="form-floating">
                             <select name="empresa" class="form-select" id="floatingSelect2" aria-label="empresa">
                                 <option value="selecione">---Selecione---</option>
-                                <option value="REGIONAL">REGIONAL</option>
-                                <option value="JAUA">JAUA</option>
+                                {{#each empresas}}
+                                <option value="{{_id}}">{{empresa}}</option>
+                                {{else}}
+                                {{/each}}                                
                             </select>
                             <label for="floatingSelect">Empresa</label>
                             </div>
@@ -92,8 +57,7 @@
                         <thead class="table-dark">
                             <tr>                            
                                 <th scope="col">#</th>
-                                <th scope="col">Número</th>
-                                <th scope="col">UF</th>
+                                <th scope="col">Número</th>                                
                                 <th scope="col">Cidade</th>
                                 <th scope="col">Empresa</th>
                                 <th scope="col">Comissão</th>                                                            
@@ -103,10 +67,9 @@
                         <tbody>
                             <tr>
                                 <th scope="row"><input type="checkbox" name="ident" value="{{_id}}"></th>
-                                <td>{{numero}}</td>
-                                <td>{{uf}}</td>
+                                <td>{{numero}}</td>                                
                                 <td>{{cidade}}</td>
-                                <td>{{empresa}}</td> 
+                                <td>{{empresa.empresa}}</td> 
                                 <td>{{#if indiceComissao}}{{indiceComissao}}%{{else}}{{/if}}</td>                               
                             </tr>                                    
                         </tbody>                                        

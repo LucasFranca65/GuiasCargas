@@ -16,16 +16,17 @@ const Talao = new Schema({
         required: true
     },
     agencia:{
-        type: String,        
+        type: Schema.Types.ObjectId,
+        ref: "agencias",
         required: true
-    },    
-    empresa:{
-        type: String,
-        required: true
-    },    
+    },  
     date:{
         type: Date,
         default: new Date()
+    },
+    tipo:{
+        type: String,
+        required: true
     }
 })
 

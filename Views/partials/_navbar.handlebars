@@ -10,31 +10,36 @@
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Guias 
+              Guias Encomendas 
             </a>
             <ul class="dropdown-menu">              
               <li><a class="dropdown-item" href="/guias">Cadastrar Guias</a></li>
-              <li><a class="dropdown-item" href="/administracao/controle">Encerrar Digitação</a></li>                            
+              <li><a class="dropdown-item" href="/consultas/por_empresa">Buscar Por Empresa</a></li>                           
+              <li><a class="dropdown-item" href="/consultas/por_usuario">Buscar Por Usuario</a></li>
+              <li><a class="dropdown-item" href="/consultas/por_agencia">Buscar Por Agencia</a></li>
             </ul>
-          </li>         
+        </li>
+
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Buscar Guias
-            </a>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="/consultas/por_empresa">Por Empresa</a></li>                           
-              <li><a class="dropdown-item" href="/consultas/por_usuario">Por Usuario</a></li>
-              <li><a class="dropdown-item" href="/consultas/por_agencia">Por Agencia</a></li>
-              <li><a class="dropdown-item" href="/consultas/comissao">Historico Comissão</a></li>
-            </ul>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Comissão
+              Prestação de Contas
             </a>
             <ul class="dropdown-menu">              
-              <li><a class="dropdown-item" href="/comissao">Comissão por Agencia</a></li>
-                            
+              <li><a class="dropdown-item" href="/arrecadacao">Cadastrar Prestação Contas</a></li>
+              <li><a class="dropdown-item" href="/consultas/por_empresa">Buscar Por Empresa</a></li>                           
+              <li><a class="dropdown-item" href="/consultas/por_usuario">Buscar Por Usuario</a></li>
+              <li><a class="dropdown-item" href="/consultas/por_agencia">Buscar Por Agencia</a></li>                             
+            </ul>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Comissão
+          </a>
+            <ul class="dropdown-menu">              
+              <li><a class="dropdown-item" href="/comissao">Comissão dos Bilhetes</a></li>
+              <li><a class="dropdown-item" href="/comissao">Comissão de Excesso de Bagagem</a></li>
+              <li><a class="dropdown-item" href="/comissao">Comissão de Seguro</a></li>
             </ul>
           </li> 
         
@@ -43,6 +48,8 @@
               Administrador
             </a>
             <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="/periodos">Abrir e Encerrar Digitação</a></li>
+              <li><a class="dropdown-item" href="/administracao/empresas">Cadastrar Empresas</a></li>
               <li><a class="dropdown-item" href="/administracao/users">Cadastrar Usuarios</a></li>
               <li><a class="dropdown-item" href="/administracao/agencias">Cadastrar Agencias</a></li>
               <li><a class="dropdown-item" href="/talao">Cadastrar Talão</a></li>                            
@@ -63,7 +70,7 @@
           </li>
       </ul>
       <form class="d-flex" role="search" action="/guias/buscar" method="post">
-        <input name="numero" class="form-control me-2" type="search" placeholder="Conhecimento" aria-label="Conhecimento">
+        <input name="numero" class="form-control me-2" type="search" placeholder="Nº Guia/P.Contas " aria-label="Conhecimento">
         <button class="btn btn-outline-success" type="submit">Buscar</button>
       </form>
     </div>

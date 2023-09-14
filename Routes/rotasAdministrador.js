@@ -12,10 +12,10 @@ require('../Models/GuiaCarga')
 const GuiaCarga = mongoose.model('guiascargas')
 require('../Models/Agencia')
 const Agencia = mongoose.model('agencias')
-require('../Models/Periodo')
-const Periodo = mongoose.model('periodos')
-require('../Models/Controle')
-const Controle = mongoose.model('controles')
+require('../Models/Empresa')
+const Empresa = mongoose.model('empresas')
+require('../Models/PContas')
+const PContas = mongoose.model('pContas')
 
 //Rotas de Administração de Usuarios
     //Rota Principal
@@ -28,7 +28,7 @@ const Controle = mongoose.model('controles')
                     users[i]['tipoUser']="Padrão"
                 }
             }
-            res.render('administracao/adm_users',{users})
+            res.render('administracao/users/adm_users',{users})
         }).catch((err)=>{
             req.flash('error_msg',"Erro ao Carregar usuarios "+err)
             res.redirect('/painel')
@@ -174,12 +174,13 @@ const Controle = mongoose.model('controles')
     
     router.get('/users/reset_pass/administracao/:id',eAdmin,(req,res)=>{
         User.findOne({_id: req.params.id}).then((usuario)=>{
-            res.render('administracao/admin_resetpass',{usuario})
+            res.render('administracao/users/admin_resetpass',{usuario})
         }).catch((err)=>{
             req.flash('error_msg',"Não foi encontrado usuario com esses parametros")
             res.redirect('/administracao/users')
         })
     })
+//Rotas para Administrar Guias
     //excluir selecionados
     router.post('/guias/excluir',eAdmin,(req,res)=>{
         if(req.body.ident == undefined){
@@ -212,14 +213,21 @@ const Controle = mongoose.model('controles')
                    })
            }
     })
-    //Rotas Administração de agencias
+
+//Rotas Administração de agencias
     router.get('/agencias',eAdmin,(req,res)=>{
-        Agencia.find().sort({cidade: 1}).then((agencias)=>{
-            res.render('administracao/adm_agencias',{agencias})
+        Empresa.find().then((empresas)=>{
+            Agencia.find().populate("empresa").sort({cidade: 1}).then((agencias)=>{
+                res.render('administracao/agencias/index_agencias',{agencias, empresas})
+            }).catch((err)=>{
+                req.flash('error_msg',"Erro ao Carregar Agencias "+err)
+                res.redirect('/painel')
+            }) 
         }).catch((err)=>{
             req.flash('error_msg',"Erro ao Carregar Agencias "+err)
             res.redirect('/painel')
-        })        
+        }) 
+               
     })
     //Rota para cadastrar agencia no banco de dados 
     router.post('/agencias/add_agencia',eAdmin,(req,res)=>{
@@ -242,7 +250,7 @@ const Controle = mongoose.model('controles')
         }
         if(error.length > 0){
             Agencia.find().then((agencias)=>{
-                res.render('administracao/adm_agencias',{error, agencias})
+                res.render('administracao/agencias/index_agencias',{error, agencias})
             })
         }else{
             Agencia.findOne({ $or: [{cidade: req.body.cidade},{numero: req.body.numero}]}).then((agencias)=>{
@@ -286,185 +294,84 @@ const Controle = mongoose.model('controles')
            }
     })
 
-// Rotas de Controle
-    router.get('/controle',eAdmin,(req,res)=>{
-        Periodo.find().sort({nome: -1}).limit(12).then((periodos)=>{
-            var i=0
-            while(i < periodos.length){                   
-                periodos[i]["date_init"] = moment(periodos[i].dateInit).format('DD/MM/YYYY')
-                periodos[i]["date_fin"] = moment(periodos[i].dateFin).format('DD/MM/YYYY')
-                i++
-            }
-            res.render('administracao/controle',{periodos})
-        }).catch((err)=>{
-            req.flash('error_msg',"Erro ao tentar localizar periodo" + err)
-            res.render('administracao/controle')
-        })
-    })
-    //Rota que gera periodo de controle
-    router.post('/controle/gerar',eAdmin,(req,res)=>{
-        
-        if(req.body.empresa == "selecione"){
-            req.flash('error_msg',"Selecione uma empresa mês e ano para gerar um periodo de controle")
-            res.redirect('/administracao/controle')
-        }else{        
-            let reference = (req.body.empresa+"-"+req.body.mes+"-"+req.body.ano)        
-            Periodo.findOne({nome: reference}).then((periodo)=>{
-                if(periodo){
-                    req.flash('error_msg',"Periodo "+reference+" existentes")
-                    res.redirect('/administracao/dadosPeriododeControle/'+periodo.nome)
-                }else{             
-                    let uDia                
-                    if(req.body.mes == 2){
-                        if((req.body.ano % 4) > 0){                        
-                            uDia = 28
-                        }else{
-                            uDia = 29
-                        }
+//Rotas Administração de Empresas
+    router.get('/empresas',eAdmin,(req,res)=>{
+        Empresa.find().then((empresas)=>{
+            if(empresas.length == 0){
+                res.render('administracao/empresas/index_empresas')    
+            }else{
+                for(let i = 0; i < empresas.length; i++){
+                    if(empresas[i].status == true){
+                        empresas[i]["statusExib"]="Ativo"
                     }else{
-                        if(req.body.mes == 4 || req.body.mes == 6|| req.body.mes == 9|| req.body.mes == 11  ){
-                            uDia = 30
-                        }else{
-                            uDia = 31
-                        }                    
-                    }               
-                    const newPeriodo = {
-                        nome: (req.body.empresa+"-"+req.body.mes+"-"+req.body.ano),
-                        empresa: req.body.empresa,
-                        dateInit: moment(req.body.ano+'-'+req.body.mes+'-01').format("YYYY-MM-DDT00:00:00.SSSZ"),
-                        dateFin: moment(req.body.ano+'-'+req.body.mes+'-'+uDia).format("YYYY-MM-DDT23:59:59.SSSZ")
+                        empresas[i]["statusExib"]="Inativo"
                     }
-                    
-                    new Periodo(newPeriodo).save().then(()=>{
-                        console.log("Periodo "+newPeriodo.nome+" Criado com sucesso")
-                        req.flash('success_msg',"Periodo "+newPeriodo.nome+" Criado com sucesso")
-                        res.redirect('/administracao/dadosPeriododeControle/'+newPeriodo.nome)                    
-                    }).catch((err)=>{
-                        req.flash('error_msg',"Erro ao criar periodo "+err)
-                        res.redirect('/administracao/controle')
-                    })               
-                    
                 }
-            }).catch((err)=>{
-                req.flash('error_msg',"Erro ao criar periodo "+err)
-                res.redirect('/administracao/controle')
-            })
-        }        
-    })
-    //Rota que exclui periodo de controle e todos os seus dados
-    router.post('/controle/excluir',eAdmin,(req,res)=>{
-        if(req.body.ident == undefined){
-            req.flash('error_msg',"Nenhum Perido Selecionado para exclusão")
-            res.redirect('/administracao/controle')
-           }else{       
-               var query = {"_id":{$in:req.body.ident}}       
-                    Periodo.find(query).then((periodos)=>{
-                        for(var i=0; i<periodos.length; i++){
-                            Controle.deleteMany({periodo: periodos[i].nome }).then(()=>{
-                                console.log('Guias do periodo excluidas com sucesso')
-                            }).catch((err)=>{
-                                console.log("Erro ao tentar exluirir controles do periodo: "+err)
-                            })
-                        }                        
-                   }).catch((err)=>{
-                       req.flash('error_msg',"Não foi encontradas agencias para exclusão" +err)
-                       res.redirect('/administracao/controle')
-                   })
-                    Periodo.deleteMany(query).then(()=>{
-                        req.flash('success_msg',"Periodos selecionados excluidos com sucesso, Obs: Todos os controles criados seram excluidos juntamente com o periodo")
-                        res.redirect('/administracao/controle')
-                    }).catch((err)=>{
-                        req.flash('error_msg',"Não foi encontrados periodos para exclusão"+err)
-                        res.redirect('/administracao/controle')
-                    })                 
-           }
-    })
-    //Rota que exibe dados do periodo de controle
-    router.get('/dadosPeriododeControle/:nome',eAdmin, async(req,res)=>{
-
-        await Periodo.findOne({nome: req.params.nome}).then((periodo)=>{
-            periodo['inicio'] = moment(periodo.dateInit).format('DD/MM/YYYY')
-            periodo['final'] = moment(periodo.dateFin).format('DD/MM/YYYY')
-            Controle.find({periodo: periodo.nome }).then((dados)=>{                
-                if(dados.length > 0){                    
-                    for(let i = 0; i < dados.length; i++){
-                        dados[i]["pgExib"] = dados[i].pg.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-                        dados[i]["acExib"] = dados[i].ac.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-                        dados[i]["ccExib"] = dados[i].cc.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-                        dados[i]["totalexib"] = dados[i].total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-                        
-                    }
-                    res.render('administracao/dadosPeriodo',{dados,periodo})
-                }else{
-                    Agencia.find({empresa: periodo.empresa}).sort({cidade: 1}).then((agencia)=>{
-                        var dateMax = periodo.dateFin
-                        var dateMin = periodo.dateInit
-                        var empresa = periodo.empresa
-                        let totalPg = []
-                        let totalAc = []
-                        let totalCc = []
-                        let total = []                                               
-                        for(let j = 0; j<agencia.length; j ++){                               
-                             GuiaCarga.find({dateEntrada: {$gte: dateMin, $lt: dateMax}, statusPag: "PAGO", origem: agencia[j].cidade}).then((guiasPg)=>{                                    
-                                GuiaCarga.find({dateEntrada: {$gte: dateMin, $lt: dateMax}, empresa: empresa, statusPag: "A COBRAR", origem: agencia[j].cidade}).then((guiasAc)=>{                                        
-                                    GuiaCarga.find({dateEntrada: {$gte: dateMin, $lt: dateMax}, empresa: empresa, statusPag: "CONTA CORRENTE", origem: agencia[j].cidade}).then((guiasCc)=>{                                            
-                                        totalPg[j] = 0
-                                        totalAc[j] = 0
-                                        totalCc[j] = 0
-                                        total[j] = 0
-                                        for(let i=0; i<guiasPg.length; i++){
-                                            totalPg[j] = totalPg[j] + guiasPg[i].valor
-                                        }
-                                        for(let i=0; i<guiasAc.length; i++){
-                                            totalAc[j] = totalAc[j] + guiasAc[i].valor
-                                        }
-                                        for(let i=0; i<guiasCc.length; i++){
-                                            totalCc[j] = totalCc[j] + guiasCc[i].valor
-                                        }                                        
-                                        total[j] = totalPg[j] + totalAc[j] + totalCc[j]
-                                        console.log("Agencia: "+agencia[j].cidade+" Pago: "+ totalPg[j] +" A Cobrar: "+totalAc[j]+" Conta Corrente: "+totalCc[j] )
-                                        const newControle = {
-                                            periodo: periodo.nome,
-                                            agencia: agencia[j].cidade,
-                                            cc: totalCc[j], 
-                                            ac: totalAc[j],
-                                            pg: totalPg[j],
-                                            total: total[j],
-                                            empresa: empresa,
-                                            dateInit: dateMin,
-                                            dateFin: dateMax,
-                                            user: req.user.nome
-                                        }                                        
-                                        //console.log(newControle)                                      
-                                        new Controle(newControle).save().then(()=>{
-                                            console.log('Controle da agencia: '+newControle.agencia +' criada com suceso ')
-                                        }).catch((err)=>{
-                                            console.log('Controle da agencia: '+newControle.agencia + ' erro ao criar '+err)    
-                                        })                                   
-                                    }).catch((err)=>{
-                                        console.log("Falha ao localizar Guias CONTA CORRENTE para a agencia "+agencia[j].cidade+"Erro: " + err) 
-                                    })           
-                                }).catch((err)=>{
-                                    console.log("Falha ao localizar Guias A COBRAR para a agencia "+agencia[j].cidade+"Erro: " + err)  
-                                })                      
-                            }).catch((err)=>{
-                                console.log("Falha ao localizar Guias PAGAS para a agencia "+agencia[j].cidade+"Erro: " + err)                                 
-                            }) 
-                        }
-                    }).catch((err)=>{
-                        req.flash('error_msg',"Falha ao localizar agencias" + err)
-                        res.redirect('/administracao/controle')  
-                    }) 
-                    res.redirect('/administracao/dadosPeriododeControle/'+periodo.nome)
-                }
-            }).catch((err)=>{
-                req.flash('error_msg',"Falha ao carregar dados do periodo ou dados inexistentes" + err)
-                res.redirect('/administracao/controle')
-            })                     
+                res.render('administracao/empresas/index_empresas',{empresas})
+            }            
         }).catch((err)=>{
-            req.flash('error_msg',"Esse Periodo não foi encontrado ou não existe"+err)
-            res.redirect('/administracao/controle')
-        })
-    })    
+            req.flash('error_msg',"Erro ao Carregar Empresas "+err)
+            res.redirect('/painel')
+        })        
+    })
+    //Rota para cadastrar agencia no banco de dados 
+    router.post('/empresas/save',eAdmin,(req,res)=>{
+        
+        if(req.body.status == "selecione"){
+            req.flash('error_msg',"Selecione um status")
+            res.redirect('/administracao/empresas')
+        }else{
+            Empresa.findOne({ $or: [{numero: req.body.numero},{empresa: req.body.empresa}]}).then((empresa)=>{
+                if(empresa){
+                    req.flash('error_msg',"Empresa Já Cadastrada com esse número ou Nome")
+                    res.redirect('/administracao/empresas')
+                }else{
 
+                    const newEmpresa = {
+                        numero: req.body.numero,
+                        empresa: req.body.empresa,
+                        status: req.body.status
+                    }
+
+                    new Empresa(newEmpresa).save().then(()=>{
+                        req.flash('success_msg',"Empresa Cadastrada com sucesso")
+                        res.redirect('/administracao/empresas')
+                    }).catch((err)=>{
+                        req.flash('error_msg',"Erro ao Cadastrar Empresa ERRO: "+err)
+                        res.redirect('/administracao/empresas')
+                    })        
+                }
+            })
+        }
+    })
+    //Rota que exclui agencias selecionadas
+    router.get('/empresas/excluir/:ident',eAdmin,(req,res)=>{
+        const ident = req.params.ident
+        if(ident == undefined){
+            req.flash('error_msg',"Nenhuma Agencia Selecionado para exclusão")
+            res.redirect('/administracao/empresas')
+           }else{       
+               var query = {"_id":{$in: ident}}
+                    GuiaCarga.findOne({empresa: ident}).then((guia)=>{
+                        PContas.findOne({empresa: ident}).then((contas)=>{
+                            if(guia || contas){
+                                req.flash('error_msg',"Existem Prestações de COntas ou Guias de cargas cadastradas para essa empresa, não é possivel excluir, necessario manter o historico")
+                                res.redirect('/administracao/empresas')
+                            }else{
+                                Empresa.deleteMany(query).then(()=>{
+                                    req.flash('success_msg',"Empresas selecionadas Excluidas com sucesso")
+                                    res.redirect('/administracao/empresas')
+                                }).catch((err)=>{
+                                    req.flash('error_msg',"Não foi encontradas Empresas para exclusão")
+                                    res.redirect('/administracao/empresas')
+                                })
+                            }
+                        
+                        })                            
+                    })
+            }
+    })
+
+    
+    
 module.exports = router

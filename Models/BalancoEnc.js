@@ -1,13 +1,14 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
-const Controle = new Schema({
+const BalancoEnc = new Schema({
     periodo:{
         type: String,
         required: true
     },
     agencia:{
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: "agencias",
         required: true
     },
     cc:{
@@ -27,7 +28,8 @@ const Controle = new Schema({
         required: true
     },
     empresa:{
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: "empresas",
         required: true
     },
     dateInit:{
@@ -42,9 +44,10 @@ const Controle = new Schema({
         default: new Date()
     },
     user:{
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: "users",
         required: true
     }
 })
 
-mongoose.model('controles',Controle)
+mongoose.model('balancoEnc',BalancoEnc)

@@ -6,12 +6,24 @@ const GuiaCarga = new Schema({
         type: Number,
         required: true
     },
+    periodo:{
+        type: Schema.Types.ObjectId,
+        ref: "periodos",
+        required: true
+    },
+    talao:{
+        type: Schema.Types.ObjectId,
+        ref: "taloes",
+        required: true
+    },
     origem:{
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: "agencias",
         required: true
     },
     destino: {
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: "agencias",
         required: true
     },
     cliente:{
@@ -19,20 +31,23 @@ const GuiaCarga = new Schema({
         required: true
     },
     empresa:{
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: "empresas",
         required: true
     },
     dateEntrada:{
-        type: Date
+        type: Date,
+        required: true
     },
     datePagamento:{
-        type: Date
+        type: Date,
+        require: true
     },
     valor:{
         type: Number,
         required: true
     },
-    statusPag:{
+    formaPag:{
         type: String,
         required: true
     },
@@ -42,10 +57,12 @@ const GuiaCarga = new Schema({
     },
     date:{
         type: Date,
+        default: new Date(),
         required: true
     },
     user:{
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: "usuarios",
         required: true
     }
 })

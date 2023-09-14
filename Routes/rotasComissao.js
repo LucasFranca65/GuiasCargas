@@ -11,8 +11,8 @@ require('../Models/Agencia')
 const Agencia = mongoose.model('agencias')
 require('../Models/Periodo')
 const Periodo = mongoose.model('periodos')
-require('../Models/Controle')
-const Controle = mongoose.model('controles')
+require('../Models/BalancoEnc')
+const BalancoEnc = mongoose.model('balancoEnc')
 require('../Models/Comissao')
 const Comissao = mongoose.model('comissoes')
 
@@ -84,7 +84,7 @@ router.get('/calcular',(req,res)=>{
                         var newComissao = {}                
                        await Agencia.find({empresa: empresa}).then( async (agenc)=>{                                               
                             for(let j=0;j<agenc.length;j++){
-                            await Controle.findOne({periodo: reference, agencia: agenc[j].cidade}).then((controle)=>{
+                            await BalancoEnc.findOne({periodo: reference, agencia: agenc[j].cidade}).then((controle)=>{
                                     newComissao = {
                                         periodo: reference,
                                         agencia: agenc[j].cidade,

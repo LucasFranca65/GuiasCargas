@@ -1,0 +1,79 @@
+{{#each error}}
+<div class="alert alert-danger">{{texto}}</div>
+{{else}}
+{{/each}}
+
+<div class="table-responsive-xl">
+
+        <form action="/administracao/empresas/save" method="post">
+            <table class="table">
+                <p style="font-weight: bold;" >Cadastrar Empresa</p>
+                <thead class="table-secondary">
+                    <tr>                           
+                        <th scope="col">Número</th>
+                        <th scope="col">Nome Empresa</th>
+                        <th scope="col">Status</th>                           
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>                                
+                        <td>
+                            <input class="form-control" type="number" name="numero" required>
+                        </td>
+
+                        <td>
+                            <input class="form-control" type="text" name="empresa" required>
+                        </td>                        
+                        
+                        <td>
+                            <div class="form-floating">
+                            <select name="status" class="form-select" id="floatingSelect2" aria-label="status">
+                                <option value="selecione">---Selecione---</option>
+                                <option value= true >Ativa</option>
+                                <option value= false >Inativa</option>
+                            </select>
+                            <label for="floatingSelect">Status</label>
+                            </div>
+                        </td>                      
+                    </tr>                                    
+                </tbody>
+            </table>
+            <button class="btn btn-secondary" type="submit">Salvar</button> <button class="btn btn-outline-secondary" type="reset">Limpar</button>
+        </form>
+</div>
+ 
+    <div class="table-responsive-xl">        
+        
+        <table class="table">
+                <hr>
+                    <p style="font-weight: bold;">Empresas Cadastradas</p>
+                        <thead class="table-secondary">
+                            <tr> 
+                                <th scope="col">Número</th>
+                                <th scope="col">Empresa</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">#</th>                                                                                          
+                            </tr>
+                        </thead>
+                        {{#each empresas}}
+                        <tbody>
+                            <tr>                                
+                                <td>{{numero}}</td>
+                                <td>{{empresa}}</td>
+                                <td>{{statusExib}}</td>
+                                <td><a href="/administracao/empresas/excluir/{{_id}}"><button class=" btn btn-sm btn-outline-danger">Excluir</button></a></td>                        
+                            </tr>                                    
+                        </tbody>                                        
+                        {{else}}            
+                            <tbody>
+                            <tr>
+                                <th scope="row">---</th>
+                                <td>---</td>
+                                <td>---</td>
+                                <td>---</td>                                
+                            </tr>                                    
+                        </tbody>  
+                        {{/each}}
+                    </table>    
+            </div>
+</div>

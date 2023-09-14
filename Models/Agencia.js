@@ -6,17 +6,14 @@ const Agencia = new Schema({
     numero:{
         type: Number,
         required: true
-    },
-    uf:{
-        type: String,
-        required: true
-    },
+    },    
     cidade:{
         type: String,
         required: true
     },    
     empresa:{
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: "empresas",
         required: true
     },    
     date:{

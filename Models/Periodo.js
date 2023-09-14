@@ -7,7 +7,8 @@ const Periodo = new Schema({
         required: true
     },
     empresa:{
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: "empresas",
         required: true
     },
     dateInit:{
@@ -29,6 +30,10 @@ const Periodo = new Schema({
     totalComiss:{
         type: Number,
         default: 0.0
+    },
+    status: {
+        type: String,
+        default: "Aberto"
     }
     
 })
