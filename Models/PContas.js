@@ -2,176 +2,175 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const PContas = new Schema({
-//Dados do Sumario
-    numero:{
+    //Dados do Sumario
+    numero: {
         type: Number,
         required: true
     },
-    talao:{
+    talao: {
         type: Schema.Types.ObjectId,
         ref: "taloes",
         required: true
     },
-    periodo:{
+    periodo: {
         type: Schema.Types.ObjectId,
         ref: "periodos",
         required: true
-    }, 
+    },
     agencia: {
         type: Schema.Types.ObjectId,
         ref: "agencias",
         required: true
-    },   
-    empresa:{
+    },
+    empresa: {
         type: Schema.Types.ObjectId,
         ref: "empresas",
         required: true
     },
-    dateOperacao:{
+    dateOperacao: {
         type: Date,
         required: true
     },
-//Entradas    
-    qtdBilhetes:{
+    //Entradas    
+    qtdBilhetes: {
         type: Number,
         default: 0
     },
-    totalBilhetes:{
+    totalBilhetes: {
         type: Number,
         default: 0.0
     },
-    qtdSeguro:{
-        type: Number,
-        default: 0
-    },    
-    totalSeguro:{
-        type: Number,
-        default: 0.0
-    },    
-    qtdPedagio:{
-        type: Number,
-        default: 0
-    },    
-    totalPedagio:{
-        type: Number,
-        default: 0.0
-    },
-    qtdCargas:{
-        type: Number,
-        default: 0
-    },    
-    totalCargas:{
-        type: Number,
-        default: 0.0
-    },
-    qtdBagagem:{
+    qtdSeguro: {
         type: Number,
         default: 0
     },
-    totalBagagem:{
-        type: Number,
-        default: 0.0
-    },     
-    totalOutrosEntradas:{
+    totalSeguro: {
         type: Number,
         default: 0.0
     },
-    obsOutrosEntradas:{
-        type: String        
+    qtdPedagio: {
+        type: Number,
+        default: 0
+    },
+    totalPedagio: {
+        type: Number,
+        default: 0.0
+    },
+    qtdCargas: {
+        type: Number,
+        default: 0
+    },
+    totalCargas: {
+        type: Number,
+        default: 0.0
+    },
+    qtdBagagem: {
+        type: Number,
+        default: 0
+    },
+    totalBagagem: {
+        type: Number,
+        default: 0.0
+    },
+    totalOutrosEntradas: {
+        type: Number,
+        default: 0.0
+    },
+    obsOutrosEntradas: {
+        type: String
     },
     //Saidas
-    qtdRequisicao:{
+    qtdRequisicao: {
         type: Number,
         default: 0
-    },    
-    totalRequisicao:{
+    },
+    totalRequisicao: {
         type: Number,
         default: 0.0
     },
-    qtdCortesia:{
+    qtdCortesia: {
         type: Number,
         default: 0
-    },    
-    totalCortesia:{
+    },
+    totalCortesia: {
         type: Number,
         default: 0.0
     },
-    qtdDevolucao:{
+    qtdDevolucao: {
         type: Number,
         default: 0
-    },    
-    totalDevolucao:{
+    },
+    totalDevolucao: {
         type: Number,
         default: 0.0
     },
-    qtdDesconto:{
+    qtdDesconto: {
         type: Number,
         default: 0
-    },    
-    totalDesconto:{
+    },
+    totalDesconto: {
         type: Number,
         default: 0.0
     },
-    qtdVale:{
+    qtdVale: {
         type: Number,
         default: 0
-    },    
-    totalVale:{
+    },
+    totalVale: {
         type: Number,
         default: 0.0
     },
-    totalOutrosSaidas:{
+    totalOutrosSaidas: {
         type: Number,
         default: 0.0
     },
-    obsOutrosSaidas:{
+    obsOutrosSaidas: {
         type: String,
-        required: true
     },
     //Resumo
-    totalEntradas:{
+    totalEntradas: {
         type: Number,
         default: 0.0
     },
-    totalSaidas:{
+    totalSaidas: {
         type: Number,
         default: 0.0
     },
-    liquido:{
+    liquido: {
         type: Number,
         default: 0.0
     },
-    deposito:{
+    deposito: {
         type: Number,
         default: 0.0
     },
-    cheque:{
+    cheque: {
         type: Number,
         default: 0.0
     },
-    rvr:{
+    rvr: {
         type: Number,
         default: 0.0
     },
-    pendencia:{
+    pendencia: {
         type: Boolean,
         default: false
     },
-    valorPendente:{
+    valorPendente: {
         type: Number,
         default: 0.0
     },
 
     //Controles e Logs        
-    date:{
+    date: {
         type: Date,
         default: new Date()
     },
-    user:{
+    user: {
         type: Schema.Types.ObjectId,
         ref: "users",
         required: true
     }
 })
 
-mongoose.model('pContas',PContas)
+mongoose.model('pContas', PContas)
