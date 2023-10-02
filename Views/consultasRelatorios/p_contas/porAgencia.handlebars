@@ -1,0 +1,92 @@
+{{#each error}}
+<div class="alert alert-danger">{{texto}}</div>
+{{else}}
+{{/each}}
+
+<form action="/consultas/por_agencia/pesquisar" method="get">
+  <h3>Guias lançadas por Agencia</h3>
+    <div class="table-responsive-xl">
+    <table class="table">
+        <thead class="table-dark">
+        <tr>
+            <th scope="col">Agencia</th>
+            <th scope="col">Data Inicial</th>
+            <th scope="col">Data Final</th>      
+        </tr>
+        </thead>  
+        
+            <tbody>
+            <td>
+            <div class="form-floating">
+            <select name="agencia" class="form-select" id="floatingSelect2" aria-label="agencia">                
+                <option value="selecione">---Selecione---</option>
+                {{#each agencias}}
+                <option value="{{cidade}}">{{cidade}}-{{uf}}</option>                
+                {{else}}
+                {{/each}}
+            </select>
+            <label for="floatingSelect">Agencia de Origem</label>
+            </div>
+            </td>
+            <td><input type="date" class="form-control" name="dateMin"></td>
+            <td><input type="date" class="form-control" name="dateMax"></td>      
+        </tr>          
+        </tbody> 
+    </table>
+    <button type="submit" class="btn btn-outline-success">Buscar</button>
+</form>
+<hr>
+
+<form action="/administracao/guias/excluir" method="post">
+<div class="table-responsive-xl fs-6">  
+      <table class="table table-bordered">
+          <thead class="table-dark ">
+            <tr class="fs-6">
+              <th scope="col">Nº</th>
+              <th scope="col">Conh.</th>
+              <th scope="col">Origem</th>
+              <th scope="col">Destino</th>
+              <th scope="col">Cliente</th>
+              <th scope="col">Empresa</th>
+              <th scope="col">Entrada</th>
+              <th scope="col">Pagamento</th>
+              <th scope="col">Valor</th>
+              <th scope="col">Status </th>
+              <th scope="col">Baixa </th>
+              <th scope="col">#</th>
+            </tr>
+          </thead>          
+          {{#each dados}}   
+          <tbody>
+            <tr class="fs-6 fst-normal">
+              <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{n}}</a></th>             
+              <td>{{numero}}</td>
+              <td>{{origem}}</td>
+              <td>{{destino}}</td>
+              <td>{{cliente}}</td>
+              <td>{{empresa}}</td>
+              <td>{{date_entrada}}</td>
+              <td>{{date_pagamento}}</td>
+              <td>{{valor_exib}}</td>
+              <td>{{statusPag}}</td>  
+              <td>{{statusBaixa}}</td>             
+              <td><input id="ckbox" type="checkbox" name="id" value="{{_id}}"></td>
+            </tr>    
+          </tbody>  
+          {{else}}                    
+          {{/each}}
+</table>
+      <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+          <li class="page-item {{prev}}">
+            <a class="page-link " href="/consultas/por_agencia/pesquisar?agencia={{prevUrl.agen}}&dateMin={{prevUrl.dmin}}&dateMax={{prevUrl.dmax}}&offset={{prevUrl.ofst}}&page={{prevUrl.pag}}">Anterior</a>
+          </li>
+          <li class="page-item"><a class="page-link">-- {{page}} --</a></li>
+          <li class="page-item {{next}}">
+            <a class="page-link " href="/consultas/por_agencia/pesquisar?agencia={{nextUrl.agen}}&dateMin={{nextUrl.dmin}}&dateMax={{nextUrl.dmax}}&offset={{nextUrl.ofst}}&page={{nextUrl.pag}}">Proximo</a>
+          </li>
+        </ul>
+      </nav>
+<button class="btn btn-sm btn-outline-danger" type="submit">Excluir Selecionados</button>
+</form>
+

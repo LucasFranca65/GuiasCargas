@@ -172,14 +172,57 @@ const PContas = mongoose.model('pContas')
            }
     })
     
-    router.get('/users/reset_pass/administracao/:id',eAdmin,(req,res)=>{
+    router.get('/users/reset_pass/:id',eAdmin,(req,res)=>{
         User.findOne({_id: req.params.id}).then((usuario)=>{
             res.render('administracao/users/admin_resetpass',{usuario})
         }).catch((err)=>{
             req.flash('error_msg',"Não foi encontrado usuario com esses parametros")
             res.redirect('/administracao/users')
         })
+    })    
+
+    router.post('/reset_pass/reset',eAdmin,(req,res)=>{
+        const {senha1, senha2, user_id} = req.body
+        User.findOne({_id: user_id}).then((usuario)=>{
+            
+            var error = []
+    
+            if(!senha1 || typeof senha1 == undefined || senha1 == null){
+                error.push({texto:"Senha Invalida"})
+            }
+            if(senha1.length < 6){
+                error.push({texto:"Senha Muito Curta, minimo 6 caracteres"})
+            }
+            if(senha1 != senha2){
+                error.push({texto:"As Senhas não conferem"})
+            }if(error.length > 0) {
+                res.render('administracao/users/admin_resetpass',{usuario,error})
+            }else{
+                                
+                bcrypt.genSalt(10, (erro, salt)=>{
+                    bcrypt.hash(senha1, salt,(erro,hash)=>{
+                        if(erro){
+                            req.flash('error_msg',"Houve um erro Interno "+erro)
+                            res.redirect('/administracao/users')
+                        }
+                        usuario.senha = hash
+                        usuario.save().then(()=>{
+                            req.flash('success_msg',"Senha alterada com sucesso")
+                            res.redirect('/administracao/users')
+                        }).catch((err)=>{
+                            req.flash('error_msg',"Erro ao alterar senha",err)
+                            res.redirect('/administracao/users')
+                        })
+                    })
+                })
+            }       
+    
+        }).catch((err)=>{
+        req.flash('erro_msg',"Não foi possivel carregar informações da conta",err)
+        res.redirect('/') 
+        })
     })
+
 //Rotas para Administrar Guias
     //excluir selecionados
     router.post('/guias/excluir',eAdmin,(req,res)=>{

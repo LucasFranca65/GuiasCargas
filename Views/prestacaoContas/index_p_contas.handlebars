@@ -1,72 +1,73 @@
-
 {{#each erro}}
-    <div class="alert alert-danger">{{text}}</div>
+<div class="alert alert-danger">{{text}}</div>
 {{else}}
 {{/each}}
 
 <h3>Adicionar Prestação de Contas das Agencias</h3>
 
- <form action="/arrecadacao/adicionar" method="POST" >
+<form action="/arrecadacao/adicionar" method="POST">
     <div class="table-responsive-xl">
-    <!--Formulario Dados Sumario-->
+        <!--Formulario Dados Sumario-->
         <div class="card">
             <div class="card-header">
                 <h5>Dados Sumário</h5>
             </div>
             <div class="card-body">
                 <table class="table table-borderless">
-                <thead class="table-primary">
-                    <tr>
-                    <th scope="col">N° Sumario</th>
-                    <th scope="col">Empresa</th>
-                    <th scope="col">Agencia</th>
-                    <th scope="col">Data Operação</th>                  
-                    </tr>
-                </thead>
+                    <thead class="table-primary">
+                        <tr>
+                            <th scope="col">N° Sumario</th>
+                            <th scope="col">Empresa</th>
+                            <th scope="col">Agencia</th>
+                            <th scope="col">Data Operação</th>
+                        </tr>
+                    </thead>
 
-                <tbody>
-                    <tr>
-                        <td>
-                            <input type="number" class="form-control" name="numero" placeholder="000000" required>
-                        </td>
-                        <td>                           
-                            <select name="empresa" class="form-select" id="floatingSelect" aria-label="Empresa" required>        
-                            <option value="selecione">---Selecione---</option>
-                            {{#each empresas}}
-                            <option value="{{_id}}">{{empresa}}</option>
-                            {{else}}
-                            {{/each}}                              
-                            </select>                            
-                        </td>
-                        <td>
-                            <select name="agencia" class="form-select" id="floatingSelect2" aria-label="Agencia" required>        
-                            <option value="selecione">---Selecione---</option>         
-                            {{#each agencias}}
-                            <option value="{{_id}}">{{cidade}}</option>
-                            {{else}}
-                            {{/each}}                                
-                            </select>                             
-                        </td>
-                        <td>
-                            <input type="date" class="form-control" name="dateOperacao" required>
-                        </td>
-                    </tr>          
-                </tbody>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <input type="number" class="form-control" name="numero" placeholder="000000" required>
+                            </td>
+                            <td>
+                                <select name="empresa" class="form-select" id="floatingSelect" aria-label="Empresa"
+                                    required>
+                                    <option value="selecione">---Selecione---</option>
+                                    {{#each empresas}}
+                                    <option value="{{_id}}">{{empresa}}</option>
+                                    {{else}}
+                                    {{/each}}
+                                </select>
+                            </td>
+                            <td>
+                                <select name="agencia" class="form-select" id="floatingSelect2" aria-label="Agencia"
+                                    required>
+                                    <option value="selecione">---Selecione---</option>
+                                    {{#each agencias}}
+                                    <option value="{{_id}}">{{cidade}}</option>
+                                    {{else}}
+                                    {{/each}}
+                                </select>
+                            </td>
+                            <td>
+                                <input type="date" class="form-control" name="dateOperacao" required>
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </div><br>
-    <!--Formulario Entradas-->
+        <!--Formulario Entradas-->
         <div class="card">
             <div class="card-header">
                 <h5>Entradas</h5>
             </div>
             <div class="card-body">
-            <!--Primeira Linhas das entradas-->
+                <!--Primeira Linhas das entradas-->
                 <table class="table table-borderless">
                     <thead class="table-success">
                         <tr>
-                            <th scope="col" colspan="2">Passagens </th>                            
-                            <th scope="col" colspan="2" >Seguros </th>
+                            <th scope="col" colspan="2">Passagens </th>
+                            <th scope="col" colspan="2">Seguros </th>
                             <th scope="col" colspan="2">Pedagio </th>
                         </tr>
                     </thead>
@@ -74,76 +75,85 @@
                     <tbody>
                         <tr>
                             <td>
-                                <input type="number" class="form-control" name="qtdBilhetes" placeholder="Quantidade" >                        
+                                <input type="number" class="form-control" name="qtdBilhetes" placeholder="Quantidade">
                             </td>
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="totalBilhetes" type="number" class="form-control" placeholder="Valor" aria-label="Dollar amount (with dot and two decimal places)" >
+                                    <input name="totalBilhetes" type="number" class="form-control" placeholder="Valor"
+                                        aria-label="Dollar amount (with dot and two decimal places)">
                                 </div>
                             </td>
                             <td>
-                                <input type="number" class="form-control" name="qtdSeguro" placeholder="Quantidade" >                        
+                                <input type="number" class="form-control" name="qtdSeguro" placeholder="Quantidade">
                             </td>
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="totalSeguro" type="number" class="form-control" placeholder="Valor" aria-label="Dollar amount (with dot and two decimal places)" >
+                                    <input name="totalSeguro" type="number" class="form-control" placeholder="Valor"
+                                        aria-label="Dollar amount (with dot and two decimal places)">
                                 </div>
                             </td>
                             <td>
-                                <input type="number" class="form-control" name="qtdPedagio" placeholder="Quantidade" >                        
+                                <input type="number" class="form-control" name="qtdPedagio" placeholder="Quantidade">
                             </td>
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="totalPedagio" type="number" class="form-control"  placeholder="Valor" aria-label="Dollar amount (with dot and two decimal places)" >
+                                    <input name="totalPedagio" type="number" class="form-control" placeholder="Valor"
+                                        aria-label="Dollar amount (with dot and two decimal places)">
                                 </div>
                             </td>
-                        </tr>          
+                        </tr>
                     </tbody>
                 </table>
-            <!--Segunda Linhas das entradas-->
+                <!--Segunda Linhas das entradas-->
                 <table class="table table-borderless">
                     <thead class="table-success">
                         <tr>
                             <th scope="col" colspan="2">Exesso Bagagem </th>
-                            <th scope="col" colspan="2">Cargas</th> 
+                            <th scope="col" colspan="2">Cargas</th>
                             <th scope="col">Outras Entradas</th>
-                            <th scope="col">Liquido Entradas </th>                                                           
-                        </tr>                    
+                            <th scope="col">Liquido Entradas </th>
+                        </tr>
                     </thead>
 
                     <tbody>
                         <tr>
                             <td>
-                                <input type="number" class="form-control" name="qtdBagagem" placeholder="Quantidade" >                        
+                                <input type="number" class="form-control" name="qtdBagagem" placeholder="Quantidade">
                             </td>
                             <td>
                                 <div class="input-group mb-3">
-                                    <span class="input-group-text">R$</span>                                    
-                                    <input name="totalBagagem" type="number" class="form-control" aria-label="Dollar amount (with dot and two decimal places)" placeholder="Valor" >
+                                    <span class="input-group-text">R$</span>
+                                    <input name="totalBagagem" type="number" class="form-control"
+                                        aria-label="Dollar amount (with dot and two decimal places)"
+                                        placeholder="Valor">
                                 </div>
                             </td>
                             <td>
-                                <input type="number" class="form-control" name="qtdCargas" placeholder="Quantidade" >                        
+                                <input type="number" class="form-control" name="qtdCargas" placeholder="Quantidade">
                             </td>
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="totalCargas" type="number" placeholder="Valor" class="form-control" aria-label="Dollar amount (with dot and two decimal places)" >
+                                    <input name="totalCargas" type="number" placeholder="Valor" class="form-control"
+                                        aria-label="Dollar amount (with dot and two decimal places)">
                                 </div>
                             </td>
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="totalOutrosEntradas" placeholder="Valor" type="number" class="form-control" aria-label="Dollar amount (with dot and two decimal places)" >
-                                </div>                       
+                                    <input name="totalOutrosEntradas" placeholder="Valor" type="number"
+                                        class="form-control"
+                                        aria-label="Dollar amount (with dot and two decimal places)">
+                                </div>
                             </td>
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="totalEntradas" type="number" placeholder="Valor" class="form-control" aria-label="Dollar amount (with dot and two decimal places)" >
+                                    <input name="totalEntradas" type="number" placeholder="Valor" class="form-control"
+                                        aria-label="Dollar amount (with dot and two decimal places)">
                                 </div>
                             </td>
                         </tr>
@@ -153,98 +163,108 @@
                                 <textarea name="" rows="3" class="form-control"></textarea>
                             </td>
                         </tr>
-                                                    
+
                     </tbody>
                 </table>
             </div>
         </div><br>
 
-    <!--Formulario Saidas-->
+        <!--Formulario Saidas-->
         <div class="card">
-            <div class="card-header"><h5>Saidas</h5></div>
+            <div class="card-header">
+                <h5>Saidas</h5>
+            </div>
             <div class="card-body">
-            <!--Primeira Linhas das Saidas-->
+                <!--Primeira Linhas das Saidas-->
                 <table class="table table-borderless">
                     <thead class="table-danger">
                         <tr>
-                            <th scope="col" colspan="2">Requisições </th>                            
-                            <th scope="col" colspan="2" >Cortesias </th>
+                            <th scope="col" colspan="2">Requisições </th>
+                            <th scope="col" colspan="2">Cortesias </th>
                             <th scope="col" colspan="2">Devolução </th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td>
-                                <input type="number" class="form-control" name="qtdRequisicao" placeholder="Quantidade" >                        
+                                <input type="number" class="form-control" name="qtdRequisicao" placeholder="Quantidade">
                             </td>
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="totalRequisicao" type="number" class="form-control" placeholder="Valor" aria-label="Dollar amount (with dot and two decimal places)" >
+                                    <input name="totalRequisicao" type="number" class="form-control" placeholder="Valor"
+                                        aria-label="Dollar amount (with dot and two decimal places)">
                                 </div>
                             </td>
                             <td>
-                                <input type="number" class="form-control" name="qtdCortesia" placeholder="Quantidade" >                        
+                                <input type="number" class="form-control" name="qtdCortesia" placeholder="Quantidade">
                             </td>
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="totalCortesia" type="number" class="form-control" placeholder="Valor" aria-label="Dollar amount (with dot and two decimal places)" >
+                                    <input name="totalCortesia" type="number" class="form-control" placeholder="Valor"
+                                        aria-label="Dollar amount (with dot and two decimal places)">
                                 </div>
                             </td>
                             <td>
-                                <input type="number" class="form-control" name="qtdDevolucao" placeholder="Quantidade" >                        
+                                <input type="number" class="form-control" name="qtdDevolucao" placeholder="Quantidade">
                             </td>
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="totalDevolucao" type="number" class="form-control"  placeholder="Valor" aria-label="Dollar amount (with dot and two decimal places)" >
+                                    <input name="totalDevolucao" type="number" class="form-control" placeholder="Valor"
+                                        aria-label="Dollar amount (with dot and two decimal places)">
                                 </div>
                             </td>
-                        </tr>          
+                        </tr>
                     </tbody>
                 </table>
-            <!--Segunda Linhas das saidas-->
+                <!--Segunda Linhas das saidas-->
                 <table class="table table-borderless">
                     <thead class="table-danger">
                         <tr>
-                            <th scope="col" colspan="2">Desconto </th>                            
-                            <th scope="col" colspan="2" >Vale Transporte </th>
-                            <th scope="col" >Outros </th>
-                            <th scope="col" >Liquido Saidas</th>
-                        </tr>                   
+                            <th scope="col" colspan="2">Desconto </th>
+                            <th scope="col" colspan="2">Vale Transporte </th>
+                            <th scope="col">Outros </th>
+                            <th scope="col">Liquido Saidas</th>
+                        </tr>
                     </thead>
 
                     <tbody>
                         <tr>
                             <td>
-                                <input type="number" class="form-control" name="qtdDevolucao" placeholder="Quantidade" >                        
+                                <input type="number" class="form-control" name="qtdDesconto" placeholder="Quantidade">
                             </td>
                             <td>
                                 <div class="input-group mb-3">
-                                    <span class="input-group-text">R$</span>                                    
-                                    <input name="totalDevolucao" type="number" class="form-control" aria-label="Dollar amount (with dot and two decimal places)" placeholder="Valor" >
+                                    <span class="input-group-text">R$</span>
+                                    <input name="totalDesconto" type="number" class="form-control"
+                                        aria-label="Dollar amount (with dot and two decimal places)"
+                                        placeholder="Valor">
                                 </div>
                             </td>
                             <td>
-                                <input type="number" class="form-control" name="qtdVale" placeholder="0" >                        
+                                <input type="number" class="form-control" name="qtdVale" placeholder="0">
                             </td>
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="totalVale" type="number" class="form-control" aria-label="Dollar amount (with dot and two decimal places)" >
+                                    <input name="totalVale" type="number" class="form-control"
+                                        aria-label="Dollar amount (with dot and two decimal places)">
                                 </div>
                             </td>
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="totalOutrosSaidas" type="number" class="form-control" aria-label="Dollar amount (with dot and two decimal places)" >
-                                </div>                       
+                                    <input name="totalOutrosSaidas" type="number" class="form-control"
+                                        aria-label="Dollar amount (with dot and two decimal places)">
+                                </div>
                             </td>
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="totalSaidas" type="number" class="form-control" aria-label="Dollar amount (with dot and two decimal places)" >
+                                    <input name="totalSaidas" type="number" class="form-control"
+                                        aria-label="Dollar amount (with dot and two decimal places)">
                                 </div>
                             </td>
                         </tr>
@@ -254,20 +274,22 @@
                                 <textarea name="obsOutrosSaidas" rows="3" class="form-control"></textarea>
                             </td>
                         </tr>
-                                                    
+
                     </tbody>
                 </table>
             </div>
         </div><br>
 
-         <!--Formulario Resumo-->
+        <!--Formulario Resumo-->
         <div class="card">
-            <div class="card-header"><h5>Resumo</h5></div>
-            <div class="card-body">            
+            <div class="card-header">
+                <h5>Resumo</h5>
+            </div>
+            <div class="card-body">
                 <table class="table table-borderless">
                     <thead class="table-secondary">
                         <tr>
-                            <th scope="col">Liquido Total</th>                            
+                            <th scope="col">Liquido Total</th>
                             <th scope="col">Deposito</th>
                             <th scope="col">Cheque</th>
                             <th scope="col">RVR</th>
@@ -279,36 +301,41 @@
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="liquido" type="number" class="form-control" placeholder="Valor" aria-label="Dollar amount (with dot and two decimal places)" >
-                                </div>
-                            </td>                            
-                            <td>
-                                <div class="input-group mb-3">
-                                    <span class="input-group-text">R$</span>
-                                    <input name="deposito" type="number" class="form-control" placeholder="Valor" aria-label="Dollar amount (with dot and two decimal places)" >
-                                </div>
-                            </td>                            
-                            <td>
-                                <div class="input-group mb-3">
-                                    <span class="input-group-text">R$</span>
-                                    <input name="cheque" type="number" class="form-control"  placeholder="Valor" aria-label="Dollar amount (with dot and two decimal places)" >
+                                    <input name="liquido" type="number" class="form-control" placeholder="Valor"
+                                        aria-label="Dollar amount (with dot and two decimal places)">
                                 </div>
                             </td>
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="rvr" type="number" class="form-control"  placeholder="Valor" aria-label="Dollar amount (with dot and two decimal places)" >
+                                    <input name="deposito" type="number" class="form-control" placeholder="Valor"
+                                        aria-label="Dollar amount (with dot and two decimal places)">
                                 </div>
                             </td>
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="valorPendente" type="number" class="form-control"  placeholder="Valor" aria-label="Dollar amount (with dot and two decimal places)" >
+                                    <input name="cheque" type="number" class="form-control" placeholder="Valor"
+                                        aria-label="Dollar amount (with dot and two decimal places)">
                                 </div>
                             </td>
-                        </tr>          
+                            <td>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">R$</span>
+                                    <input name="rvr" type="number" class="form-control" placeholder="Valor"
+                                        aria-label="Dollar amount (with dot and two decimal places)">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">R$</span>
+                                    <input name="valorPendente" type="number" class="form-control" placeholder="Valor"
+                                        aria-label="Dollar amount (with dot and two decimal places)">
+                                </div>
+                            </td>
+                        </tr>
                     </tbody>
-                </table>           
+                </table>
             </div>
         </div><br>
 
@@ -316,52 +343,4 @@
     <button class="btn btn-secondary btn-sm" type="submit">Gravar</button>
     <button class="btn btn-outline-secondary btn-sm" type="reset">Limpar</button>
 </form>
-  
-<br>
-{{#if guias}}
-<h3>Ultimas Guias Adicionadas</h3>
-<br>
-<div class="table-responsive-xl">  
-    <table class="table table-bordered fs-6">
-      <thead class="table-dark">
-        <tr>
-          <th scope="col">Conhec.</th>
-          <th scope="col">Origem</th>
-          <th scope="col">Destino</th>
-          <th scope="col">Cliente</th>
-          <th scope="col">Empresa</th>
-          <th scope="col">Entrada</th>
-          <th scope="col">Pagamento</th>
-          <th scope="col">Valor</th>
-          <th scope="col">Status</th>
-          <th scope="col">Baixa</th>
-          <th scope="col">#</th>
-        </tr>
-      </thead>
-      <form action="/administracao/guias/excluir" method="post">
-      {{#each guias}}   
-      <tbody>
-        <tr>
-          <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
-          <td>{{origem.cidade}}</td>
-          <td>{{destino.cidade}}</td>
-          <td>{{cliente}}</td>
-          <td>{{empresa.empresa}}</td>
-          <td>{{date_entrada}}</td>
-          <td>{{date_pagamento}}</td>
-          <td>{{valorExib}}</td>
-          <td>{{formaPag}}</td>
-          <td>{{statusBaixa}}</td>          
-          <td><input type="checkbox" name="ident" value="{{_id}}"></td>
-        </tr>    
-      </tbody>  
-      {{else}}
-      {{/each}}
-    </table>
-    <button class="btn btn-sm btn-outline-danger" type="submit">Excluir Selecionados</button>
-  </form>
-</div>
-
-{{else}}
-{{/if}}
 <br>
