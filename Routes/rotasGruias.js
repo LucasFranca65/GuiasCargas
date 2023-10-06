@@ -228,6 +228,7 @@ router.get('/selectEdit/:id', lOgado, (req, res) => {
                 if (guia.baixa == true) {
                     guia["check"] = "checked"
                 }
+                console.log(guia)
                 res.render('guiasDeCargas/vizualizar', { guia, empresas, agencias })
 
             }).catch((err) => {

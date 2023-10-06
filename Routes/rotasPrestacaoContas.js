@@ -104,9 +104,9 @@ router.post('/adicionar', lOgado, (req, res) => {
                         req.flash('error_msg', "Não existe talão cadastrado para esse numero de sumario")
                         res.redirect('/arrecadacao')
                     } else {
-                        PContas.findOne({ numero: numero }).then((sumario) => {
+                        PContas.findOne({ $or: [{ numero: numero }, { dateOperacao: moment(dateOperacao).format('YYYY-MM-DDT00:00:00.000+00:00') }], agencia: agencia, empresa: empresa }).then((sumario) => {
                             if (sumario) {
-                                req.flash('error_msg', "Já existe uma digitação para esse numero de sumario")
+                                req.flash('error_msg', "Já existe uma digitação para esse numero de sumario, ou data de operação para a empresa ou agencia selecionado")
                                 res.redirect('/arrecadacao')
                             } else {
 
@@ -140,7 +140,7 @@ router.post('/adicionar', lOgado, (req, res) => {
                                 }
                                 console.log(newPcontas)
                                 new PContas(newPcontas).save().then(() => {
-                                    req.flash('succes_msg', "Prestação de contas Numero: " + numero + ", Cadastrada com sucesso ")
+                                    req.flash('success_msg', "Prestação de contas Numero: " + numero + ", Cadastrada com sucesso ")
                                     res.redirect('/arrecadacao')
                                 }).catch((err) => {
                                     req.flash('error_msg', "Erro ao Tentar Cadastrar a Prestação de contas Numero: " + numero + "Erro: " + err)
@@ -165,5 +165,71 @@ router.post('/adicionar', lOgado, (req, res) => {
 
 
 })
+
+router.get('/buscar_guias', lOgado, (req, res) => {
+    Empresa.find().sort({ empresa: 1 }).then((empresas) => {
+        Agencia.find().sort({ cidade: 1 }).then((agencias) => {
+            res.render('prestacaoContas/buscar_p_contas', ({ empresas, agencias }))
+        }).catch((err) => {
+            req.flash('error_msg', "Erro ao buscar agencias na busca de guias" + err)
+            res.redirect('/painel')
+        })
+    }).catch((err) => {
+        req.flash('error_msg', "Erro ao buscar empresas na busca de guias" + err)
+        res.redirect('/painel')
+    })
+})
+
+router.get('/buscar_guias/buscar', lOgado, (req, res) => {
+    const { dateOperacao, empresa } = req.query
+    Empresa.find().sort({ empresa: 1 }).then((empresas) => {
+
+        let data = moment(dateOperacao).format('YYYY-MM-DDT00:00:00.000+00:00')
+        PContas.find({ dateOperacao: data, empresa: empresa }).populate('agencia').populate('empresa').then((sumarios) => {
+            if (sumarios.length == 0) {
+                req.flash('error_msg', "Não foi encontrada prestação de contas para esses parametros")
+                res.redirect('/arrecadacao/buscar_guias')
+            } else {
+                sumarios.forEach(sumarios => {
+                    sumarios['dateExib'] = moment(dateOperacao).format('DD/MM/YYYY')
+                    sumarios['liqExib'] = sumarios.liquido.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                });
+                res.render('prestacaoContas/buscar_p_contas', ({ empresas, sumarios }))
+
+            }
+        }).catch((err) => {
+            req.flash('error_msg', "Erro ao buscar agencias na busca de guias" + err)
+            res.redirect('/painel')
+        })
+    }).catch((err) => {
+        req.flash('error_msg', "Erro ao buscar empresas na busca de guias" + err)
+        res.redirect('/painel')
+    })
+})
+
+router.get('/selectEdit/:id', lOgado, (req, res) => {
+    const id = req.params.id
+    Empresa.find().sort({ empresa: 1 }).then((empresas) => {
+        Agencia.find().sort({ cidade: 1 }).then((agencias) => {
+            PContas.findOne({ _id: id }).populate('agencia').populate('empresa').then((sumario) => {
+                sumario["date_exib"] = moment(sumario.dateOperacao).format('YYYY-MM-DD')
+                console.log(moment(sumario.dateOperacao).format('YYYY-MM-DD'))
+                res.render('prestacaoContas/ver_p_contas', ({ sumario, empresas, agencias }))
+            }).catch((err) => {
+                req.flash('error_msg', "Erro ao buscar prestação de contas na edicao" + err)
+                res.redirect('/painel')
+            })
+        }).catch((err) => {
+            req.flash('error_msg', "Erro ao buscar agencias na edicao de guias" + err)
+            res.redirect('/painel')
+        })
+    }).catch((err) => {
+        req.flash('error_msg', "Erro ao buscar empresas na edicao de guias" + err)
+        res.redirect('/painel')
+    })
+
+
+})
+
 
 module.exports = router

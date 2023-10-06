@@ -80,7 +80,8 @@
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="totalBilhetes" type="number" class="form-control" placeholder="Valor"
+                                    <input name="totalBilhetes" step="any" type="number" class="form-control"
+                                        placeholder="Valor"
                                         aria-label="Dollar amount (with dot and two decimal places)">
                                 </div>
                             </td>
@@ -90,7 +91,8 @@
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="totalSeguro" type="number" class="form-control" placeholder="Valor"
+                                    <input name="totalSeguro" step="any" type="number" class="form-control"
+                                        placeholder="Valor"
                                         aria-label="Dollar amount (with dot and two decimal places)">
                                 </div>
                             </td>
@@ -100,7 +102,8 @@
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="totalPedagio" type="number" class="form-control" placeholder="Valor"
+                                    <input name="totalPedagio" type="number" step="any" class="form-control"
+                                        placeholder="Valor"
                                         aria-label="Dollar amount (with dot and two decimal places)">
                                 </div>
                             </td>
@@ -126,7 +129,7 @@
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="totalBagagem" type="number" class="form-control"
+                                    <input name="totalBagagem" step="any" type="number" class="form-control"
                                         aria-label="Dollar amount (with dot and two decimal places)"
                                         placeholder="Valor">
                                 </div>
@@ -137,14 +140,7 @@
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="totalCargas" type="number" placeholder="Valor" class="form-control"
-                                        aria-label="Dollar amount (with dot and two decimal places)">
-                                </div>
-                            </td>
-                            <td>
-                                <div class="input-group mb-3">
-                                    <span class="input-group-text">R$</span>
-                                    <input name="totalOutrosEntradas" placeholder="Valor" type="number"
+                                    <input name="totalCargas" type="number" step="any" placeholder="Valor"
                                         class="form-control"
                                         aria-label="Dollar amount (with dot and two decimal places)">
                                 </div>
@@ -152,7 +148,16 @@
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="totalEntradas" type="number" placeholder="Valor" class="form-control"
+                                    <input name="totalOutrosEntradas" placeholder="Valor" type="number" step="any"
+                                        class="form-control"
+                                        aria-label="Dollar amount (with dot and two decimal places)">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">R$</span>
+                                    <input name="totalEntradas" type="number" step="any" placeholder="Valor"
+                                        class="form-control"
                                         aria-label="Dollar amount (with dot and two decimal places)">
                                 </div>
                             </td>
@@ -160,7 +165,7 @@
                         <tr>
                             <td colspan="6">
                                 <p>Observações</p>
-                                <textarea name="" rows="3" class="form-control"></textarea>
+                                <textarea name="obsOutrosEntradas" rows="3" class="form-control"></textarea>
                             </td>
                         </tr>
 
@@ -192,7 +197,8 @@
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="totalRequisicao" type="number" class="form-control" placeholder="Valor"
+                                    <input name="totalRequisicao" type="number" step="any" class="form-control"
+                                        placeholder="Valor"
                                         aria-label="Dollar amount (with dot and two decimal places)">
                                 </div>
                             </td>
@@ -202,7 +208,8 @@
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="totalCortesia" type="number" class="form-control" placeholder="Valor"
+                                    <input name="totalCortesia" type="number" class="form-control" format="currency"
+                                        precision="2" placeholder="Valor"
                                         aria-label="Dollar amount (with dot and two decimal places)">
                                 </div>
                             </td>
@@ -212,7 +219,8 @@
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="totalDevolucao" type="number" class="form-control" placeholder="Valor"
+                                    <input name="totalDevolucao" type="number" class="form-control" format="currency"
+                                        precision="2" placeholder="Valor"
                                         aria-label="Dollar amount (with dot and two decimal places)">
                                 </div>
                             </td>
@@ -238,7 +246,7 @@
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="totalDesconto" type="number" class="form-control"
+                                    <input name="totalDesconto" type="number" step="any" class="form-control"
                                         aria-label="Dollar amount (with dot and two decimal places)"
                                         placeholder="Valor">
                                 </div>
@@ -249,21 +257,20 @@
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="totalVale" type="number" class="form-control"
+                                    <input name="totalVale" type="number" step="any" class="form-control"
                                         aria-label="Dollar amount (with dot and two decimal places)">
                                 </div>
                             </td>
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="totalOutrosSaidas" type="number" class="form-control"
-                                        aria-label="Dollar amount (with dot and two decimal places)">
+                                    <input name="totalOutrosSaidas" type="number" step="any" class="form-control">
                                 </div>
                             </td>
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="totalSaidas" type="number" class="form-control"
+                                    <input name="totalSaidas" type="number" step="any" class="form-control"
                                         aria-label="Dollar amount (with dot and two decimal places)">
                                 </div>
                             </td>
@@ -301,35 +308,39 @@
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="liquido" type="number" class="form-control" placeholder="Valor"
+                                    <input name="liquido" type="number" step="any" class="form-control"
+                                        placeholder="Valor"
                                         aria-label="Dollar amount (with dot and two decimal places)">
                                 </div>
                             </td>
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="deposito" type="number" class="form-control" placeholder="Valor"
+                                    <input name="deposito" type="number" step="any" class="form-control"
+                                        placeholder="Valor"
                                         aria-label="Dollar amount (with dot and two decimal places)">
                                 </div>
                             </td>
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="cheque" type="number" class="form-control" placeholder="Valor"
+                                    <input name="cheque" type="number" step="any" class="form-control"
+                                        placeholder="Valor"
                                         aria-label="Dollar amount (with dot and two decimal places)">
                                 </div>
                             </td>
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="rvr" type="number" class="form-control" placeholder="Valor"
+                                    <input name="rvr" type="number" step="any" class="form-control" placeholder="Valor"
                                         aria-label="Dollar amount (with dot and two decimal places)">
                                 </div>
                             </td>
                             <td>
                                 <div class="input-group mb-3">
                                     <span class="input-group-text">R$</span>
-                                    <input name="valorPendente" type="number" class="form-control" placeholder="Valor"
+                                    <input name="valorPendente" type="number" step="any" class="form-control"
+                                        placeholder="Valor"
                                         aria-label="Dollar amount (with dot and two decimal places)">
                                 </div>
                             </td>
