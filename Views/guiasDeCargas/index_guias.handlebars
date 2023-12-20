@@ -1,111 +1,117 @@
 <div style="padding: ;">
-{{#each erro}}
-    <div class="alert alert-danger">{{text}}</div>
-{{else}}
-{{/each}}
-<h3>Adicionar Guia de Carga</h3>
-<div class="card">
+  {{#each erro}}
+  <div class="alert alert-danger">{{text}}</div>
+  {{else}}
+  {{/each}}
+  <h3>Cadastrar Excesso de Bagagem</h3>
+
   <div class="card-body">
-    <form action="/guias/adicionar" method="POST" >
+    <form action="/guias/adicionar" method="POST">
       <div class="table-responsive-xl">
         <!--Formulario primeira Linha-->
         <table class="table">
           <thead class="table-dark">
             <tr>
-              <th scope="col">Conhecimento</th>
+              <th scope="col">Número</th>
               <th scope="col">Origem</th>
               <th scope="col">Destino</th>
               <th scope="col">Cliente</th>
-              <th scope="col">Empresa</th>      
+              <th scope="col">Empresa</th>
             </tr>
           </thead>
-
           <tbody>
             <tr>
               <td>
                 <div class="form-floating mb-3">
-                <input type="number" class="form-control" name="numero" placeholder="Valor da Guia" required>
-                <label for="floatingInput">Numero Conhecimento</label>
+                  <input type="number" class="form-control" name="numero" placeholder="Valor da Guia" required>
+                  <label for="floatingInput">Numero Conhecimento</label>
                 </div>
               </td>
               <td>
                 <div class="form-floating">
-                <select name="origem" class="form-select" id="floatingSelect" aria-label="Agencia Origem">        
-                  <option value="selecione">---Selecione---</option>
-                  {{#each agencias}}
-                  <option value="{{_id}}">{{cidade}}</option>
-                  {{else}}
-                  {{/each}}                              
-                </select>
-                <label for="floatingSelect">Agencia Origem</label> 
+                  <select name="origem" class="form-select" id="floatingSelect" aria-label="Agencia Origem">
+                    <option value="selecione">---Selecione---</option>
+                    {{#each agencias}}
+                    <option value="{{_id}}">{{cidade}}</option>
+                    {{else}}
+                    {{/each}}
+                  </select>
+                  <label for="floatingSelect">Agencia Origem</label>
                 </div>
               </td>
               <td>
                 <div class="form-floating">
-                <select name="destino" class="form-select" id="floatingSelect2" aria-label="Agencia Destino">        
-                  <option value="selecione">---Selecione---</option>         
-                  {{#each agencias}}
-                  <option value="{{_id}}">{{cidade}}</option>
-                  {{else}}
-                  {{/each}}                                
-                </select> 
-                <label for="floatingSelect2">Agencia de Destino</label>
-                </div>
-              </td>
-              <td>
-                <div class="form-floating mb-3">
-                <input type="text" name="cliente" class="form-control" id="floatingInput" placeholder="Cliente" required>
-                <label for="floatingInput">Cliente</label>
+                  <select name="destino" class="form-select" id="floatingSelect2" aria-label="Agencia Destino">
+                    <option value="selecione">---Selecione---</option>
+                    {{#each agencias}}
+                    <option value="{{_id}}">{{cidade}}</option>
+                    {{else}}
+                    {{/each}}
+                  </select>
+                  <label for="floatingSelect2">Agencia de Destino</label>
                 </div>
               </td>
               <td>
                 <div class="form-floating">
-                <select name="empresa" class="form-select" id="floatingSelect2" aria-label="Agencia Destino">
-                  <option value="selecione">---Selecione---</option>
-                  {{#each empresas}}
-                  <option value="{{_id}}">{{empresa}}</option>
-                  {{else}}
-                  {{/each}}   
-                </select>
-                <label for="floatingSelect">Empresa</label>
+                  <select name="client" class="form-select" id="floatingSelect2" aria-label="Cliente">
+                    <option value="selecione">---Selecione---</option>
+                    {{#each clientes}}
+                    <option value="{{_id}}">{{name_client}}</option>
+                    {{else}}
+                    {{/each}}
+                  </select>
+                  <label for="floatingSelect2">Cliente</label>
                 </div>
-              </td>      
-            </tr>          
+              </td>
+              <td>
+                <div class="form-floating">
+                  <select name="empresa" class="form-select" id="floatingSelect2" aria-label="Agencia Destino">
+                    <option value="selecione">---Selecione---</option>
+                    {{#each empresas}}
+                    <option value="{{_id}}">{{empresa}}</option>
+                    {{else}}
+                    {{/each}}
+                  </select>
+                  <label for="floatingSelect">Empresa</label>
+                </div>
+              </td>
+            </tr>
           </tbody>
         </table>
         <!--Formulario segunda Linha-->
         <table class="table">
           <thead class="table-dark">
-            <tr>      
+            <tr>
               <th scope="col">Entrada</th>
               <th scope="col">Pagamento/Previsão</th>
               <th scope="col">Valor</th>
               <th scope="col">Cond Pagamento </th>
-              <th scope="col">--</th>
+              <th scope="col">Nº Fatura</th>
             </tr>
-          </thead> 
+          </thead>
           <tbody>
-            <tr>      
+            <tr>
               <td><input type="date" class="form-control" name="dateEntrada"></td>
               <td><input type="date" class="form-control" name="datePagamento"></td>
               <td>
                 <div class="input-group mb-3">
-                <span class="input-group-text">R$</span>
-                <span class="input-group-text">0.00</span>
-                <input name="valor" type="number" class="form-control" aria-label="Dollar amount (with dot and two decimal places)" required>
-              </div>
-          </td>
+                  <span class="input-group-text">R$</span>
+                  <span class="input-group-text">0.00</span>
+                  <input name="valor" type="number" class="form-control"
+                    aria-label="Dollar amount (with dot and two decimal places)" required>
+                </div>
+              </td>
               <td>
                 <select name="formaPag" class="form-select" required>
                   <option value="selecione">---Selecione---</option>
-                  <option value="PAGO">A VISTA / PAGO</option>
+                  <option value="A VISTA">A VISTA</option>
                   <option value="A COBRAR">A COBRAR</option>
-                  <option value="CONTA CORRENTE">CONTA CORRENTE</option>
+                  <option value="FATURADO">FATURADO</option>
                   <option value="CANCELADO">CANCELADO</option>
                 </select>
               </td>
-              <td><input type="checkbox" name="baixa" value="true">Baixa Automatica</td>
-            </tr>          
+              <td><input type="number" class="form-control" placeholder="Obrigaorio se Faturado" name="n_fatura"></td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -113,15 +119,15 @@
       <button class="btn btn-outline-secondary btn-sm" type="reset">Limpar</button>
     </form>
   </div>
-</div><br>
-{{#if guias}}
-<h3>Ultimas Guias Adicionadas</h3>
-<br>
-<div class="table-responsive-xl">  
+  <br>
+  {{#if guias}}
+  <h3>Ultimas Guias Adicionadas</h3>
+  <br>
+  <div class="table-responsive-xl">
     <table class="table table-bordered fs-6">
       <thead class="table-dark">
         <tr>
-          <th scope="col">Conhec.</th>
+          <th scope="col">Conhecimento</th>
           <th scope="col">Origem</th>
           <th scope="col">Destino</th>
           <th scope="col">Cliente</th>
@@ -129,34 +135,35 @@
           <th scope="col">Entrada</th>
           <th scope="col">Pagamento</th>
           <th scope="col">Valor</th>
-          <th scope="col">Status</th>
-          <th scope="col">Baixa</th>
-          <th scope="col">#</th>
+          <th scope="col">Forma Pag</th>
+          <th scope="col">Nº Fatura</th>
+          <th scope="col">Status Pag</th>
+
         </tr>
       </thead>
       <form action="/administracao/guias/excluir" method="post">
-      {{#each guias}}   
-      <tbody>
-        <tr>
-          <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
-          <td>{{origem.cidade}}</td>
-          <td>{{destino.cidade}}</td>
-          <td>{{cliente}}</td>
-          <td>{{empresa.empresa}}</td>
-          <td>{{date_entrada}}</td>
-          <td>{{date_pagamento}}</td>
-          <td>{{valorExib}}</td>
-          <td>{{formaPag}}</td>
-          <td>{{statusBaixa}}</td>          
-          <td><input type="checkbox" name="ident" value="{{_id}}"></td>
-        </tr>    
-      </tbody>  
-      {{else}}
-      {{/each}}
+        {{#each guias}}
+        <tbody>
+          <tr>
+            <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
+            <td>{{origem.cidade}}</td>
+            <td>{{destino.cidade}}</td>
+            <td>{{cliente.name_client}}</td>
+            <td>{{empresa.empresa}}</td>
+            <td>{{date_entrada}}</td>
+            <td>{{date_pagamento}}</td>
+            <td>{{valorExib}}</td>
+            <td>{{formaPag}}</td>
+            <td>{{n_fatura}}</td>
+            <td>{{statusBaixa}}</td>
+          </tr>
+        </tbody>
+        {{else}}
+        {{/each}}
     </table>
     <button class="btn btn-sm btn-outline-danger" type="submit">Excluir Selecionados</button>
-  </form>
-</div>
+    </form>
+  </div>
 </div>
 {{else}}
 {{/if}}

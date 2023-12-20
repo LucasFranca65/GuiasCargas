@@ -1,0 +1,86 @@
+{{#each error}}
+<div class="alert alert-danger">{{texto}}</div>
+{{else}}
+{{/each}}
+
+<div class="table-responsive-xl">
+
+    <form action="/administracao/clientes/add_cliente" method="post">
+        <table class="table">
+            <p style="font-weight: bold;">Cadastrar Novo Cliente gencia</p>
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">Nome</th>
+                    <th scope="col">Tipo</th>
+                    <th scope="col">CNPJ/CPF</th>
+                    <th scope="col">Contato Tel</th>
+                    <th scope="col">Permite Faturar</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <input class="form-control" type="text" name="name_client">
+                    </td>
+                    <td>
+                        <select name="tipo_doc" class="form-select" id="floatingSelect2" aria-label="tipo">
+                            <option value="selecione">---Selecione---</option>
+                            <option value="CPF">CPF</option>
+                            <option value="CNPJ">CNPJ</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input class="form-control" type="number" name="documento">
+                    </td>
+                    <td>
+                        <input class="form-control" type="number" name="contato">
+                    </td>
+                    <td>
+                        <select name="perm_fatura" class="form-select" id="floatingSelect2" aria-label="perm_fatura">
+                            <option value="selecione">---Selecione---</option>
+                            <option value="true">Premite faturar</option>
+                            <option value="false">Não permite faturar</option>
+                        </select>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="btn btn-secondary" type="submit">Salvar</button>
+    </form>
+</div>
+{{#if clientes}}
+<div class="table-responsive-xl">
+    <form action="/administracao/clientes/excluir" method="post">
+        <table class="table">
+            <hr>
+            <p style="font-weight: bold;">Agencias Cadastradas</p>
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Nome</th>
+                    <th scope="col">Tipo</th>
+                    <th scope="col">CNPJ/CPF</th>
+                    <th scope="col">Contato Tel</th>
+                    <th scope="col">Permite Faturar</th>
+                </tr>
+            </thead>
+            {{#each clientes}}
+            <tbody>
+                <tr>
+                    <th scope="row"><input type="checkbox" name="ident" value="{{_id}}"></th>
+                    <td><a href="">{{name_client}}</a></td>
+                    <td>{{tipo_doc}}</td>
+                    <td>{{documento}}</td>
+                    <td>{{contato}}</td>
+                    <td>{{premFatExib}}</td>
+                </tr>
+            </tbody>
+            {{else}}
+            {{/each}}
+        </table>
+        <button class="btn btn-outline-danger" type="submit">Excluir</button>
+    </form>
+</div>
+{{else}}
+{{/if}}
+<br><br>

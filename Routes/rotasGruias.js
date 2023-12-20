@@ -16,24 +16,29 @@ require('../Models/Empresa')
 const Empresa = mongoose.model('empresas')
 require('../Models/Talao')
 const Talao = mongoose.model('taloes')
-
-
+require('../Models/Cliente')
+const Cliente = mongoose.model('clientes')
 
 router.get('/', lOgado, (req, res) => {
     Empresa.find().then((empresas) => {
         Agencia.find().sort({ cidade: 1 }).then((agencias) => {
-            GuiaCarga.find().populate('empresa').populate('origem').populate('destino').limit(5).sort({ date: 1 }).then((guias) => {
-                for (let i = 0; i < guias.length; i++) {
-                    guias[i]["date_entrada"] = moment(guias[i].dateEntrada).format('DD/MM/YYYY')
-                    guias[i]["date_pagamento"] = moment(guias[i].datePagamento).format('DD/MM/YYYY')
-                    guias[i]["valorExib"] = guias[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-                    if (guias[i].baixa == true) {
-                        guias[i]["statusBaixa"] = "Baixado"
-                    } else {
-                        guias[i]["statusBaixa"] = "Pendente"
+            GuiaCarga.find().populate('empresa').populate('origem').populate('destino').populate('cliente').limit(10).sort({ date: 1 }).then((guias) => {
+                Cliente.find().sort({ nome: 1 }).then((clientes) => {
+                    for (let i = 0; i < guias.length; i++) {
+                        guias[i]["date_entrada"] = moment(guias[i].dateEntrada).format('DD/MM/YYYY')
+                        guias[i]["date_pagamento"] = moment(guias[i].datePagamento).format('DD/MM/YYYY')
+                        guias[i]["valorExib"] = guias[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                        if (guias[i].baixa == true) {
+                            guias[i]["statusBaixa"] = "Baixado"
+                        } else {
+                            guias[i]["statusBaixa"] = "Pendente"
+                        }
                     }
-                }
-                res.render('guiasDeCargas/index_guias', { guias, agencias, empresas })
+                    res.render('guiasDeCargas/index_guias', { guias, agencias, empresas, clientes })
+                }).catch((err) => {
+                    console.log("erros ao caregar clientes, ERRO: ", err)
+                    res.render('guiasDeCargas/index_guias')
+                })
             }).catch((err) => {
                 console.log("erros ao caregar guias, ERRO: ", err)
                 res.render('guiasDeCargas/index_guias')
@@ -51,13 +56,19 @@ router.get('/', lOgado, (req, res) => {
 
 //Rota de adição de guia
 router.post('/adicionar', lOgado, (req, res) => {
-    const { numero, origem, destino, cliente, empresa, dateEntrada, datePagamento, valor, formaPag, baixa } = req.body
+    const { numero, origem, destino, cliente, empresa, dateEntrada, datePagamento, valor, formaPag, baixa, tipo, n_fatura } = req.body
     var AutoBaixa = baixa
     if (formaPag != "A COBRAR") {
         AutoBaixa = true
     }
 
     var erro = []
+    if (formaPag == "FATURADO" && !n_fatura) {
+        erro.push({ text: "Para venda Faturada o numero da Fatura é Obrigatorio" })
+    }
+    if (tipo == "selecione") {
+        erro.push({ text: "Selecione o tipo do documento" })
+    }
     if (req.body.origem === req.body.destino) {
         erro.push({ text: "Cidade de oriegem não pode ser igual a cidade de destino" })
     }
@@ -109,64 +120,140 @@ router.post('/adicionar', lOgado, (req, res) => {
             res.render('guiasDeCargas/index_guias')
         })
     } else {
-        Periodo.findOne({ dateInit: { $lte: dateEntrada }, dateFin: { $gte: dateEntrada }, empresa: empresa }).then((periodo) => {
-            if (!periodo) {
-                req.flash('error_msg', "Não foi encontrado periodo para a data de entrada informada, favor criar um periodo para essa data")
-                res.redirect('/periodos')
-            } else {
-                if (periodo.status != "Aberto") {
-                    req.flash('error_msg', "Periodo referente a data de entrada informada, Já está encerrado, caso necessario reabra o periodo")
+        if (formaPag == "FATURADO") {
+            Cliente.findById(cliente).then((client) => {
+                if (client.perm_fatura == false || client.perm_fatura == "false") {
+                    req.flash("Cliente não autorizado paravenda Faturada")
                     res.redirect('/guias')
                 } else {
-                    Talao.findOne({ numeroInicial: { $lte: numero }, numeroFinal: { $gte: numero }, tipo: "ENCOMENDAS", agencia: origem }).then((talao) => {
-                        if (!talao) {
-                            req.flash('error_msg', "Não foi encontrado talão cadastrado para a numeração de guia ou agencia, a oriegem deve corresponder a agengia que foi destinado o talão, favor verificar")
+                    Periodo.findOne({ dateInit: { $lte: dateEntrada }, dateFin: { $gte: dateEntrada }, empresa: empresa }).then((periodo) => {
+                        if (!periodo) {
+                            req.flash('error_msg', "Não foi encontrado periodo para a data de entrada informada, favor criar um periodo para essa data")
                             res.redirect('/guias')
                         } else {
-                            const newGuia = {
-                                numero: numero,
-                                periodo: periodo._id,
-                                talao: talao._id,
-                                origem: origem,
-                                destino: destino,
-                                cliente: cliente,
-                                empresa: empresa,
-                                dateEntrada: dateEntrada,
-                                datePagamento: datePagamento,
-                                formaPag: formaPag,
-                                valor: valor,
-                                baixa: baixa,
-                                user: req.user._id
-                            }
-                            GuiaCarga.findOne({ numero: numero, empresa: empresa }).then((guia) => {
-                                if (guia) {
-                                    req.flash('error_msg', "Numero de Guia informada já cadastrado para essa empresa")
-                                    res.redirect('/guias')
-                                } else {
-
-                                    new GuiaCarga(newGuia).save().then(() => {
-                                        req.flash('success_msg', "Guia de Encomenda Nº " + numero + " cadastrada com sucesso")
-                                        res.redirect('/guias')
-                                    }).catch((err) => {
-                                        req.flash('error_msg', "Erro na Salvar nova guia Pg, ERRO: " + err)
-                                        res.redirect('/guias')
-                                    })
-                                }
-                            }).catch((err) => {
-                                req.flash('error_msg', "Erro na busca das guias Pagas, ERRO: " + err)
+                            if (periodo.status != "Aberto") {
+                                req.flash('error_msg', "Periodo referente a data de entrada informada, Já está encerrado, caso necessario reabra o periodo")
                                 res.redirect('/guias')
-                            })
+                            } else {
+                                Talao.findOne({ numeroInicial: { $lte: numero }, numeroFinal: { $gte: numero }, tipo: "ENCOMENDAS", agencia: origem }).then((talao) => {
+                                    if (!talao) {
+                                        req.flash('error_msg', "Não foi encontrado talão cadastrado para a numeração de guia ou agencia, a oriegem deve corresponder a agengia que foi destinado o talão, favor verificar")
+                                        res.redirect('/guias')
+                                    } else {
+                                        const newGuia = {
+                                            numero: numero,
+                                            tipo: tipo,
+                                            n_fatura: tipo, n_fatura,
+                                            periodo: periodo._id,
+                                            talao: talao._id,
+                                            origem: origem,
+                                            destino: destino,
+                                            cliente: cliente,
+                                            empresa: empresa,
+                                            dateEntrada: dateEntrada,
+                                            datePagamento: datePagamento,
+                                            formaPag: formaPag,
+                                            valor: valor,
+                                            baixa: baixa,
+                                            user: req.user._id
+                                        }
+                                        GuiaCarga.findOne({ numero: numero, empresa: empresa }).then((guia) => {
+                                            if (guia) {
+                                                req.flash('error_msg', "Numero de Guia informada já cadastrado para essa empresa")
+                                                res.redirect('/guias')
+                                            } else {
+
+                                                new GuiaCarga(newGuia).save().then(() => {
+                                                    req.flash('success_msg', "Guia de Encomenda Nº " + numero + " cadastrada com sucesso")
+                                                    res.redirect('/guias')
+                                                }).catch((err) => {
+                                                    req.flash('error_msg', "Erro na Salvar nova guia Pg, ERRO: " + err)
+                                                    res.redirect('/guias')
+                                                })
+                                            }
+                                        }).catch((err) => {
+                                            req.flash('error_msg', "Erro na busca das guias Pagas, ERRO: " + err)
+                                            res.redirect('/guias')
+                                        })
+                                    }
+                                }).catch((err) => {
+                                    req.flash('error_msg', "Erro ao Buscar Talão, ERRO: " + err)
+                                    res.redirect('/guias')
+                                })
+                            }
                         }
                     }).catch((err) => {
-                        req.flash('error_msg', "Erro ao Buscar Talão, ERRO: " + err)
+                        req.flash('error_msg', "Erro ao tentar buscar Periodo, ERRO: " + err)
                         res.redirect('/guias')
                     })
                 }
-            }
-        }).catch((err) => {
-            req.flash('error_msg', "Erro ao tentar buscar Periodo, ERRO: " + err)
-            res.redirect('/guias')
-        })
+            }).catch((err) => {
+                req.flash('error_msg', "Erro ao tentar buscar Clientes, ERRO: " + err)
+                res.redirect('/guias')
+            })
+        } else {
+            Periodo.findOne({ dateInit: { $lte: dateEntrada }, dateFin: { $gte: dateEntrada }, empresa: empresa }).then((periodo) => {
+                if (!periodo) {
+                    req.flash('error_msg', "Não foi encontrado periodo para a data de entrada informada, favor criar um periodo para essa data")
+                    res.redirect('/guias')
+                } else {
+                    if (periodo.status != "Aberto") {
+                        req.flash('error_msg', "Periodo referente a data de entrada informada, Já está encerrado, caso necessario reabra o periodo")
+                        res.redirect('/guias')
+                    } else {
+                        Talao.findOne({ numeroInicial: { $lte: numero }, numeroFinal: { $gte: numero }, tipo: "ENCOMENDAS", agencia: origem }).then((talao) => {
+                            if (!talao) {
+                                req.flash('error_msg', "Não foi encontrado talão cadastrado para a numeração de guia ou agencia, a oriegem deve corresponder a agengia que foi destinado o talão, favor verificar")
+                                res.redirect('/guias')
+                            } else {
+                                const newGuia = {
+                                    numero: numero,
+                                    tipo: tipo,
+                                    n_fatura: tipo, n_fatura,
+                                    periodo: periodo._id,
+                                    talao: talao._id,
+                                    origem: origem,
+                                    destino: destino,
+                                    cliente: cliente,
+                                    empresa: empresa,
+                                    dateEntrada: dateEntrada,
+                                    datePagamento: datePagamento,
+                                    formaPag: formaPag,
+                                    valor: valor,
+                                    baixa: baixa,
+                                    user: req.user._id
+                                }
+                                GuiaCarga.findOne({ numero: numero, empresa: empresa }).then((guia) => {
+                                    if (guia) {
+                                        req.flash('error_msg', "Numero de Guia informada já cadastrado para essa empresa")
+                                        res.redirect('/guias')
+                                    } else {
+
+                                        new GuiaCarga(newGuia).save().then(() => {
+                                            req.flash('success_msg', "Guia de Encomenda Nº " + numero + " cadastrada com sucesso")
+                                            res.redirect('/guias')
+                                        }).catch((err) => {
+                                            req.flash('error_msg', "Erro na Salvar nova guia Pg, ERRO: " + err)
+                                            res.redirect('/guias')
+                                        })
+                                    }
+                                }).catch((err) => {
+                                    req.flash('error_msg', "Erro na busca das guias Pagas, ERRO: " + err)
+                                    res.redirect('/guias')
+                                })
+                            }
+                        }).catch((err) => {
+                            req.flash('error_msg', "Erro ao Buscar Talão, ERRO: " + err)
+                            res.redirect('/guias')
+                        })
+                    }
+                }
+            }).catch((err) => {
+                req.flash('error_msg', "Erro ao tentar buscar Periodo, ERRO: " + err)
+                res.redirect('/guias')
+            })
+        }
+
     }
 })
 

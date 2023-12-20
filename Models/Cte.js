@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
-const GuiaCarga = new Schema({
+const Cte = new Schema({
     numero: {
         type: String,
         required: true
@@ -9,11 +9,6 @@ const GuiaCarga = new Schema({
     periodo: {
         type: Schema.Types.ObjectId,
         ref: "periodos",
-        required: true
-    },
-    talao: {
-        type: Schema.Types.ObjectId,
-        ref: "taloes",
         required: true
     },
     origem: {
@@ -71,4 +66,4 @@ const GuiaCarga = new Schema({
     }
 })
 
-mongoose.model('guiascargas', GuiaCarga)
+mongoose.model('ctes', Cte)
