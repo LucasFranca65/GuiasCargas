@@ -6,10 +6,9 @@ const Cte = new Schema({
         type: String,
         required: true
     },
-    periodo: {
-        type: Schema.Types.ObjectId,
-        ref: "periodos",
-        required: true
+    tipo: {
+        type: String,
+        default: "1"
     },
     origem: {
         type: Schema.Types.ObjectId,
@@ -36,6 +35,9 @@ const Cte = new Schema({
         required: true
     },
     datePagamento: {
+        type: Date
+    },
+    vencimento: {
         type: Date,
         require: true
     },

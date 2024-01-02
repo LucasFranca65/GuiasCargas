@@ -26,12 +26,16 @@ router.get('/', lOgado, (req, res) => {
                 Cliente.find().sort({ nome: 1 }).then((clientes) => {
                     for (let i = 0; i < guias.length; i++) {
                         guias[i]["date_entrada"] = moment(guias[i].dateEntrada).format('DD/MM/YYYY')
-                        guias[i]["date_pagamento"] = moment(guias[i].datePagamento).format('DD/MM/YYYY')
+                        guias[i]["date_vencimento"] = moment(guias[i].vencimento).format('DD/MM/YYYY')
                         guias[i]["valorExib"] = guias[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-                        if (guias[i].baixa == true) {
-                            guias[i]["statusBaixa"] = "Baixado"
+                        if (guias[i].baixa == true || guias[i].baixa == "true") {
+                            guias[i]["statusBaixa"] = "PAGO"
                         } else {
-                            guias[i]["statusBaixa"] = "Pendente"
+                            if (moment(guias[i].vencimento).format("YYYY-MM-DD") < moment(new Date()).format("YYYY-MM-DD")) {
+                                guias[i]["statusBaixa"] = "VENCIDO"
+                            } else {
+                                guias[i]["statusBaixa"] = "PENDENTE"
+                            }
                         }
                     }
                     res.render('guiasDeCargas/index_guias', { guias, agencias, empresas, clientes })
@@ -56,18 +60,11 @@ router.get('/', lOgado, (req, res) => {
 
 //Rota de adição de guia
 router.post('/adicionar', lOgado, (req, res) => {
-    const { numero, origem, destino, cliente, empresa, dateEntrada, datePagamento, valor, formaPag, baixa, tipo, n_fatura } = req.body
-    var AutoBaixa = baixa
-    if (formaPag != "A COBRAR") {
-        AutoBaixa = true
-    }
+    const { numero, origem, destino, client, empresa, dateEntrada, vencimento, valor, condPag, baixa, n_fatura } = req.body
 
     var erro = []
-    if (formaPag == "FATURADO" && !n_fatura) {
+    if (condPag == "FATURADO" && !n_fatura) {
         erro.push({ text: "Para venda Faturada o numero da Fatura é Obrigatorio" })
-    }
-    if (tipo == "selecione") {
-        erro.push({ text: "Selecione o tipo do documento" })
     }
     if (req.body.origem === req.body.destino) {
         erro.push({ text: "Cidade de oriegem não pode ser igual a cidade de destino" })
@@ -75,7 +72,7 @@ router.post('/adicionar', lOgado, (req, res) => {
     if (!dateEntrada || dateEntrada == undefined) {
         erro.push({ text: "Informe a data de Entrada" })
     }
-    if (!datePagamento || datePagamento == undefined) {
+    if (!vencimento || vencimento == undefined) {
         erro.push({ text: "Informe a data de Pagamento ou data de Previsão de Pagamento" })
     }
     if (origem == "selecione") {
@@ -87,25 +84,33 @@ router.post('/adicionar', lOgado, (req, res) => {
     if (empresa == "selecione") {
         erro.push({ text: "Selecione uma empresa" })
     }
-    if (formaPag == "selecione") {
+    if (condPag == "selecione") {
         erro.push({ text: "Selecione uma forma de pagamento" })
     }
     if (erro.length > 0) {
         Empresa.find().then((empresas) => {
             Agencia.find().sort({ cidade: 1 }).then((agencias) => {
-                GuiaCarga.find().limit(20).sort({ date: 1 }).then((guias) => {
-                    var i = 0
-                    while (i < guias.length) {
-                        guias[i]["date_entrada"] = moment(guias[i].dateEntrada).format('DD/MM/YYYY')
-                        guias[i]["date_pagamento"] = moment(guias[i].datePagamento).format('DD/MM/YYYY')
-                        if (guias[i].baixa == true) {
-                            guias[i]["statusBaixa"] = "BAIXADO"
-                        } else {
-                            guias[i]["statusBaixa"] = "PENDENTE"
+                GuiaCarga.find().populate('empresa').populate('origem').populate('destino').populate('cliente').limit(10).sort({ date: 1 }).then((guias) => {
+                    Cliente.find().sort({ nome: 1 }).then((clientes) => {
+                        for (let i = 0; i < guias.length; i++) {
+                            guias[i]["date_entrada"] = moment(guias[i].dateEntrada).format('DD/MM/YYYY')
+                            guias[i]["date_vencimento"] = moment(guias[i].vencimento).format('DD/MM/YYYY')
+                            guias[i]["valorExib"] = guias[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                            if (guias[i].baixa == true || guias[i].baixa == "true") {
+                                guias[i]["statusBaixa"] = "PAGO"
+                            } else {
+                                if (moment(guias[i].vencimento).format("YYYY-MM-DD") < moment(new Date()).format("YYYY-MM-DD")) {
+                                    guias[i]["statusBaixa"] = "VENCIDO"
+                                } else {
+                                    guias[i]["statusBaixa"] = "PENDENTE"
+                                }
+                            }
                         }
-                        i++
-                    }
-                    res.render('guiasDeCargas/index_guias', { guias, agencias, empresas, erro })
+                        res.render('guiasDeCargas/index_guias', { guias, agencias, empresas, clientes, erro })
+                    }).catch((err) => {
+                        console.log("erros ao caregar clientes, ERRO: ", err)
+                        res.render('guiasDeCargas/index_guias')
+                    })
                 }).catch((err) => {
                     console.log("erros ao caregar guias, ERRO: ", err)
                     res.render('guiasDeCargas/index_guias')
@@ -120,8 +125,8 @@ router.post('/adicionar', lOgado, (req, res) => {
             res.render('guiasDeCargas/index_guias')
         })
     } else {
-        if (formaPag == "FATURADO") {
-            Cliente.findById(cliente).then((client) => {
+        if (condPag == "FATURADO") {
+            Cliente.findById(client).then((client) => {
                 if (client.perm_fatura == false || client.perm_fatura == "false") {
                     req.flash("Cliente não autorizado paravenda Faturada")
                     res.redirect('/guias')
@@ -142,27 +147,24 @@ router.post('/adicionar', lOgado, (req, res) => {
                                     } else {
                                         const newGuia = {
                                             numero: numero,
-                                            tipo: tipo,
-                                            n_fatura: tipo, n_fatura,
+                                            n_fatura: n_fatura,
                                             periodo: periodo._id,
                                             talao: talao._id,
                                             origem: origem,
                                             destino: destino,
-                                            cliente: cliente,
+                                            cliente: client,
                                             empresa: empresa,
                                             dateEntrada: dateEntrada,
-                                            datePagamento: datePagamento,
-                                            formaPag: formaPag,
+                                            vencimento: vencimento,
+                                            condPag: condPag,
                                             valor: valor,
-                                            baixa: baixa,
                                             user: req.user._id
                                         }
-                                        GuiaCarga.findOne({ numero: numero, empresa: empresa }).then((guia) => {
+                                        GuiaCarga.findOne({ $or: [{ numero: numero, empresa: empresa }, { n_fatura: n_fatura, empresa: empresa, condPag: "FATURADO" }] }).then((guia) => {
                                             if (guia) {
-                                                req.flash('error_msg', "Numero de Guia informada já cadastrado para essa empresa")
+                                                req.flash('error_msg', "Numero de Guia informada já cadastrado para essa empresa, ou existe guia cadastrada com o mesmo numero de fatura")
                                                 res.redirect('/guias')
                                             } else {
-
                                                 new GuiaCarga(newGuia).save().then(() => {
                                                     req.flash('success_msg', "Guia de Encomenda Nº " + numero + " cadastrada com sucesso")
                                                     res.redirect('/guias')
@@ -208,17 +210,16 @@ router.post('/adicionar', lOgado, (req, res) => {
                             } else {
                                 const newGuia = {
                                     numero: numero,
-                                    tipo: tipo,
-                                    n_fatura: tipo, n_fatura,
+                                    n_fatura: n_fatura,
                                     periodo: periodo._id,
                                     talao: talao._id,
                                     origem: origem,
                                     destino: destino,
-                                    cliente: cliente,
+                                    cliente: client,
                                     empresa: empresa,
                                     dateEntrada: dateEntrada,
-                                    datePagamento: datePagamento,
-                                    formaPag: formaPag,
+                                    vencimento: vencimento,
+                                    condPag: condPag,
                                     valor: valor,
                                     baixa: baixa,
                                     user: req.user._id
@@ -264,7 +265,7 @@ router.post('/baixar', lOgado, (req, res) => {
     if (Array.isArray(ident)) {
         ident.forEach((item) => {
             GuiaCarga.findOne({ _id: item }).then((guia) => {
-                guia.formaPag = "PAGO",
+                guia.condPag = "PAGO",
                     guia.baixa = true
                 guia.save().then(() => {
                 }).catch((err) => {
@@ -286,8 +287,8 @@ router.post('/baixar', lOgado, (req, res) => {
 
     } else {
         GuiaCarga.findOne({ _id: ident }).then((guia) => {
-            guia.formaPag = "Pago",
-                guia.baixa = true
+
+            guia.baixa = true
             guia.save().then(() => {
                 req.flash('success_msg', "Realizada baixa da guia selecionada")
                 res.redirect('/painel')
@@ -308,20 +309,34 @@ router.get('/selectEdit/:id', lOgado, (req, res) => {
 
     Empresa.find().then((empresas) => {
         Agencia.find().then((agencias) => {
-            GuiaCarga.findOne({ _id: req.params.id }).populate('origem').populate('destino').populate('empresa').then((guia) => {
+            Cliente.find().sort({ nome: 1 }).then((clientes) => {
+                GuiaCarga.findOne({ _id: req.params.id }).populate('origem').populate('destino').populate('empresa').populate('user').populate('cliente').then((guia) => {
 
-                guia["date_entrada"] = moment(guia.dateEntrada).format('YYYY-MM-DD')
-                guia["date_pagamento"] = moment(guia.datePagamento).format('YYYY-MM-DD')
-                if (guia.baixa == true) {
-                    guia["check"] = "checked"
-                }
-                console.log(guia)
-                res.render('guiasDeCargas/vizualizar', { guia, empresas, agencias })
+                    guia["date_entrada"] = moment(guia.dateEntrada).format('YYYY-MM-DD')
+                    guia["date_vencimento"] = moment(guia.vencimento).format('YYYY-MM-DD')
+                    guia["date_pagamento"] = moment(guia.datePagamento).format('YYYY-MM-DD')
+                    guia["date_exib"] = moment(guia.date).format('DD/MM/YYYY HH:mm')
+                    if (guia.baixa == true || guia.baixa == "true") {
+                        guia["statusBaixa"] = "PAGO"
+                    } else {
+                        if (moment(guia.vencimento).format("YYYY-MM-DD") < moment(new Date()).format("YYYY-MM-DD")) {
+                            guia["statusBaixa"] = "VENCIDO"
+                        } else {
+                            guia["statusBaixa"] = "PENDENTE"
+                        }
+                    }
+                    //console.log(guia)
+                    res.render('guiasDeCargas/vizualizar', { guia, empresas, agencias, clientes })
 
+                }).catch((err) => {
+                    req.flash('error_msg', "Erro Buscar Guia Paga " + err)
+                    res.redirect('/guias')
+                })
             }).catch((err) => {
-                req.flash('error_msg', "Erro Buscar Guia Paga " + err)
+                req.flash('error_msg', "Erro Buscar Clientes " + err)
                 res.redirect('/guias')
             })
+
         }).catch((err) => {
             req.flash('error_msg', "Erro Buscar Empresas " + err)
             res.redirect('/guias')
@@ -335,7 +350,12 @@ router.get('/selectEdit/:id', lOgado, (req, res) => {
 
 //Editando Guia
 router.post('/editar', lOgado, (req, res) => {
-    const { id, user, origem, destino, cliente, empresa, dateEntrada, datePagamento, valor, formaPag, baixa } = req.body
+
+    const { id, user, origem, destino, cliente, empresa, dateEntrada, vencimento, valor, condPag, baixa, n_fatura } = req.body
+    if (condPag == 'FATURADO' && !n_fatura) {
+        req.flash('error_msg', "Condição de Pagamento Faturado, deve ser informado o numero da fatura")
+        res.redirect('/guias/selectEdit/' + id)
+    }
     let erro = []
 
     if (origem == "selecione") {
@@ -347,92 +367,60 @@ router.post('/editar', lOgado, (req, res) => {
     if (empresa == "selecione") {
         erro.push({ text: "Selecione a Empresa da Guia" })
     }
-    if (formaPag == "selecione") {
+    if (condPag == "selecione") {
         erro.push({ text: "Informe o Status do pagamento" })
     }
     if (origem === destino) {
         erro.push({ text: "Cidade de oriegem não pode ser igual a cidade de destino" })
     }
-    if (!cliente || typeof cliente == undefined || cliente == null || cliente.length < 3) {
-        erro.push({ text: "Cliente informado invalido, ou muito curto, minimo 3 caracteres" })
+    if (cliente == "selecione") {
+        erro.push({ text: "Selecione um cliente" })
     }
     if (!dateEntrada || typeof dateEntrada == undefined || dateEntrada == null) {
         erro.push({ text: "Data de entrada informada é  invalida" })
     }
-    if (!datePagamento || typeof datePagamento == undefined || datePagamento == null) {
+    if (!vencimento || typeof vencimento == undefined || vencimento == null) {
         erro.push({ text: "Data de Pagamento iinformada é invalida" })
     }
     if (erro.length > 0) {
         Empresa.find().then((empresas) => {
-            Agencia.find().then((agencias) => {
-                GuiaPaga.findOne({ _id: req.params.id }).populate('origem').populate('destino').populate('empresa').then((guia) => {
-                    if (!guia) {
-                        GuiaAc.findOne({ _id: req.params.id }).populate('origem').populate('destino').populate('empresa').then((guia) => {
-                            if (!guia) {
-                                GuiaCc.findOne({ _id: req.params.id }).populate('origem').populate('destino').populate('empresa').then((guia) => {
-                                    if (!guia) {
-                                        GuiaCancel.findOne({ _id: req.params.id }).populate('origem').populate('destino').populate('empresa').then((guia) => {
-                                            if (!guia) {
-                                                req.flash('error_msg', "Não foi encontrada guia com esses paramentros")
-                                                res.redirect('/guias')
-                                            } else {
-                                                guia["date_entrada"] = moment(guia.dateEntrada).format('YYYY-MM-DD')
-                                                guia["date_pagamento"] = moment(guia.datePagamento).format('YYYY-MM-DD')
-                                                if (guia.baixa == true) {
-                                                    guia["check"] = "checked"
-                                                }
-                                                res.render('guiasDeCargas/vizualizar', { guia, empresas, agencias, erro })
-                                            }
-                                        }).catch((err) => {
-                                            req.flash('error_msg', "Erro Buscar Guia Cancelada " + err)
-                                            res.redirect('/guias')
-                                        })
-                                    } else {
-                                        guia["date_entrada"] = moment(guia.dateEntrada).format('YYYY-MM-DD')
-                                        guia["date_pagamento"] = moment(guia.datePagamento).format('YYYY-MM-DD')
-                                        if (guia.baixa == true) {
-                                            guia["check"] = "checked"
-                                        }
-                                        res.render('guiasDeCargas/vizualizar', { guia, empresas, agencias, erro })
-                                    }
-                                }).catch((err) => {
-                                    req.flash('error_msg', "Erro Buscar Guia Conta Corrente " + err)
-                                    res.redirect('/guias')
-                                })
+            Agencia.find().sort({ cidade: 1 }).then((agencias) => {
+                GuiaCarga.find().populate('empresa').populate('origem').populate('destino').populate('cliente').limit(10).sort({ date: 1 }).then((guias) => {
+                    Cliente.find().sort({ nome: 1 }).then((clientes) => {
+                        for (let i = 0; i < guias.length; i++) {
+                            guias[i]["date_entrada"] = moment(guias[i].dateEntrada).format('DD/MM/YYYY')
+                            guias[i]["date_vencimento"] = moment(guias[i].vencimento).format('DD/MM/YYYY')
+                            guias[i]["valorExib"] = guias[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                            if (guias[i].baixa == true || guias[i].baixa == "true") {
+                                guias[i]["statusBaixa"] = "PAGO"
                             } else {
-                                guia["date_entrada"] = moment(guia.dateEntrada).format('YYYY-MM-DD')
-                                guia["date_pagamento"] = moment(guia.datePagamento).format('YYYY-MM-DD')
-                                if (guia.baixa == true) {
-                                    guia["check"] = "checked"
+                                if (guias[i].vencimento < moment(new Date()).format("YYYY-MM-DDTHH:mm:ss.SSSZ")) {
+                                    guias[i]["statusBaixa"] = "VENCIDO"
+                                } else {
+                                    guias[i]["statusBaixa"] = "PENDENTE"
                                 }
-                                res.render('guiasDeCargas/vizualizar', { guia, empresas, agencias, erro })
                             }
-                        }).catch((err) => {
-                            req.flash('error_msg', "Erro Buscar Guia A Cobrar " + err)
-                            res.redirect('/guias')
-                        })
-                    } else {
-                        guia["date_entrada"] = moment(guia.dateEntrada).format('YYYY-MM-DD')
-                        guia["date_pagamento"] = moment(guia.datePagamento).format('YYYY-MM-DD')
-                        if (guia.baixa == true) {
-                            guia["check"] = "checked"
                         }
-                        res.render('guiasDeCargas/vizualizar', { guia, empresas, agencias, erro })
-                    }
+                        res.render('guiasDeCargas/index_guias', { guias, agencias, empresas, clientes, erro })
+                    }).catch((err) => {
+                        console.log("erros ao caregar clientes, ERRO: ", err)
+                        res.render('guiasDeCargas/index_guias')
+                    })
                 }).catch((err) => {
-                    req.flash('error_msg', "Erro Buscar Guia Paga " + err)
-                    res.redirect('/guias')
+                    console.log("erros ao caregar guias, ERRO: ", err)
+                    res.render('guiasDeCargas/index_guias')
                 })
+
             }).catch((err) => {
-                req.flash('error_msg', "Erro Buscar Empresas " + err)
-                res.redirect('/guias')
+                console.log("erros ao caregar guias, ERRO: ", err)
+                res.render('guiasDeCargas/index_guias')
             })
         }).catch((err) => {
-            req.flash('error_msg', "Erro Buscar Agencias " + err)
-            res.redirect('/guias')
+            console.log("erros ao caregar guias, ERRO: ", err)
+            res.render('guiasDeCargas/index_guias')
         })
     } else {
-        //console.log(id, user, origem,destino, cliente,empresa,dateEntrada,datePagamento,valor,formaPag,baixa)
+        //console.log(id, user, origem,destino, cliente,empresa,dateEntrada,datePagamento,valor,condPag,baixa)
         GuiaCarga.findOne({ _id: id }).then((guia) => {
             if (!guia) {
                 req.flash('error_msg', "Guia não encontrada")
@@ -442,12 +430,9 @@ router.post('/editar', lOgado, (req, res) => {
                 //console.log(baixa)
                 if (baixa == undefined) {
                     baixado = false
-                    console.log("Pendente")
                 } else {
                     baixado = true
-                    console.log("Baixado")
                 }
-                //console.log(baixado)
                 guia.user = user,
                     guia.origem = origem,
                     guia.destino = destino,
@@ -455,9 +440,10 @@ router.post('/editar', lOgado, (req, res) => {
                     guia.empresa = empresa,
                     guia.baixa = baixado,
                     guia.dateEntrada = moment(dateEntrada).format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
-                    guia.datePagamento = moment(datePagamento).format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
+                    guia.vencimento = moment(vencimento).format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
                     guia.valor = valor,
-                    guia.formaPag = formaPag
+                    guia.condPag = condPag,
+                    guia.date = moment(new Date()).format("YYYY-MM-DDTHH:mm:ss.SSSZ")
 
                 guia.save().then(() => {
                     req.flash('success_msg', "Edição da Guia " + guia.numero + " Realizada com sucesso")
@@ -477,12 +463,36 @@ router.post('/editar', lOgado, (req, res) => {
 router.post('/buscar', lOgado, (req, res) => {
     GuiaCarga.findOne({ numero: req.body.numero }).then((guia) => {
         guia["date_entrada"] = moment(guia.dateEntrada).format('YYYY-MM-DD')
-        guia["date_pagamento"] = moment(guia.datePagamento).format('YYYY-MM-DD')
+        guia["date_vencimento"] = moment(guia.vencimento).format('YYYY-MM-DD')
         res.render('guiasDeCargas/vizualizar', { guia })
     }).catch((err) => {
         req.flash('error_msg', "Guias Nº " + req.body.numero + " não encontrada")
         res.redirect('/guias')
     })
+})
+
+router.post('/biaxar_guia', lOgado, (req, res) => {
+    const { ident, date_pagamento, formaPag } = req.body
+    if (formaPag == "selecione") {
+        req.flash('error_msg', "A forma de Pagamento é Obrigatoria")
+        res.redirect('/guias/selectEdit/' + ident)
+    } else {
+        GuiaCarga.findById(ident).then((guia) => {
+            guia.datePagamento = date_pagamento
+            guia.formaPag = formaPag
+            guia.baixa = true
+            guia.save().then(() => {
+                req.flash('success_msg', "Guia " + guia.numero + " baixada com sucesso")
+                res.redirect('/guias/selectEdit/' + ident)
+            }).catch((err) => {
+                req.flash('error_msg', "Guia " + guia.numero + " Erro ao realizar baixa, ERR " + err)
+                res.redirect('/guias/selectEdit/' + ident)
+            })
+        }).catch((err) => {
+            req.flash('error_msg', "Erro ao Buscar a guia" + err)
+            res.redirect('/guias/selectEdit/' + ident)
+        })
+    }
 })
 
 module.exports = router

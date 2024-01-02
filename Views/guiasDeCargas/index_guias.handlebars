@@ -5,12 +5,12 @@
   {{/each}}
   <h3>Cadastrar Excesso de Bagagem</h3>
 
-  <div class="card-body">
+  <div class="card-body ">
     <form action="/guias/adicionar" method="POST">
       <div class="table-responsive-xl">
         <!--Formulario primeira Linha-->
-        <table class="table">
-          <thead class="table-dark">
+        <table class="table shadow">
+          <thead class="table-secondary">
             <tr>
               <th scope="col">Número</th>
               <th scope="col">Origem</th>
@@ -79,8 +79,8 @@
           </tbody>
         </table>
         <!--Formulario segunda Linha-->
-        <table class="table">
-          <thead class="table-dark">
+        <table class="table shadow">
+          <thead class="table-secondary">
             <tr>
               <th scope="col">Entrada</th>
               <th scope="col">Pagamento/Previsão</th>
@@ -92,17 +92,17 @@
           <tbody>
             <tr>
               <td><input type="date" class="form-control" name="dateEntrada"></td>
-              <td><input type="date" class="form-control" name="datePagamento"></td>
+              <td><input type="date" class="form-control" name="vencimento"></td>
               <td>
                 <div class="input-group mb-3">
                   <span class="input-group-text">R$</span>
                   <span class="input-group-text">0.00</span>
-                  <input name="valor" type="number" class="form-control"
+                  <input name="valor" type="number" class="form-control" step="any"
                     aria-label="Dollar amount (with dot and two decimal places)" required>
                 </div>
               </td>
               <td>
-                <select name="formaPag" class="form-select" required>
+                <select name="condPag" class="form-select" required>
                   <option value="selecione">---Selecione---</option>
                   <option value="A VISTA">A VISTA</option>
                   <option value="A COBRAR">A COBRAR</option>
@@ -115,17 +115,17 @@
           </tbody>
         </table>
       </div>
-      <button class="btn btn-secondary btn-sm" type="submit">Gravar</button>
-      <button class="btn btn-outline-secondary btn-sm" type="reset">Limpar</button>
+      <button class="btn btn-secondary btn-sm shadow" type="submit">Gravar</button>
+      <button class="btn btn-outline-secondary btn-sm shadow" type="reset">Limpar</button>
     </form>
   </div>
   <br>
   {{#if guias}}
   <h3>Ultimas Guias Adicionadas</h3>
   <br>
-  <div class="table-responsive-xl">
-    <table class="table table-bordered fs-6">
-      <thead class="table-dark">
+  <div class="table-responsive-xl ">
+    <table class="table table-bordered fs-6 shadow">
+      <thead class="table-secondary ">
         <tr>
           <th scope="col">Conhecimento</th>
           <th scope="col">Origem</th>
@@ -133,11 +133,12 @@
           <th scope="col">Cliente</th>
           <th scope="col">Empresa</th>
           <th scope="col">Entrada</th>
-          <th scope="col">Pagamento</th>
+          <th scope="col">Vencimento</th>
           <th scope="col">Valor</th>
           <th scope="col">Forma Pag</th>
           <th scope="col">Nº Fatura</th>
           <th scope="col">Status Pag</th>
+          <th scope="col">#</th>
 
         </tr>
       </thead>
@@ -151,17 +152,18 @@
             <td>{{cliente.name_client}}</td>
             <td>{{empresa.empresa}}</td>
             <td>{{date_entrada}}</td>
-            <td>{{date_pagamento}}</td>
+            <td>{{date_vencimento}}</td>
             <td>{{valorExib}}</td>
-            <td>{{formaPag}}</td>
+            <td>{{condPag}}</td>
             <td>{{n_fatura}}</td>
             <td>{{statusBaixa}}</td>
+            <th><input type="checkbox" name="ident" value="{{_id}}"></th>
           </tr>
         </tbody>
         {{else}}
         {{/each}}
     </table>
-    <button class="btn btn-sm btn-outline-danger" type="submit">Excluir Selecionados</button>
+    <button class="btn btn-sm btn-outline-danger shadow" type="submit">Excluir Selecionados</button>
     </form>
   </div>
 </div>

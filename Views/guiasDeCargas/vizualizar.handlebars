@@ -1,25 +1,25 @@
 {{#each erro}}
-    <div class="alert alert-danger">{{text}}</div>
+<div class="alert alert-danger">{{text}}</div>
 {{else}}
 {{/each}}
 
-  <h3>Editar guia</h3>
-  <p>Por: {{user.nome}}</p>
+<h3>Editar guia</h3>
+<p>Ultima Alteração</p>
+<small>Usuario: {{guia.user.nome}}</small><br>
+<small>Data hora: {{guia.date_exib}}</small>
 
-<div class="card">
-  <div class="card-body">
-    <form action="/guias/editar" method="POST" >
-    <input type="hidden" name="id" value="{{guia._id}}">
-    <input type="hidden" name="user" value="{{user._id}}">
-    <div class="table-responsive-xl">
+<form action="/guias/editar" method="POST" class="mt-3">
+  <input type="hidden" name="id" value="{{guia._id}}">
+  <input type="hidden" name="user" value="{{user._id}}">
+  <div class="table-responsive-xl">
     <table class="table">
-      <thead class="table-dark">
+      <thead class="table-secondary">
         <tr>
           <th scope="col">Conhecimento</th>
           <th scope="col">Origem</th>
           <th scope="col">Destino</th>
           <th scope="col">Cliente</th>
-          <th scope="col">Empresa</th>      
+          <th scope="col">Empresa</th>
         </tr>
       </thead>
 
@@ -27,96 +27,165 @@
         <tr>
           <td>
             <div class="form-floating mb-3">
-            <input type="number" value="{{guia.numero}}" class="form-control" name="numero" placeholder="Valor da Guia" disabled >
-            <label for="floatingInput">Numero Conhecimento</label>
+              <input type="number" value="{{guia.numero}}" class="form-control" name="numero"
+                placeholder="Valor da Guia" disabled>
+              <label for="floatingInput">Numero Conhecimento</label>
             </div>
           </td>
           <td>
             <div class="form-floating">
-              <select name="origem" class="form-select" id="floatingSelect" aria-label="Agencia Origem">        
-                <option value={{guia.origem._id}}>{{guia.origem.cidade}}</option><hr>
+              <select name="origem" class="form-select" id="floatingSelect" aria-label="Agencia Origem" {{#if
+                guia.datePagamento}}disabled{{else}}{{/if}}>
+                <option value={{guia.origem._id}}>{{guia.origem.cidade}}</option>
+                <hr>
                 {{#each agencias}}
                 <option value="{{_id}}">{{cidade}}</option>
                 {{else}}
-                {{/each}}                              
+                {{/each}}
               </select>
-            <label for="floatingSelect">Agencia Origem</label> 
+              <label for="floatingSelect">Agencia Origem</label>
             </div>
           </td>
           <td>
             <div class="form-floating">
-              <select name="destino" class="form-select" id="floatingSelect2" aria-label="Agencia Destino">        
-                <option value={{guia.destino._id}}>{{guia.destino.cidade}}</option>         
+              <select name="destino" class="form-select" id="floatingSelect2" aria-label="Agencia Destino" {{#if
+                guia.datePagamento}}disabled{{else}}{{/if}}>
+                <option value={{guia.destino._id}}>{{guia.destino.cidade}}</option>
                 {{#each agencias}}
                 <option value="{{_id}}">{{cidade}}</option>
                 {{else}}
-                {{/each}}                                
-              </select>  
-            <label for="floatingSelect2">Agencia de Destino</label>
-            </div>
-          </td>
-          <td>
-            <div class="form-floating mb-3">
-            <input type="text" value="{{guia.cliente}}" name="cliente" class="form-control" id="floatingInput" placeholder="Cliente" required>
-            <label for="floatingInput">Cliente</label>
+                {{/each}}
+              </select>
+              <label for="floatingSelect2">Agencia de Destino</label>
             </div>
           </td>
           <td>
             <div class="form-floating">
-            <select name="empresa"  class="form-select" id="floatingSelect2" aria-label="Agencia Destino">
-              <option value="{{guia.empresa._id}}">{{guia.empresa.empresa}}</option>
-              {{#each empresas}}
-              <option value="{{_id}}">{{empresa}}</option>
-              {{else}}
-              {{/each}}  
-            </select>
-            <label for="floatingSelect">Empresa</label>
+              <select name="cliente" class="form-select" id="floatingSelect2" aria-label="Cliente" {{#if
+                guia.datePagamento}}disabled{{else}}{{/if}}>
+                <option value="{{guia.cliente._id}}">{{guia.cliente.name_client}}</option>
+                {{#each clientes}}
+                <option value="{{_id}}">{{name_client}}</option>
+                {{else}}
+                {{/each}}
+              </select>
+              <label for="floatingSelect">Cliente</label>
             </div>
-          </td>      
-        </tr>          
-      </tbody> 
+          </td>
+          <td>
+            <div class="form-floating">
+              <select name="empresa" class="form-select" id="floatingSelect2" aria-label="Agencia Destino" {{#if
+                guia.datePagamento}}disabled{{else}}{{/if}}>
+                <option value="{{guia.empresa._id}}">{{guia.empresa.empresa}}</option>
+                {{#each empresas}}
+                <option value="{{_id}}">{{empresa}}</option>
+                {{else}}
+                {{/each}}
+              </select>
+              <label for="floatingSelect">Empresa</label>
+            </div>
+          </td>
+        </tr>
+      </tbody>
     </table>
 
     <table class="table">
-      <thead class="table-dark">
-        <tr>      
+      <thead class="table-secondary">
+        <tr>
           <th scope="col">Entrada</th>
-          <th scope="col">Pagamento</th>
+          <th scope="col">Vencimento</th>
           <th scope="col">Valor</th>
-          <th scope="col">Status </th>
-          <th scope="col">Baixa </th>
+          <th scope="col">Cond Pagamento</th>
+          <th scope="col">Nº Fatura</th>
+          <th scope="col">Status Pag</th>
         </tr>
       </thead>
 
       <tbody>
-        <tr>      
-          <td><input type="date" value="{{guia.date_entrada}}" class="form-control" name="dateEntrada"></td>
-          <td><input type="date" value="{{guia.date_pagamento}}"  class="form-control" name="datePagamento"></td>
+        <tr>
+          <td><input type="date" value="{{guia.date_entrada}}" class="form-control" name="dateEntrada" {{#if
+              guia.datePagamento}}disabled{{else}}{{/if}}></td>
+          <td><input type="date" value="{{guia.date_vencimento}}" class="form-control" name="vencimento" {{#if
+              guia.datePagamento}}disabled{{else}}{{/if}}></td>
           <td>
             <div class="input-group mb-3">
-            <span class="input-group-text">R$</span>
-            <span class="input-group-text">0.00</span>
-            <input name="valor" value="{{guia.valor}}" type="number" class="form-control" aria-label="Dollar amount (with dot and two decimal places)" required>
-          </div>
-      </td>
+              <span class="input-group-text">R$</span>
+              <span class="input-group-text">0.00</span>
+              <input name="valor" step="any" value="{{guia.valor}}" type="number" class="form-control"
+                aria-label="Dollar amount (with dot and two decimal places)" required {{#if
+                guia.datePagamento}}disabled{{else}}{{/if}}>
+            </div>
+          </td>
           <td>
-            <select name="formaPag" class="form-select" required>
-              <option value="{{guia.formaPag}}">{{guia.formaPag}}</option>
-              <option value="PAGO">PAGO</option>
+            <select name="condPag" class="form-select" required {{#if guia.datePagamento}}disabled{{else}}{{/if}}>
+              <option value="{{guia.condPag}}">{{guia.condPag}}</option>
+              <option value="A VISTA">A VISTA</option>
               <option value="A COBRAR">A COBRAR</option>
-              <option value="CONTA CORRENTE">CONTA CORRENTE</option>
+              <option value="FATURADO">FATURADO</option>
               <option value="CANCELADO">CANCELADO</option>
             </select>
           </td>
-          <td><input type="checkbox" {{guia.check}} name="baixa" value="true">Baixado</td>
-        </tr>          
+          <td><input type="number" name="n_fatura" class="form-control" value="{{guia.n_fatura}}"></td>
+          <td>{{guia.statusBaixa}}</td>
+        </tr>
       </tbody>
     </table>
-
-    </div>
-      <button class="btn btn-secondary" type="submit">Alterar</button>  <button class="btn btn-outline-secondary" type="reset">Limpar</button>  
-    </form>
   </div>
-</div><br>
-<a href="/administracao/guias/exclusao/{{guia._id}}"><button class="btn btn-outline-danger mt-2">Excluir</button></a>
-<a href="/guias"><button class="btn btn-outline-primary mt-2" type="reset">Cancelar</button></a>
+  {{#if guia.datePagamento}}{{else}} <button class="btn btn-secondary btn-sm" type="submit">Alterar</button>{{/if}}
+
+</form>
+
+{{#if guia.datePagamento}}
+<table class="table mt-4">
+  <thead class="table-secondary">
+    <tr>
+      <th scope="col">Data Pagamento</th>
+      <th scope="col">Forma de Pagamento</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>{{guia.date_pagamento}}</td>
+      <td>{{guia.formaPag}}</td>
+    </tr>
+  </tbody>
+</table>
+{{else}}
+<hr>
+<h4>Informar Pagamento</h4>
+<form action="/guias/biaxar_guia" method="post">
+  <input type="hidden" name="ident" value="{{guia._id}}">
+  <table class="table">
+    <thead class="table-secondary">
+      <tr>
+        <th scope="col">Data Pagamento</th>
+        <th scope="col">Forma de Pagamento</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><input type="date" name="date_pagamento" id="" class="form-control" required></td>
+
+        <td>
+          <select name="formaPag" class="form-select" id="floatingSelect" aria-label="Forma de Pagamento">
+            <option value="selecione">---Selecione---</option>
+            <option value="DINHEIRO">DINHEIRO</option>
+            <option value="BOLETO FATURA">BOLETO FATURA</option>
+            <option value="TRANSFERENCIA ELETRONICA">TRANSFERENCIA ELETRONICA</option>
+            <option value="DINHEIRO">DINHEIRO</option>
+
+          </select>
+
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <button type="submit" class="btn btn-secondary btn-sm">Informar Pagamento</button>
+</form>
+{{/if}}
+<hr>
+
+<a href="/administracao/guias/exclusao/{{guia._id}}"><button class="btn btn-outline-danger btn-sm">Excluir</button></a>
+<a href="/guias"><button class="btn btn-outline-primary btn-sm" type="reset">Cancelar</button></a>
+<button class="btn btn-outline-secondary btn-sm">Imprimir</button>
+<br><br>

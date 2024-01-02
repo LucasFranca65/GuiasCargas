@@ -1,0 +1,51 @@
+{{#each error}}
+<div class="alert alert-danger">{{texto}}</div>
+{{else}}
+{{/each}}
+
+<div class="table-responsive-xl">
+
+    <form action="/administracao/agencias/edit_agencia/save" method="post">
+        <input type="hidden" name="ident" value="{{agencia._id}}">
+        <table class="table">
+            <p style="font-weight: bold;">Cadastrar nova Agencia</p>
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">Número</th>
+                    <th scope="col">Cidade</th>
+                    <th scope="col">Comissão %</th>
+                    <th scope="col">Emite CTE</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <input class="form-control" type="number" name="numero" value="{{agencia.numero}}">
+                    </td>
+
+                    <td>
+                        <input class="form-control" type="text" name="cidade" value="{{agencia.cidade}}">
+                    </td>
+
+                    <td>
+                        <input class="form-control" type="number" name="indice" value="{{agencia.indiceComissao}}">
+                    </td>
+                    <td>
+                        <select name="emite_cte" id="" class="form-select">
+                            <option value="{{agencia.emitecte}}">{{agencia.emitecteExib}}</option>
+                            <option value="true">SIM</option>
+                            <option value="false">NÂO</option>
+                        </select>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="btn btn-secondary btn-sm" type="submit">Salvar</button><a href="/administracao/agencias"><button
+                type="button" class="btn btn-outline-secondary btn-sm ms-2">Retornar</button></a>
+    </form>
+
+
+
+</div>
+
+<br><br>

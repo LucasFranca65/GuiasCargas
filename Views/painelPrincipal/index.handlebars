@@ -1,77 +1,69 @@
-{{#if guias}}
-  <div style=" height: 100px; 
-      width: 100% ;
-      background-color: rgb(245, 248, 251);
-      align-items: center;
-      align-content: center;display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      flex-direction: column;
-      text-align: center;">
-    <div>
-      <h1>Controle das Agencias</h1>
+{{>_topNavbar}}
+<div class="d-flex justify-content-between mb-3 mt-5">
+  <!-- Div Coluna 1-->
+  <div class="card shadow">
+    <div class="card-header">
+      <h4>Cargas a receber com pagamento a cobrar</h4>
     </div>
-
+    <div class="p-2 card-body">
+      <table class="table ">
+        <thead>
+          <tr>
+            <th scope="col">Número</th>
+            <th scope="col">Origem</th>
+            <th scope="col">Vencimento</th>
+            <th scope="col">Valor</th>
+            <th scope="col">Cond Pag</th>
+            <th scope="col">Sts Pagamento</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each guiasAc}}
+          <tr>
+            <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
+            <td>{{origem.cidade}}</td>
+            <td>{{date_vencimento}}</td>
+            <td>{{valorExib}}</td>
+            <td>{{condPag}}</td>
+            <td>{{statusBaixa}}</td>
+          </tr>
+          {{else}}
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
   </div>
-
-  <div class="mt-4">
-        <h3>Guias Pendentes de Baixa</h3><br>
-        
-          10 Guias mais antigas com pendencia de pagamento</small>
-            <div class="card-body">
-              <div class="table-responsive-xl">  
-                  <table class="table table-bordered fs-6">
-                    <thead class="table-dark">
-                      <tr>
-                        <th scope="col">Conhec.</th>
-                        <th scope="col">Origem</th>
-                        <th scope="col">Destino</th>                      
-                        <th scope="col">Empresa</th>
-                        <th scope="col">Entrada</th>
-                        <th scope="col">Prev Pag</th>
-                        <th scope="col">Valor</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Baixa</th>
-                        <th scope="col">#</th>
-                      </tr>
-                    </thead>
-                    <form action="/guias/baixar" method="post">
-                    {{#each guias}}   
-                    <tbody>
-                      <tr>
-                        <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
-                        <td>{{origem.cidade}}</td>
-                        <td>{{destino.cidade}}</td>                      
-                        <td>{{empresa.empresa}}</td>
-                        <td>{{date_entrada}}</td>
-                        <td>{{date_pagamento}}</td>
-                        <td>{{valorExib}}</td>
-                        <td>{{formaPag}}</td>
-                        <td>{{statusBaixa}}</td>          
-                        <td><input type="checkbox" name="ident" value="{{_id}}"></td>
-                        <input type="hidden" name="tipo" value="{{formaPag}}">
-                      </tr>    
-                    </tbody>  
-                    {{else}}
-                    {{/each}}
-                  </table>
-                  <button class="btn btn-sm btn-outline-secondary" type="submit">Baixar Selecionados</button>
-                </form>
-              </div>
-              </div>              
-              <br>
-{{else}}
-  <div class="jumbotron">
-    <h1 class="display-4">Bem Vindo ao Controle das Agencias ! </h1>
-    <p class="lead">Não Existem Guias Pendente de Pagamento no momento</p>
-    <hr class="my-4">
-    <p>Inicie o Cadastro de Guias de Encomenda ou de Peretação de Conta </p>
-    <a class="btn btn-primary btn-lg" href="/guias" role="button">Guia de Encomendas</a>
-    <a class="btn btn-primary btn-lg" href="/arrecadacao" role="button">Prestação de Contas</a>
+  <!-- Div Coluna 2-->
+  <div class="card shadow">
+    <div class="card-header">
+      <h4>Cargas a receber pagas ou faturadas</h4>
+    </div>
+    <div class="p-2 card-body">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Número</th>
+            <th scope="col">Origem</th>
+            <th scope="col">Vencimento</th>
+            <th scope="col">Valor</th>
+            <th scope="col">Cond Pag</th>
+            <th scope="col">Sts Pagamento</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each guiasGe}}
+          <tr>
+            <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
+            <td>{{origem.cidade}}</td>
+            <td>{{date_vencimento}}</td>
+            <td>{{valorExib}}</td>
+            <td>{{condPag}}</td>
+            <td>{{statusBaixa}}</td>
+          </tr>
+          {{else}}
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
   </div>
-{{/if}}
-
-
-
-
-          
+</div>

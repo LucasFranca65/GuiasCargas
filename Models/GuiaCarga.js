@@ -6,6 +6,10 @@ const GuiaCarga = new Schema({
         type: String,
         required: true
     },
+    tipo: {
+        type: String,
+        default: "2"
+    },
     periodo: {
         type: Schema.Types.ObjectId,
         ref: "periodos",
@@ -42,6 +46,9 @@ const GuiaCarga = new Schema({
     },
     datePagamento: {
         type: Date,
+    },
+    vencimento: {
+        type: Date,
         require: true
     },
     valor: {
@@ -49,6 +56,9 @@ const GuiaCarga = new Schema({
         required: true
     },
     formaPag: {
+        type: String,
+    },
+    condPag: {
         type: String,
         required: true
     },
@@ -66,7 +76,7 @@ const GuiaCarga = new Schema({
     },
     user: {
         type: Schema.Types.ObjectId,
-        ref: "usuarios",
+        ref: "users",
         required: true
     }
 })

@@ -1,0 +1,4 @@
+Tipos de Documentos DB
+1 - CTE
+2 - EXCESSO BAGAGEM
+3 - PRESTAÇÃO DE CONTAS 

@@ -7,6 +7,10 @@ const PContas = new Schema({
         type: Number,
         required: true
     },
+    tipo: {
+        type: String,
+        default: "3"
+    },
     talao: {
         type: Schema.Types.ObjectId,
         ref: "taloes",

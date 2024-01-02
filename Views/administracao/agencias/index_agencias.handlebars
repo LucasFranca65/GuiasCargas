@@ -5,88 +5,84 @@
 
 <div class="table-responsive-xl">
 
-        <form action="/administracao/agencias/add_agencia" method="post">
-            <table class="table">
-                <p style="font-weight: bold;" >Cadastrar nova Agencia</p>
-                <thead class="table-dark">
-                    <tr>                           
-                        <th scope="col">Número</th>                        
-                        <th scope="col">Cidade</th>
-                        <th scope="col">Empresa</th>
-                        <th scope="col">Comissão %</th>                                                        
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>                                
-                        <td>
-                            <input class="form-control" type="number" name="numero">
-                        </td>
-                       
-                        <td>
-                            <input class="form-control" type="text" name="cidade">
-                        </td>                        
-                        
-                        <td>
-                            <div class="form-floating">
-                            <select name="empresa" class="form-select" id="floatingSelect2" aria-label="empresa">
-                                <option value="selecione">---Selecione---</option>
-                                {{#each empresas}}
-                                <option value="{{_id}}">{{empresa}}</option>
-                                {{else}}
-                                {{/each}}                                
-                            </select>
-                            <label for="floatingSelect">Empresa</label>
-                            </div>
-                        </td>
-
-                        <td>
-                            <input class="form-control" type="number" name="indice">
-                        </td>                        
-                    </tr>                                    
-                </tbody>
-            </table>
-            <button class="btn btn-secondary" type="submit">Salvar</button>
-        </form>
-</div>
- 
-    <div class="table-responsive-xl">        
-        <form action="/administracao/agencias/excluir" method="post">
+    <form action="/administracao/agencias/add_agencia" method="post">
         <table class="table">
-                <hr>
-                    <p style="font-weight: bold;">Agencias Cadastradas</p>
-                        <thead class="table-dark">
-                            <tr>                            
-                                <th scope="col">#</th>
-                                <th scope="col">Número</th>                                
-                                <th scope="col">Cidade</th>
-                                <th scope="col">Empresa</th>
-                                <th scope="col">Comissão</th>                                                            
-                            </tr>
-                        </thead>
-                        {{#each agencias}}
-                        <tbody>
-                            <tr>
-                                <th scope="row"><input type="checkbox" name="ident" value="{{_id}}"></th>
-                                <td>{{numero}}</td>                                
-                                <td>{{cidade}}</td>
-                                <td>{{empresa.empresa}}</td> 
-                                <td>{{#if indiceComissao}}{{indiceComissao}}%{{else}}{{/if}}</td>                               
-                            </tr>                                    
-                        </tbody>                                        
-                        {{else}}            
-                            <tbody>
-                            <tr>
-                                <th scope="row">---</th>
-                                <td>---</td>
-                                <td>---</td>
-                                <td>---</td>
-                                <td>---</td>
-                                
-                            </tr>                                    
-                        </tbody>  
-                        {{/each}}
-                    </table>    
-            <button class="btn btn-outline-danger" type="submit">Excluir</button> 
-        </form>
-    </div>
+            <p style="font-weight: bold;">Cadastrar nova Agencia</p>
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">Número</th>
+                    <th scope="col">Cidade</th>
+                    <th scope="col">Comissão %</th>
+                    <th scope="col">Emite CTE</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <input class="form-control" type="number" name="numero">
+                    </td>
+
+                    <td>
+                        <input class="form-control" type="text" name="cidade">
+                    </td>
+
+                    <td>
+                        <input class="form-control" type="number" name="indice">
+                    </td>
+                    <td>
+                        <select name="emite_cte" id="" class="form-select">
+                            <option value="selecione">---selecione---</option>
+                            <option value="true">SIM</option>
+                            <option value="false">NÂO</option>
+                        </select>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="btn btn-secondary btn-sm" type="submit">Salvar</button>
+    </form>
+
 </div>
+
+<div class="table-responsive-xl">
+    <form action="/administracao/agencias/excluir" method="post">
+        <table class="table">
+            <hr>
+            <p style="font-weight: bold;">Agencias Cadastradas</p>
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">Número</th>
+                    <th scope="col">Cidade</th>
+                    <th scope="col">Emite CTE</th>
+                    <th scope="col">Comissão</th>
+                    <th scope="col">#</th>
+                </tr>
+            </thead>
+            {{#each agencias}}
+            <tbody>
+                <tr>
+                    <th scope="row"><a href="/administracao/agencias/edit_agencia/{{_id}}">{{numero}}</a></th>
+                    <td>{{cidade}}</td>
+                    <td>{{emitecteExib}}</td>
+                    <td>{{#if indiceComissao}}{{indiceComissao}}%{{else}}{{/if}}</td>
+                    <td><input type="checkbox" name="ident" value="{{_id}}" id=""></td>
+                </tr>
+            </tbody>
+            {{else}}
+            <tbody>
+                <tr>
+                    <th scope="row">---</th>
+                    <td>---</td>
+                    <td>---</td>
+                    <td>---</td>
+                    <td>---</td>
+
+                </tr>
+            </tbody>
+            {{/each}}
+        </table>
+        <button class="btn btn-outline-danger btn-sm" type="submit">Excluir Selecionados</button>
+    </form>
+</div>
+</div>
+<br><br>

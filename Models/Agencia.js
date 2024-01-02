@@ -3,27 +3,26 @@ const Schema = mongoose.Schema
 
 const Agencia = new Schema({
 
-    numero:{
-        type: Number,
-        required: true
-    },    
-    cidade:{
+    numero: {
         type: String,
         required: true
-    },    
-    empresa:{
-        type: Schema.Types.ObjectId,
-        ref: "empresas",
+    },
+    cidade: {
+        type: String,
         required: true
-    },    
-    date:{
+    },
+    date: {
         type: Date,
         default: new Date()
     },
-    indiceComissao:{
+    indiceComissao: {
         type: Number,
         required: true
+    },
+    emitecte: {
+        type: Boolean,
+        default: false
     }
 })
 
-mongoose.model('agencias',Agencia)
+mongoose.model('agencias', Agencia)

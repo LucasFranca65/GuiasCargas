@@ -24,6 +24,7 @@ const users = require('./Routes/rotasUsuarios')
 const talao = require('./Routes/rotasTaloes')
 const comissao = require('./Routes/rotasComissao')
 const periodo = require('./Routes/rotasPeriodos')
+const ctes = require('./Routes/rotasCtes')
 
 //Configurações
 
@@ -90,6 +91,7 @@ app.use('/talao', talao)
 app.use('/comissao', comissao)
 app.use('/periodos', periodo)
 app.use('/arrecadacao', arrecadacao)
+app.use('/ctes', ctes)
 
 app.get('/error', (req, res) => {
     res.render('404')
@@ -97,10 +99,10 @@ app.get('/error', (req, res) => {
 app.get('/', (req, res) => {
     res.redirect('/validation')
 })
-/* app.use((req,res,next)=>{
-  req.flash('error_msg',"Algo deu errado, Pagina não encontrada")
-  res.redirect('/error')
-  })*/
+app.use((req, res, next) => {
+    req.flash('error_msg', "Algo deu errado, Pagina não encontrada")
+    res.redirect('/error')
+})
 
 //Outros
 app.listen(PORT, (error) => {

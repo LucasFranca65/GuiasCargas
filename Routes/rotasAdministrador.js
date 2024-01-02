@@ -22,15 +22,20 @@ const Cliente = mongoose.model('clientes')
 //Rotas de Administração de Usuarios
 //Rota Principal
 router.get('/users', eAdmin, (req, res) => {
-    User.find().then((users) => {
-        for (let i = 0; i < users.length; i++) {
-            if (users[i].eAdmin == true) {
-                users[i]['tipoUser'] = "Administrador"
-            } else {
-                users[i]['tipoUser'] = "Padrão"
+    User.find().populate('agencia').then((users) => {
+        Agencia.find().sort({ cidade: 1 }).then((agencias) => {
+            for (let i = 0; i < users.length; i++) {
+                if (users[i].eAdmin == true) {
+                    users[i]['tipoUser'] = "Administrador"
+                } else {
+                    users[i]['tipoUser'] = "Padrão"
+                }
             }
-        }
-        res.render('administracao/users/adm_users', { users })
+            res.render('administracao/users/adm_users', { users, agencias })
+        }).catch((err) => {
+            req.flash('error_msg', "Erro ao Carregar agencias " + err)
+            res.redirect('/painel')
+        })
     }).catch((err) => {
         req.flash('error_msg', "Erro ao Carregar usuarios " + err)
         res.redirect('/painel')
@@ -38,61 +43,73 @@ router.get('/users', eAdmin, (req, res) => {
 })
 
 router.post('/users/add_user', eAdmin, (req, res) => {
+    const { nome, login, agencia, senha1, senha2, eAdmin } = req.body
 
     var error = []
     //  Validação de usuario
 
-    if (!req.body.nome || typeof req.body.nome == undefined || req.body.nome == null) {
+    if (!nome || typeof nome == undefined || nome == null) {
         error.push({ texto: "Nome Invalido" })
     }
-    if (req.body.nome.length < 5) {
+    if (nome.length < 5) {
         error.push({ texto: "Nome Muito Curto, minimo 5 caracteres" })
     }
     //  Validação de Login
-    if (!req.body.login || typeof req.body.login == undefined || req.body.login == null) {
+    if (!login || typeof login == undefined || login == null) {
         error.push({ texto: "Login Invalido" })
     }
-    if (req.body.login.length < 3) {
+    if (login.length < 3) {
         error.push({ texto: "Login Muito Curto minimo 3 caracteres" })
     }
-    //  Validação de Setor    
-    if (!req.body.setor || typeof req.body.setor == undefined || req.body.setor == null) {
-        error.push({ texto: "Setor Invalido" })
-    }
-    if (req.body.setor.length < 2) {
-        error.push({ texto: "Nome do Setor Muito Curto, minimo 2 caracteres" })
+    if (agencia == "selecione") {
+        error.push({ texto: "Selecione uma agencia" })
     }
     //  Validando Senha
-    if (!req.body.senha1 || typeof req.body.senha1 == undefined || req.body.senha1 == null) {
+    if (!senha1 || typeof senha1 == undefined || senha1 == null) {
         error.push({ texto: "Senha Invalida" })
     }
-    if (req.body.senha1.length < 6) {
+    if (senha1.length < 6) {
         error.push({ texto: "Senha Muito Curta, minimo 6 caracteres" })
     }
-    if (req.body.senha2 != req.body.senha1) {
+    if (senha2 != req.body.senha1) {
         error.push({ texto: "As Senhas não conferem" })
     }
     //  Verificando erros
     if (error.length > 0) {
-        User.find().then((users) => {
-            res.render('administracao/adm_users', { error, users })
+        User.find().populate('agencia').then((users) => {
+            Agencia.find().sort({ cidade: 1 }).then((agencias) => {
+                for (let i = 0; i < users.length; i++) {
+                    if (users[i].eAdmin == true) {
+                        users[i]['tipoUser'] = "Administrador"
+                    } else {
+                        users[i]['tipoUser'] = "Padrão"
+                    }
+                }
+                res.render('administracao/users/adm_users', { users, agencias, error })
+            }).catch((err) => {
+                req.flash('error_msg', "Erro ao Carregar agencias " + err)
+                res.redirect('/painel')
+            })
+        }).catch((err) => {
+            req.flash('error_msg', "Erro ao Carregar usuarios " + err)
+            res.redirect('/painel')
         })
 
     } else {
         //  Verificando se usuario é Administrador 
-        if (req.body.eAdmin == "true") { //Se campo é admin estiver marcado ele grava usuario como administrador
+        if (eAdmin == "true") { //Se campo é admin estiver marcado ele grava usuario como administrador
             //verifica se o usuario já existe
-            User.findOne({ login: req.body.login }).then((users) => {
+            User.findOne({ login: login }).then((users) => {
                 if (users) {
                     req.flash('error_msg', "Já existe um usuario com esse login")
                     res.redirect('/administracao/users')
                 } else {
 
                     const novoUsuario = new User({
-                        nome: req.body.nome,
-                        login: req.body.login,
-                        setor: req.body.setor,
-                        senha: req.body.senha1,
+                        nome: nome,
+                        login: login,
+                        senha: senha1,
+                        agencia: agencia,
                         eAdmin: true
                     })
                     bcrypt.genSalt(10, (erro, salt) => {
@@ -115,21 +132,20 @@ router.post('/users/add_user', eAdmin, (req, res) => {
             }).catch((err) => {
                 req.flash('error_msg', "Erro Interno", err)
                 res.redirect('/administracao/users')
-
             })
 
         } else { //Se campo é admin não estiver marcado ele grava como usuario comun
-            User.findOne({ login: req.body.login }).then((users) => {
+            User.findOne({ login: login }).then((users) => {
                 if (users) {
                     req.flash('error_msg', "Já existe um usuario com esse login")
                     res.redirect('/administracao/users')
                 } else {
 
                     const novoUsuario = new User({
-                        nome: req.body.nome,
-                        login: req.body.login,
-                        setor: req.body.setor,
-                        senha: req.body.senha1
+                        nome: nome,
+                        login: login,
+                        senha: senha1,
+                        agencia: agencia
                     })
                     bcrypt.genSalt(10, (erro, salt) => {
                         bcrypt.hash(novoUsuario.senha, salt, (erro, hash) => {
@@ -150,13 +166,15 @@ router.post('/users/add_user', eAdmin, (req, res) => {
                 }
             }).catch((err) => {
                 req.flash('error_msg', "Erro Interno", err)
-                res.redirect('administracao/users')
+                res.redirect('/administracao/users')
 
             })
         }
     }
 
 })
+
+//Fim rota adição
 
 router.post('/users/dell_user', eAdmin, (req, res) => {
     if (req.body.ident == undefined) {
@@ -261,44 +279,52 @@ router.get('/guias/exclusao/:id', eAdmin, (req, res) => {
 
 //Rotas Administração de agencias
 router.get('/agencias', eAdmin, (req, res) => {
-    Empresa.find().then((empresas) => {
-        Agencia.find().populate("empresa").sort({ cidade: 1 }).then((agencias) => {
-            res.render('administracao/agencias/index_agencias', { agencias, empresas })
-        }).catch((err) => {
-            req.flash('error_msg', "Erro ao Carregar Agencias " + err)
-            res.redirect('/painel')
-        })
+
+    Agencia.find().sort({ cidade: 1 }).then((agencias) => {
+        for (let i = 0; i < agencias.length; i++) {
+            if (agencias[i].emitecte == true || agencias[i].emitecte == "true") {
+                agencias[i]['emitecteExib'] = "SIM"
+            } else {
+                agencias[i]['emitecteExib'] = "NÂO"
+            }
+        }
+        res.render('administracao/agencias/index_agencias', { agencias })
     }).catch((err) => {
         req.flash('error_msg', "Erro ao Carregar Agencias " + err)
         res.redirect('/painel')
     })
 
+
 })
 //Rota para cadastrar agencia no banco de dados 
 router.post('/agencias/add_agencia', eAdmin, (req, res) => {
-    const { numero, cidade, uf, empresa, indice } = req.body
+    const { numero, cidade, indice, emite_cte } = req.body
     let error = []
     if (!cidade || typeof cidade == undefined || cidade == null) {
         error.push({ texto: "Nome Invalido" })
     }
-    if (!numero || typeof numero == undefined || numero == null) {
+    if (!numero || numero == undefined || numero == null) {
         error.push({ texto: "Numero Invalido" })
     }
-    if (uf == "selecione") {
-        error.push({ texto: "Selecione um UF Estado" })
-    }
-    if (empresa == "selecione") {
-        error.push({ texto: "Selecione uma empresa" })
+    if (emite_cte == 'selecione') {
+        error.push({ texto: "Informe se emite CTE" })
     }
     if (!indice || typeof indice == undefined || indice == null) {
         error.push({ texto: "Indice informado é invalido" })
     }
     if (error.length > 0) {
-        Agencia.find().then((agencias) => {
+        Agencia.find().populate('agencia').then((agencias) => {
+            for (let i = 0; i < agencias.length; i++) {
+                if (agencias[i].emitecte == true || agencias[i].emitecte == "true") {
+                    agencias[i]['emitecteExib'] == "SIM"
+                } else {
+                    agencias[i]['emitecteExib'] == "NÂO"
+                }
+            }
             res.render('administracao/agencias/index_agencias', { error, agencias })
         })
     } else {
-        Agencia.findOne({ $or: [{ cidade: req.body.cidade }, { numero: req.body.numero }] }).then((agencias) => {
+        Agencia.findOne({ $or: [{ cidade: cidade }, { numero: numero }] }).then((agencias) => {
             if (agencias) {
                 req.flash('error_msg', "Numero ou cidade já cadastrada")
                 res.redirect('/administracao/agencias')
@@ -307,8 +333,7 @@ router.post('/agencias/add_agencia', eAdmin, (req, res) => {
                 const newAgencia = {
                     numero: numero,
                     cidade: cidade,
-                    uf: uf,
-                    empresa: empresa,
+                    emitecte: emite_cte,
                     indiceComissao: indice
                 }
                 new Agencia(newAgencia).save().then(() => {
@@ -321,6 +346,81 @@ router.post('/agencias/add_agencia', eAdmin, (req, res) => {
             }
         })
     }
+})
+router.get('/agencias/edit_agencia/:id', eAdmin, (req, res) => {
+    const ident = req.params.id
+    Agencia.findById(ident).then((agencia) => {
+        if (agencia) {
+
+            if (agencia.emitecte == true || agencia.emitecte == "true") {
+                agencia['emitecteExib'] = "SIM"
+            } else {
+                agencia['emitecteExib'] = "NÂO"
+            }
+            res.render('administracao/agencias/edit_agencias', { agencia })
+        } else {
+            req.flash('error_msg', "Não foi encontrado agencia com o parametro informado")
+            res.redirect('/administracao/agencias')
+        }
+    }).catch((err) => {
+        req.flash('error_msg', "Erro ao buscar a agencia")
+        res.redirect('/administracao/agencias')
+    })
+})
+router.post('/agencias/edit_agencia/save', eAdmin, (req, res) => {
+    const { numero, cidade, indice, emite_cte, ident } = req.body
+    let error = []
+    if (!cidade || typeof cidade == undefined || cidade == null) {
+        error.push({ texto: "Nome Invalido" })
+    }
+    if (!numero || numero == undefined || numero == null) {
+        error.push({ texto: "Numero Invalido" })
+    }
+    if (emite_cte == 'selecione') {
+        error.push({ texto: "Informe se emite CTE" })
+    }
+    if (!indice || typeof indice == undefined || indice == null) {
+        error.push({ texto: "Indice informado é invalido" })
+    }
+    if (error.length > 0) {
+        Agencia.findById(ident).then((agencia) => {
+            if (agencia) {
+                if (agencia.emitecte == true || agencia.emitecte == "true") {
+                    agencia['emitecteExib'] == "SIM"
+                } else {
+                    agencia['emitecteExib'] == "NÂO"
+                }
+                res.render('administracao/agencias/edit_agencias', { agencia, error })
+            } else {
+                req.flash('error_msg', "Não foi encontrado agencia com o parametro informado")
+                res.redirect('/administracao/agencias')
+            }
+        }).catch((err) => {
+            req.flash('error_msg', "Erro ao buscar a agencia")
+            res.redirect('/administracao/agencias')
+        })
+    } else {
+        Agencia.findById(ident).then((agencia) => {
+            if (!agencia) {
+                req.flash('error_msg', "Parametro invalido")
+                res.redirect('/administracao/agencias')
+            } else {
+                agencia.numero = numero
+                agencia.cidade = cidade
+                agencia.emitecte = emite_cte
+                agencia.indiceComissao = indice
+
+                agencia.save().then(() => {
+                    req.flash('success_msg', "Agencia Atualizada com sucesso")
+                    res.redirect('/administracao/agencias/edit_agencia/' + ident)
+                }).catch((err) => {
+                    req.flash('error_msg', "Erro ao Cadastrar Agencia")
+                    res.redirect('/administracao/agencias/edit_agencia/' + ident)
+                })
+            }
+        })
+    }
+
 })
 //Rota que exclui agencias selecionadas
 router.post('/agencias/excluir', eAdmin, (req, res) => {
