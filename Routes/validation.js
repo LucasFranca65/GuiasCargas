@@ -44,6 +44,7 @@ router.get('/', (req, res) => {
             Agencia.findOne().then((agencia) => {
                 const novoUsuario = new User({
                     nome: "Administrador",
+                    perfil: "ADMINISTRADOR",
                     login: "admin",
                     senha: "admin",
                     agencia: agencia._id,
@@ -90,7 +91,7 @@ router.get('/login', (req, res) => {
 
 router.get('/sobre', lOgado, (req, res) => {
     System.find().then((info) => {
-        info[0]["desde"] = moment().format("DD/MM/YYYY")
+        info[0]["desde"] = moment().format("DD/MM/YYYY HH:mm:ss")
         res.render('sobre', { info })
     }).catch((err) => {
         req.flash('error_msg', "Erro ao carregar informações")

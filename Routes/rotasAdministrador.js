@@ -24,13 +24,6 @@ const Cliente = mongoose.model('clientes')
 router.get('/users', eAdmin, (req, res) => {
     User.find().populate('agencia').then((users) => {
         Agencia.find().sort({ cidade: 1 }).then((agencias) => {
-            for (let i = 0; i < users.length; i++) {
-                if (users[i].eAdmin == true) {
-                    users[i]['tipoUser'] = "Administrador"
-                } else {
-                    users[i]['tipoUser'] = "Padrão"
-                }
-            }
             res.render('administracao/users/adm_users', { users, agencias })
         }).catch((err) => {
             req.flash('error_msg', "Erro ao Carregar agencias " + err)
@@ -43,7 +36,7 @@ router.get('/users', eAdmin, (req, res) => {
 })
 
 router.post('/users/add_user', eAdmin, (req, res) => {
-    const { nome, login, agencia, senha1, senha2, eAdmin } = req.body
+    const { nome, login, agencia, senha1, senha2, eAdmin, perfil } = req.body
 
     var error = []
     //  Validação de usuario
@@ -78,13 +71,7 @@ router.post('/users/add_user', eAdmin, (req, res) => {
     if (error.length > 0) {
         User.find().populate('agencia').then((users) => {
             Agencia.find().sort({ cidade: 1 }).then((agencias) => {
-                for (let i = 0; i < users.length; i++) {
-                    if (users[i].eAdmin == true) {
-                        users[i]['tipoUser'] = "Administrador"
-                    } else {
-                        users[i]['tipoUser'] = "Padrão"
-                    }
-                }
+
                 res.render('administracao/users/adm_users', { users, agencias, error })
             }).catch((err) => {
                 req.flash('error_msg', "Erro ao Carregar agencias " + err)
@@ -97,7 +84,7 @@ router.post('/users/add_user', eAdmin, (req, res) => {
 
     } else {
         //  Verificando se usuario é Administrador 
-        if (eAdmin == "true") { //Se campo é admin estiver marcado ele grava usuario como administrador
+        if (eAdmin == "true" || eAdmin == true) { //Se campo é admin estiver marcado ele grava usuario como administrador
             //verifica se o usuario já existe
             User.findOne({ login: login }).then((users) => {
                 if (users) {
@@ -108,6 +95,7 @@ router.post('/users/add_user', eAdmin, (req, res) => {
                     const novoUsuario = new User({
                         nome: nome,
                         login: login,
+                        perfil: "ADMINISTRADOR",
                         senha: senha1,
                         agencia: agencia,
                         eAdmin: true
@@ -135,40 +123,47 @@ router.post('/users/add_user', eAdmin, (req, res) => {
             })
 
         } else { //Se campo é admin não estiver marcado ele grava como usuario comun
-            User.findOne({ login: login }).then((users) => {
-                if (users) {
-                    req.flash('error_msg', "Já existe um usuario com esse login")
-                    res.redirect('/administracao/users')
-                } else {
+            if (perfil == 'selecione') {
+                req.flash('error_msg', "Selecione um perfil para o usuario")
+                res.redirect('/administracao/users')
+            } else {
+                User.findOne({ login: login }).then((users) => {
+                    if (users) {
+                        req.flash('error_msg', "Já existe um usuario com esse login")
+                        res.redirect('/administracao/users')
+                    } else {
 
-                    const novoUsuario = new User({
-                        nome: nome,
-                        login: login,
-                        senha: senha1,
-                        agencia: agencia
-                    })
-                    bcrypt.genSalt(10, (erro, salt) => {
-                        bcrypt.hash(novoUsuario.senha, salt, (erro, hash) => {
-                            if (erro) {
-                                req.flash('error_msg', "Houve um erro ao salvar usuario")
-                                res.redirect('/administracao/users')
-                            }
-                            novoUsuario.senha = hash
-                            novoUsuario.save().then(() => {
-                                req.flash('success_msg', "Usuario Cadastrado com sucesso")
-                                res.redirect('/administracao/users')
-                            }).catch((err) => {
-                                req.flash('error_msg', "Erro ao criar usuario")
-                                res.redirect('/administracao/users')
+                        const novoUsuario = new User({
+                            nome: nome,
+                            login: login,
+                            perfil: perfil,
+                            senha: senha1,
+                            agencia: agencia
+                        })
+                        bcrypt.genSalt(10, (erro, salt) => {
+                            bcrypt.hash(novoUsuario.senha, salt, (erro, hash) => {
+                                if (erro) {
+                                    req.flash('error_msg', "Houve um erro ao salvar usuario")
+                                    res.redirect('/administracao/users')
+                                }
+                                novoUsuario.senha = hash
+                                novoUsuario.save().then(() => {
+                                    req.flash('success_msg', "Usuario Cadastrado com sucesso")
+                                    res.redirect('/administracao/users')
+                                }).catch((err) => {
+                                    req.flash('error_msg', "Erro ao criar usuario")
+                                    res.redirect('/administracao/users')
+                                })
                             })
                         })
-                    })
-                }
-            }).catch((err) => {
-                req.flash('error_msg', "Erro Interno", err)
-                res.redirect('/administracao/users')
+                    }
+                }).catch((err) => {
+                    req.flash('error_msg', "Erro Interno", err)
+                    res.redirect('/administracao/users')
 
-            })
+                })
+            }
+
         }
     }
 

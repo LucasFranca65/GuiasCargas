@@ -46,9 +46,11 @@ router.get('/guias/buscar', lOgado, (req, res) => {
 })
 
 
+
+
 router.get('/por_empresa', lOgado, (req, res) => {
     let next = "disabled", prev = "disabled"
-    res.render('consultasRelatorios/porEmpresa', { next, prev })
+    res.render('consultasRelatorios/guias_cargas/porEmpresa', { next, prev })
 })
 
 router.get('/por_empresa/pesquisar', lOgado, (req, res) => {

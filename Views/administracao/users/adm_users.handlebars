@@ -13,6 +13,7 @@
                     <th scope="col">Adm</th>
                     <th scope="col">Nome</th>
                     <th scope="col">Login</th>
+                    <th scope="col">Perfil</th>
                     <th scope="col">Agencia</th>
                     <th scope="col">Senha</th>
                     <th scope="col">Confirma Senha</th>
@@ -29,7 +30,15 @@
                     <td>
                         <input class="form-control" type="text" name="login">
                     </td>
-
+                    <td>
+                        <select class="form-select" name="perfil">
+                            <option value="selecione">-----selecione-----</option>
+                            <option value="AGENTE">AGENTE</option>
+                            <option value="FINANCEIRO">FINANCEIRO</option>
+                            <option value="ARRECADACAO">ARRECADACAO</option>
+                        </select>
+                        <small>Selecione apenas se não for administrador</small>
+                    </td>
                     <td>
                         <select class="form-select" name="agencia">
                             <option value="selecione">-----selecione-----</option>
@@ -74,7 +83,7 @@
                     <td>{{nome}}</td>
                     <td>{{login}}</td>
                     <td>{{agencia.cidade}}</td>
-                    <td>{{tipoUser}}</td>
+                    <td>{{perfil}}</td>
                     <td><a href="/administracao/users/reset_pass/{{_id}}">reset</a></td>
                 </tr>
             </tbody>

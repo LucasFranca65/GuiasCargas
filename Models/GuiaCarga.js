@@ -74,6 +74,19 @@ const GuiaCarga = new Schema({
         default: new Date(),
         required: true
     },
+    recebedor: {
+        type: String
+    },
+    cpfRecebedor: {
+        type: String
+    },
+    entrega: {
+        type: String,
+        default: "NA ORIGEM PARA ENVIO"
+    },
+    dateEntrega: {
+        type: Date
+    },
     user: {
         type: Schema.Types.ObjectId,
         ref: "users",

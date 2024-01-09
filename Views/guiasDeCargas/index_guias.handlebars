@@ -6,7 +6,7 @@
   <h3>Cadastrar Excesso de Bagagem</h3>
 
   <div class="card-body ">
-    <form action="/guias/adicionar" method="POST">
+    <form action="/guias/adicionar" method="POST" onsubmit="confirmAdd(event, this)">
       <div class="table-responsive-xl">
         <!--Formulario primeira Linha-->
         <table class="table shadow">
@@ -28,6 +28,10 @@
                 </div>
               </td>
               <td>
+                {{#if origem}}
+                <p>{{origem.cidade}}</p>
+                <input type="hidden" name="origem" value="{{origem.id}}">
+                {{else}}
                 <div class="form-floating">
                   <select name="origem" class="form-select" id="floatingSelect" aria-label="Agencia Origem">
                     <option value="selecione">---Selecione---</option>
@@ -38,6 +42,7 @@
                   </select>
                   <label for="floatingSelect">Agencia Origem</label>
                 </div>
+                {{/if}}
               </td>
               <td>
                 <div class="form-floating">
@@ -121,7 +126,7 @@
   </div>
   <br>
   {{#if guias}}
-  <h3>Ultimas Guias Adicionadas</h3>
+  <h3>Guias mais recentes</h3>
   <br>
   <div class="table-responsive-xl ">
     <table class="table table-bordered fs-6 shadow">
@@ -130,7 +135,6 @@
           <th scope="col">Conhecimento</th>
           <th scope="col">Origem</th>
           <th scope="col">Destino</th>
-          <th scope="col">Cliente</th>
           <th scope="col">Empresa</th>
           <th scope="col">Entrada</th>
           <th scope="col">Vencimento</th>
@@ -150,7 +154,6 @@
             <td>{{origem.cidade}}</td>
             <td>{{destino.cidade}}</td>
             <td>{{cliente.name_client}}</td>
-            <td>{{empresa.empresa}}</td>
             <td>{{date_entrada}}</td>
             <td>{{date_vencimento}}</td>
             <td>{{valorExib}}</td>

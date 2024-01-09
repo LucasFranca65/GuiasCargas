@@ -1,0 +1,81 @@
+@charset "UTF-8";
+
+.homepage-container {
+    display: flex;
+    justify-content: space-between;
+
+}
+
+.homepage-box {
+    width: 48.5%;
+
+}
+
+.pagina {
+    justify-content: start;
+    align-items: start;
+    margin: 0mm;
+    border: none;
+    /*background-color: "#333";*/
+    /*border: 1px solid red;*/
+    width: 210mm;
+    /*height: 29.7cm;*/
+    display: flex;
+    flex-wrap: wrap;
+    /*grid-template-rows: 2.97cm 2.97cm 2.97cm 2.97cm 2.97cm 2.97cm 2.97cm 2.97cm 2.97cm 2.97cm;*/
+}
+
+table,
+thead,
+tbody,
+tfoot,
+tr,
+th,
+td,
+p {
+    /*font-family: "Liberation Sans";*/
+    font-size: small;
+    font-weight: bold;
+}
+
+/*a.comment-indicator:hover+comment {
+    background: #ffd;
+    position: absolute;
+    display: block;
+    border: 1px solid black;
+    padding: 0.5em;
+}
+
+a.comment-indicator {
+    background: red;
+    display: inline-block;
+    border: 1px solid black;
+    width: 0.5em;
+    height: 0.5em;
+}
+
+comment {
+    display: none;
+}*/
+
+.footer {
+    background-color: #ffcc00;
+    color: #000000;
+    padding: 20px;
+    text-align: center;
+    align-items: center;
+    margin-top: 100px;
+    height: 100px;
+}
+
+.vale {
+    width: 70mm;
+    height: 29.7mm;
+    background-image: url('/img/vale.png');
+    background-size: 70mm 29.7mm;
+    padding-top: 1mm;
+    padding-left: 7mm;
+    /*background-color: burlywood;*/
+
+
+}

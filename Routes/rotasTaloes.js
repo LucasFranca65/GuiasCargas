@@ -43,7 +43,7 @@ router.get('/', lOgado, (req, res) => {
     })
 })
 
-router.post('/adicionar', lOgado, (req, res) => {
+router.post('/adicionar', eAdmin, (req, res) => {
     let erro = []
     const { numCont, numFin, numInit, tipo, agencia } = req.body
     if (tipo == "selecione") {

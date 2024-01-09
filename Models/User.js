@@ -24,6 +24,10 @@ const User = new Schema({
         type: Date,
         default: Date.now()
     },
+    perfil: {
+        type: String,
+        require: true
+    },
     eAdmin: {
         type: Boolean,
         default: false
