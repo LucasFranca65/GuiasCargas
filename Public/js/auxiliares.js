@@ -2,8 +2,8 @@ function downloadPDF() {
     const content = document.querySelector('#content')
     var opt = {
         margin: [0.5, 0.5, 0.5, 0.5],
-        filename: "valesprint.pdf",
-        jsPDF: { unit: 'in', format: "a4", orientation: 'portrait', }
+        filename: "relatorio.pdf",
+        jsPDF: { unit: 'in', format: "a4", orientation: 'landscape', }
     }
     html2pdf().set(opt).from(content).save()
 }

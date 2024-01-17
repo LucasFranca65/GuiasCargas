@@ -1,5 +1,5 @@
 const express = require('express')
-const { default: mongoose, model } = require('mongoose')
+const { default: mongoose, model, mongo } = require('mongoose')
 const router = express.Router()
 const moment = require('moment')
 const { lOgado } = require('../helpers/eAdmin')
@@ -12,7 +12,8 @@ require('../Models/GuiaCarga')
 const GuiaCarga = mongoose.model('guiascargas')
 require('../Models/Agencia')
 const Agencia = mongoose.model('agencias')
-
+require('../Models/Empresa')
+const Empresa = mongoose.model('empresas')
 //BUSCA POR EMPRESA 
 
 router.get('/guias/buscar', lOgado, (req, res) => {
@@ -49,16 +50,22 @@ router.get('/guias/buscar', lOgado, (req, res) => {
 
 
 router.get('/por_empresa', lOgado, (req, res) => {
-    let next = "disabled", prev = "disabled"
-    res.render('consultasRelatorios/guias_cargas/porEmpresa', { next, prev })
+    Empresa.find().then((empresas) => {
+        let next = "disabled", prev = "disabled"
+        res.render('consultasRelatorios/guias_cargas/porEmpresa', { next, prev, empresas })
+    }).catch((err) => {
+        req.flash('error_msg', "Erro ao Buscar empresas")
+        res.redirect('/consultas/por_empresa')
+    })
+
 })
 
 router.get('/por_empresa/pesquisar', lOgado, (req, res) => {
     var { empresa, dateMin, dateMax, offset, page } = req.query
     //console.log(empresa, dateMin,dateMax, offset, page)
-    dateMax = moment(dateMax).format("YYYY-MM-DDT23:59:59.SSSZ")
-    dateMin = moment(dateMin).format("YYYY-MM-DDT00:00:00.SSSZ")
-    const limit = 20
+    dateMax = moment(dateMax).format()
+    dateMin = moment(dateMin).format()
+    const limit = 30
     if (!offset) {
         offset = 0
     }
@@ -80,58 +87,67 @@ router.get('/por_empresa/pesquisar', lOgado, (req, res) => {
         req.flash('error_msg', "A data inicial não pode ser menor que a final")
         res.redirect('/consulta/por_empresa')
     } else {
-        let query = { dateEntrada: { $gte: dateMin, $lt: dateMax }, empresa: empresa }
-        GuiaCarga.find(query).limit(limit).skip(offset).sort({ dateEntrada: 1 }).then((dados) => {
-            if (dados.length == 0) {
-                req.flash('error_msg', "Não foi encontrado guias para o periodo Informado")
+        Empresa.find().then((empresas) => {
+            let query = { dateEntrada: { $gte: dateMin, $lt: dateMax }, empresa: empresa }
+            GuiaCarga.find(query).populate('origem').populate('destino').populate('empresa').populate('cliente').limit(limit).skip(offset).sort({ dateEntrada: 1 }).then((dados) => {
+                if (dados.length == 0) {
+                    req.flash('error_msg', "Não foi encontrado guias para o periodo Informado")
+                    res.redirect('/consultas/por_empresa')
+                } else {
+                    var next, prev
+                    if (page == 1) {
+                        prev = "disabled"
+                    }
+                    if (dados.length <= limit) {
+                        next = "disabled"
+                    }
+                    var nextUrl = {
+                        emp: empresa,
+                        dmin: moment(dateMin).format('YYYY-MM-DD'),
+                        dmax: moment(dateMax).format('YYYY-MM-DD'),
+                        ofst: offset + limit,
+                        pag: page + 1,
+                    }
+                    var prevUrl = {
+                        emp: empresa,
+                        dmin: moment(dateMin).format('YYYY-MM-DD'),
+                        dmax: moment(dateMax).format('YYYY-MM-DD'),
+                        ofst: offset - limit,
+                        pag: page - 1
+                    }
+
+                    var i = 0
+                    while (i < dados.length) {
+                        dados[i]["date_entrada"] = moment(dados[i].dateEntrada).format('DD/MM/YYYY')
+                        dados[i]["date_pagamento"] = moment(dados[i].datePagamento).format('DD/MM/YYYY')
+                        dados[i]["date_vencimento"] = moment(dados[i].vencimento).format('DD/MM/YYYY')
+
+                        dados[i]["valor_exib"] = dados[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+
+                        if (dados[i].baixa == true) {
+                            dados[i]["statusBaixa"] = "BAIXADO"
+                        }
+                        if (dados[i].statusPag = "CANCELADO") {
+                            dados[i]["statusBaixa"] = "CANCELADO"
+                        }
+                        else {
+                            dados[i]["statusBaixa"] = "PENDENTE"
+                        }
+                        i++
+                    }
+                    res.render('consultasRelatorios/guias_cargas/porEmpresa', { dados, nextUrl, prevUrl, page, prev, next, empresas })
+                }
+
+            }).catch((err) => {
+                req.flash('error_msg', "Não foi encontrado guias para os parametros no periodo informado")
                 res.redirect('/consultas/por_empresa')
-            } else {
-                var next, prev
-                if (page == 1) {
-                    prev = "disabled"
-                }
-                if (dados.length <= limit) {
-                    next = "disabled"
-                }
-                var nextUrl = {
-                    emp: empresa,
-                    dmin: moment(dateMin).format('YYYY-MM-DD'),
-                    dmax: moment(dateMax).format('YYYY-MM-DD'),
-                    ofst: offset + limit,
-                    pag: page + 1,
-                }
-                var prevUrl = {
-                    emp: empresa,
-                    dmin: moment(dateMin).format('YYYY-MM-DD'),
-                    dmax: moment(dateMax).format('YYYY-MM-DD'),
-                    ofst: offset - limit,
-                    pag: page - 1
-                }
-
-                var i = 0
-                while (i < dados.length) {
-                    dados[i]["date_entrada"] = moment(dados[i].dateEntrada).format('DD/MM/YYYY')
-                    dados[i]["date_pagamento"] = moment(dados[i].datePagamento).format('DD/MM/YYYY')
-                    dados[i]["valor_exib"] = dados[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-                    dados[i]["n"] = (i + 1) + offset
-                    if (dados[i].baixa == true) {
-                        dados[i]["statusBaixa"] = "BAIXADO"
-                    }
-                    if (dados[i].statusPag = "CANCELADO") {
-                        dados[i]["statusBaixa"] = "CANCELADO"
-                    }
-                    else {
-                        dados[i]["statusBaixa"] = "PENDENTE"
-                    }
-                    i++
-                }
-                res.render('consultasRelatorios/porEmpresa', { dados, nextUrl, prevUrl, page, prev, next })
-            }
-
+            })
         }).catch((err) => {
-            req.flash('error_msg', "Não foi encontrado guias para os parametros no periodo informado")
+            req.flash('error_msg', "Erro ao Buscar empresas")
             res.redirect('/consultas/por_empresa')
         })
+
+
     }
 })
 

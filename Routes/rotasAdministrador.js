@@ -256,12 +256,13 @@ router.post('/guias/excluir', eAdmin, (req, res) => {
     }
 })
 //excuir indicidualmente
-router.get('/guias/exclusao/:id', eAdmin, (req, res) => {
-    if (req.params.id == undefined) {
+router.get('/guias/exclusao', eAdmin, (req, res) => {
+    const { ident } = req.query
+    if (ident == undefined) {
         req.flash('error_msg', "Nenhuma Guia Selecionado para exclusão")
         res.redirect('/guias')
     } else {
-        var query = { "_id": req.params.id }
+        var query = { "_id": ident }
         GuiaCarga.deleteMany(query).then(() => {
             req.flash('success_msg', "Guias selecionadas Excluidas com sucesso")
             res.redirect('/guias')

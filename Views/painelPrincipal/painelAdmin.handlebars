@@ -1,20 +1,21 @@
-{{#if guiasGe}}
 <div class="d-flex justify-content-between mb-3 mt-5">
     <!-- Div Coluna 1-->
-    <div class="card shadow">
+    <div class="card shadow" style="width: 51%;">
         <div class="card-header">
             <h4>Guias "A COBRAR" com pagamento pendente</h4>
+            <small>Quantidade: {{qtd_guiasAc}}</small>
         </div>
-        <div class="p-2 card-body">
+        <div class="p-2 card-body table-responsive" style="overflow-y: scroll; height: 400px;overflow-x: scroll;">
             <table class="table ">
                 <thead>
                     <tr>
                         <th scope="col">Número</th>
-                        <th scope="col">Cliente</th>
+                        <th scope="col">Origem</th>
+                        <th scope="col">Destino</th>
                         <th scope="col">Venc</th>
                         <th scope="col">Valor</th>
-                        <th scope="col">Cond Pag</th>
                         <th scope="col">Sts Pag</th>
+                        <th scope="col">Cliente</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -22,10 +23,11 @@
                     <tr>
                         <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
                         <td>{{origem.cidade}}</td>
+                        <td>{{destino.cidade}}</td>
                         <td>{{date_vencimento}}</td>
                         <td>{{valorExib}}</td>
-                        <td>{{condPag}}</td>
                         <td>{{statusBaixa}}</td>
+                        <td><a href="">{{cliente.name_client}}</a></td>
                     </tr>
                     {{else}}
                     {{/each}}
@@ -34,11 +36,12 @@
         </div>
     </div>
     <!-- Div Coluna 2-->
-    <div class="card shadow">
+    <div class="card shadow" style="width: 48%;">
         <div class="card-header">
             <h4>Guias com Entrega Pendente</h4>
+            <small>Quantidade: {{qtd_guiasPe}}</small>
         </div>
-        <div class="p-2 card-body">
+        <div class="p-2 card-body table-responsive" style="overflow-y: scroll; height: 400px;">
             <table class="table">
                 <thead>
                     <tr>
@@ -50,7 +53,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {{#each guiasGe}}
+                    {{#each guiasPe}}
                     <tr>
                         <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
                         <td>{{origem.cidade}}</td>
@@ -65,41 +68,38 @@
         </div>
     </div>
 </div>
-{{else}}
-{{/if}}
 
-{{#if guiasFin}}
-<div class="card shadow mt-5">
+
+<div class="card shadow">
     <div class="card-header">
-        <h4>Guias Pendentes</h4>
+        <h4>Guias com pagamento pendente</h4>
+        <small>Quantidade: {{qtd_guiasPp}}</small>
     </div>
-    <div class="p-2 card-body">
+    <div class="p-2 card-body" style="overflow-y: scroll; height: 400px;">
         <table class="table ">
             <thead>
                 <tr>
                     <th scope="col">Número</th>
+                    <th scope="col">Cliente</th>
                     <th scope="col">Origem</th>
                     <th scope="col">Destino</th>
-                    <th scope="col">Vencimento</th>
+                    <th scope="col">Venc</th>
                     <th scope="col">Valor</th>
                     <th scope="col">Cond Pag</th>
-                    <th scope="col">Sts Pagamento</th>
-                    <th scope="col">Entrega</th>
-
+                    <th scope="col">Sts Pag</th>
                 </tr>
             </thead>
             <tbody>
-                {{#each guiasFin}}
+                {{#each guiasPp}}
                 <tr>
                     <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
+                    <td><a href="">{{cliente.name_client}}</a></td>
                     <td>{{origem.cidade}}</td>
                     <td>{{destino.cidade}}</td>
                     <td>{{date_vencimento}}</td>
                     <td>{{valorExib}}</td>
                     <td>{{condPag}}</td>
                     <td>{{statusBaixa}}</td>
-                    <td>{{entrega}}</td>
-
                 </tr>
                 {{else}}
                 {{/each}}
@@ -107,5 +107,5 @@
         </table>
     </div>
 </div>
-{{else}}
-{{/if}}
+
+<br><br><br>

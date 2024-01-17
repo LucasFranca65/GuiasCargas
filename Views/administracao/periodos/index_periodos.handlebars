@@ -1,22 +1,26 @@
 <div class="table-responsive-xl">
 
-        <form action="/periodos/adicionar" method="post">
-            <table class="table">
-                <p style="font-weight: bold;">Criar Periodo de Digitalção</p>
-                <small>Crie um periodo de digitação para cadastrar guias de cargas e prestações de contas desse periodo</small>
-                <hr>
-                <thead class="table-secondary mt-2">
-                    <tr>                            
-                        <th scope="col">Empresa</th>
-                        <th scope="col">Mês</th>
-                        <th scope="col">Ano</th>                                                        
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>                                
+    <form action="/periodos/adicionar" method="post">
+
+        <table class="table shadow">
+            <h4>Abrir periodo de digitação</h4>
+            <small>Para digitar infromações de documentos,Excesso de Bagagem e Prestação de Contas, dentro de um
+                determinado mês, é necesario abriri periodo para que seja
+                inserido documentos.</small>
+            <hr>
+            <thead class="table-secondary mt-2">
+                <tr>
+                    <th scope="col">Empresa</th>
+                    <th scope="col">Mês</th>
+                    <th scope="col">Ano</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
                         <div class="form-floating">
-                            <select name="empresa" class="form-select" id="floatingSelect2" aria-label="Agencia Destino" required>
+                            <select name="empresa" class="form-select" id="floatingSelect2" aria-label="Agencia Destino"
+                                required>
                                 <option value="selecione">---Selecione---</option>
                                 {{#each empresas}}
                                 <option value="{{_id}}">{{empresa}}</option>
@@ -25,65 +29,68 @@
                             </select>
                             <label for="floatingSelect">Empresa</label>
                         </div>
-                        </td>
-                        <td>
-                            <div class="form-floating mb-3">
-                            <input type="number" class="form-control" name="mes" min="01" max="12" placeholder="00" required>
+                    </td>
+                    <td>
+                        <div class="form-floating mb-3">
+                            <input type="number" class="form-control" name="mes" min="01" max="12" placeholder="00"
+                                required>
                             <label for="floatingInput">Mês</label>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="form-floating mb-3">
-                            <input type="number" class="form-control" min="2000" max="2999" name="ano" placeholder="0000" required>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-floating mb-3">
+                            <input type="number" class="form-control" min="2000" max="2999" name="ano"
+                                placeholder="0000" required>
                             <label for="floatingInput">Ano</label>
-                            </div>
-                        </td>
-                    </tr>                                    
-                </tbody>
-            </table>
-            <button class="btn btn-outline-success btn-sm" type="submit">Criar</button> <button class="btn btn-outline-secondary btn-sm" type="reset">Limpar</button>
-        </form>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="btn btn-outline-success btn-sm" type="submit">Criar</button> <button
+            class="btn btn-outline-secondary btn-sm" type="reset">Limpar</button>
+    </form>
 </div>
 
-{{#if periodosAbertos}} 
-<div class="table-responsive-xl">        
-        <form action="/periodos/encerrar" method="post">
-        <table class="table">
-                <hr>
-                        <p style="font-weight: bold;">Periodos Abertos</p>
-                        <thead class="table-dark">
-                            <tr>
-                                <th scope="col">Nome</th>
-                                <th scope="col">Empresa</th>
-                                <th scope="col">Inicio</th>
-                                <th scope="col">Fim</th>
-                                <th scope="col">Status</th>
-                                <th scope="col">-</th>                                                                                               
-                            </tr>
-                        </thead>
-                        {{#each periodosAbertos}}
-                        <tbody>
-                            <tr>                                
-                                <td> <a href="/administracao/dadosPeriododeControle/{{_id}}">{{nome}}</a></td>
-                                <td>{{empresa.empresa}}</td>
-                                <td>{{dateExibInit}}</td>
-                                <td>{{dateExibFin}}</td>
-                                <td>{{status}}</td>
-                                <th scope="row"><input type="checkbox" name="ident" value="{{_id}}"></th>                               
-                            </tr>                                    
-                        </tbody>                                        
-                        {{else}}
-                        {{/each}}
-                    </table>    
-            <button class="btn btn-outline-danger btn-sm" type="submit">Encerrar</button> 
-        </form>
+{{#if periodosAbertos}}
+<div class="table-responsive-xl ">
+    <form action="/periodos/encerrar" method="post">
+        <table class="table shadow table-bordered">
+            <hr>
+            <p style="font-weight: bold;">Periodos Abertos</p>
+            <thead class="table-secondary">
+                <tr>
+                    <th scope="col">Identificador</th>
+                    <th scope="col">Empresa</th>
+                    <th scope="col">Inicio</th>
+                    <th scope="col">Fim</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">#</th>
+                </tr>
+            </thead>
+            {{#each periodosAbertos}}
+            <tbody>
+                <tr>
+                    <td> <a href="/administracao/dadosPeriododeControle/{{_id}}">{{nome}}</a></td>
+                    <td>{{empresa.empresa}}</td>
+                    <td>{{dateExibInit}}</td>
+                    <td>{{dateExibFin}}</td>
+                    <td>{{status}}</td>
+                    <th scope="row"><input type="checkbox" name="ident" value="{{_id}}"></th>
+                </tr>
+            </tbody>
+            {{else}}
+            {{/each}}
+        </table>
+        <button class="btn btn-outline-danger btn-sm" type="submit">Encerrar</button>
+    </form>
 </div>
 {{else}}
 {{/if}}
 
 {{#if periodosFechados}}
 <form action="/periodos/reabrir" method="post">
-<div class="table-responsive-xl">        
+    <div class="table-responsive-xl">
         <table class="table">
             <hr>
             <p style="font-weight: bold;">Periodos Encerados</p>
@@ -92,27 +99,29 @@
                     <th scope="col">Nome</th>
                     <th scope="col">Empresa</th>
                     <th scope="col">Inicio</th>
-                    <th scope="col">Fim</th> 
-                    <th scope="col">Status</th> 
-                    <th scope="col">-</th>                                                                                               
+                    <th scope="col">Fim</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">-</th>
                 </tr>
             </thead>
             {{#each periodosFechados}}
             <tbody>
-                <tr>                                
+                <tr>
                     <td> <a href="/administracao/dadosPeriododeControle/{{_id}}">{{nome}}</a></td>
                     <td>{{empresa.empresa}}</td>
                     <td>{{dateExibInit}}</td>
                     <td>{{dateExibFin}}</td>
                     <td>{{status}}</td>
-                    <th scope="row"><input type="checkbox" name="ident" value="{{_id}}"></th>                               
-                </tr>                                    
-            </tbody>                                        
+                    <th scope="row"><input type="checkbox" name="ident" value="{{_id}}"></th>
+                </tr>
+            </tbody>
             {{else}}
             {{/each}}
         </table>
-        <button class="btn btn-outline-success btn-sm" type="submit">Reabrir</button>    
-</div>
+        <button class="btn btn-outline-success btn-sm" type="submit">Reabrir</button>
+    </div>
 </form>
 {{else}}
 {{/if}}
+
+<br><br><br>

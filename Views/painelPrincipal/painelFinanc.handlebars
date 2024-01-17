@@ -1,0 +1,44 @@
+<div class="card shadow mt-2" id="content">
+
+    <h4 class="mt-2 ms-2">Guias com faturas pendentes de pagamento</h4>
+    <small class="ms-2">Quantidade: {{qtd_guias}}</small>
+    <div class="p-2 card-body" id='card' style="overflow-y: scroll; height: 450px;">
+        <div class="table-responsive ">
+            <table class="table table-bordered">
+                <thead class="table-secondary">
+                    <tr>
+                        <th scope="col">Número</th>
+                        <th scope="col">Origem</th>
+                        <th scope="col">Destino</th>
+                        <th scope="col">Cliente</th>
+                        <th scope="col">Venc.</th>
+                        <th scope="col">Valor</th>
+                        <th scope="col">Fatura Nº</th>
+                        <th scope="col">Sts Paga</th>
+                        <th scope="col">Data Entrada</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each guiasFin}}
+                    <tr>
+                        <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
+                        <td>{{origem.cidade}}</td>
+                        <td>{{destino.cidade}}</td>
+                        <td><a href="">{{cliente.name_client}}</a></td>
+                        <td>{{date_vencimento}}</td>
+                        <td>{{valorExib}}</td>
+                        <td>{{n_fatura}}</td>
+                        <td>{{statusBaixa}}</td>
+                        <td>{{date_entrada}}</td>
+                    </tr>
+                    {{else}}
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<button class="btn btn-outline-secondary btn-sm mt-2" onclick="window.print()">Imprimir</button>
+<button class="btn btn-outline-secondary btn-sm mt-2" onclick="downloadPDF()">Salvar</button>

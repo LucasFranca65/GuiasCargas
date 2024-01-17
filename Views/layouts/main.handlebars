@@ -3,10 +3,13 @@
 
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="/css/style.css" media="screen">
+    <link rel="stylesheet" href="/css/styles_print.css" media="print">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+        integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous"
+        media="screen">
 
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle das Agencias VRJ</title>
     <link rel="icon" href="/img/icon.png">
@@ -14,7 +17,8 @@
 
 <body>
     {{>_navbar}}
-    <div class=" ms-4 me-4 mt-4 ">
+
+    <div class=" container-fluid mt-4" style=" height: 650px">
         {{>_msg}}
         {{#if error}}
         <div class="alert alert-danger mt-4">{{error}}</div>
@@ -22,6 +26,7 @@
         {{/if}}
         {{{body}}}
     </div>
+    {{>_footer}}
 </body>
 <script src='http://code.jquery.com/jquery-2.1.3.min.js'></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"

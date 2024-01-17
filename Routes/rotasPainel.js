@@ -17,23 +17,24 @@ router.get('/', lOgado, (req, res) => {
     const usuario = req.user
     if (usuario.eAdmin == true) {
 
-        GuiaCarga.find({ $nor: [{ entrega: "ENTREGUE AO DESTINATARIO" }, { entrega: "DEVOLVIDO AO REMETENTE" }] }).sort({ dateEntrada: 1 }).populate('origem').populate('destino').populate('empresa').populate('cliente').then((guiasGe) => {
-            for (let i = 0; i < guiasGe.length; i++) {
-                guiasGe[i]["date_entrada"] = moment(guiasGe[i].dateEntrada).format('DD/MM/YYYY')
-                guiasGe[i]["date_vencimento"] = moment(guiasGe[i].vencimento).format('DD/MM/YYYY')
-                guiasGe[i]["valorExib"] = guiasGe[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-                if (guiasGe[i].baixa == true || guiasGe[i].baixa == "true") {
-                    guiasGe[i]["statusBaixa"] = "PAGO"
+        GuiaCarga.find({ $nor: [{ entrega: "ENTREGUE AO DESTINATARIO" }, { entrega: "DEVOLVIDO AO REMETENTE" }, { condPag: "CANCELADO" }] }).sort({ dateEntrada: 1 }).populate('origem').populate('destino').populate('empresa').populate('cliente').then((guiasPe) => {
+            for (let i = 0; i < guiasPe.length; i++) {
+                guiasPe[i]["date_entrada"] = moment(guiasPe[i].dateEntrada).format('DD/MM/YYYY')
+                guiasPe[i]["date_vencimento"] = moment(guiasPe[i].vencimento).format('DD/MM/YYYY')
+                guiasPe[i]["valorExib"] = guiasPe[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                if (guiasPe[i].baixa == true || guiasPe[i].baixa == "true") {
+                    guiasPe[i]["statusBaixa"] = "PAGO"
                 } else {
-                    if (moment(guiasGe[i].vencimento).format("YYYY-MM-DD") < moment(new Date()).format("YYYY-MM-DD")) {
-                        guiasGe[i]["statusBaixa"] = "VENCIDO"
+                    if (moment(guiasPe[i].vencimento).format("YYYY-MM-DD") < moment(new Date()).format("YYYY-MM-DD")) {
+                        guiasPe[i]["statusBaixa"] = "VENCIDO"
                     } else {
-                        guiasGe[i]["statusBaixa"] = "PENDENTE"
+                        guiasPe[i]["statusBaixa"] = "PENDENTE"
                     }
                 }
             }
+            const qtd_guiasPe = guiasPe.length
 
-            GuiaCarga.find({ baixa: false, condPag: "A COBRAR", destino: usuario.agencia }).populate('origem').populate('destino').populate('empresa').populate('cliente').then((guiasAc) => {
+            GuiaCarga.find({ baixaPag: false, condPag: "A COBRAR" }).populate('origem').populate('destino').populate('empresa').populate('cliente').then((guiasAc) => {
                 for (let i = 0; i < guiasAc.length; i++) {
                     guiasAc[i]["date_entrada"] = moment(guiasAc[i].dateEntrada).format('DD/MM/YYYY')
                     guiasAc[i]["date_vencimento"] = moment(guiasAc[i].vencimento).format('DD/MM/YYYY')
@@ -48,7 +49,30 @@ router.get('/', lOgado, (req, res) => {
                         }
                     }
                 }
-                res.render('painelPrincipal/painelAdmin', { guiasAc, guiasGe })
+                const qtd_guiasAc = guiasAc.length
+
+                GuiaCarga.find({ baixaPag: false, $nor: [{ condPag: "A COBRAR" }] }).populate('origem').populate('destino').populate('empresa').populate('cliente').then((guiasPp) => {
+                    for (let i = 0; i < guiasPp.length; i++) {
+                        guiasPp[i]["date_entrada"] = moment(guiasPp[i].dateEntrada).format('DD/MM/YYYY')
+                        guiasPp[i]["date_vencimento"] = moment(guiasPp[i].vencimento).format('DD/MM/YYYY')
+                        guiasPp[i]["valorExib"] = guiasPp[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                        if (guiasPp[i].baixa == true || guiasPp[i].baixa == "true") {
+                            guiasPp[i]["statusBaixa"] = "PAGO"
+                        } else {
+                            if (moment(guiasPp[i].vencimento).format("YYYY-MM-DD") < moment(new Date()).format("YYYY-MM-DD")) {
+                                guiasPp[i]["statusBaixa"] = "VENCIDO"
+                            } else {
+                                guiasPp[i]["statusBaixa"] = "PENDENTE"
+                            }
+                        }
+                    }
+                    const qtd_guiasPp = guiasPp.length
+
+                    res.render('painelPrincipal/painelAdmin', { guiasAc, guiasPe, guiasPp, qtd_guiasPe, qtd_guiasAc, qtd_guiasPp })
+                }).catch((err) => {
+                    req.flash('error_msg', "Erro ao Buscar guias pendentes")
+                    res.render('painelPrincipal/index')
+                })
             }).catch((err) => {
                 req.flash('error_msg', "Erro ao Buscar guias pendentes")
                 res.render('painelPrincipal/index')
@@ -60,7 +84,7 @@ router.get('/', lOgado, (req, res) => {
 
             case "FINANCEIRO":
                 Agencia.findById(usuario.agencia).then((agencia) => {
-                    GuiaCarga.find({ baixa: false, condPag: "FATURADO" }).populate('origem').populate('destino').populate('empresa').populate('cliente').then((guiasFin) => {
+                    GuiaCarga.find({ baixaPag: false, condPag: "FATURADO" }).populate('origem').populate('destino').populate('empresa').populate('cliente').then((guiasFin) => {
                         for (let i = 0; i < guiasFin.length; i++) {
                             guiasFin[i]["date_entrada"] = moment(guiasFin[i].dateEntrada).format('DD/MM/YYYY')
                             guiasFin[i]["date_vencimento"] = moment(guiasFin[i].vencimento).format('DD/MM/YYYY')
@@ -75,7 +99,8 @@ router.get('/', lOgado, (req, res) => {
                                 }
                             }
                         }
-                        res.render('painelPrincipal/index', { guiasFin, agencia })
+                        const qtd_guias = guiasFin.length
+                        res.render('painelPrincipal/painelFinanc', { guiasFin, agencia, qtd_guias })
                     }).catch((err) => {
                         req.flash('error_msg', "Erro ao Buscar guias pendentes")
                         res.render('painelPrincipal/index')

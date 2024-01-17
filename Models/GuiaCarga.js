@@ -65,9 +65,13 @@ const GuiaCarga = new Schema({
     n_fatura: {
         type: String
     },
-    baixa: {
+    baixaPag: {
         type: Boolean,
         default: false
+    },
+    user_conf_pag: {
+        type: Schema.Types.ObjectId,
+        ref: "users"
     },
     date: {
         type: Date,
@@ -80,9 +84,17 @@ const GuiaCarga = new Schema({
     cpfRecebedor: {
         type: String
     },
+    user_conf_entr: {
+        type: Schema.Types.ObjectId,
+        ref: "users"
+    },
     entrega: {
         type: String,
         default: "NA ORIGEM PARA ENVIO"
+    },
+    baixaEntr: {
+        type: Boolean,
+        default: false
     },
     dateEntrega: {
         type: Date

@@ -1,11 +1,15 @@
-<div style="padding: ;">
-  {{#each erro}}
-  <div class="alert alert-danger">{{text}}</div>
-  {{else}}
-  {{/each}}
+{{#each erro}}
+<div class="alert alert-danger">{{text}}</div>
+{{else}}
+{{/each}}
+<div class="container">
   <h3>Cadastrar Excesso de Bagagem</h3>
 
-  <div class="card-body ">
+  <small>Atenção no lançamento das informações! Todas deverm coincidir com as guias fisicas.</small><br>
+  <small>Existe um vinculo com os talões, só é possivel lançamento de guia que talão é vinculado a agencia.</small><br>
+  <small>Guias salvas só poderão ser exluidas por um usuario administrador.</small><br><br>
+
+  <div class="card-body">
     <form action="/guias/adicionar" method="POST" onsubmit="confirmAdd(event, this)">
       <div class="table-responsive-xl">
         <!--Formulario primeira Linha-->
@@ -126,9 +130,9 @@
   </div>
   <br>
   {{#if guias}}
-  <h3>Guias mais recentes</h3>
+  <h3>10 Guias mais recentes</h3>
   <br>
-  <div class="table-responsive-xl ">
+  <div class="table-responsive-xl" style="overflow-y: scroll; height: 420px;overflow-x: scroll;">
     <table class="table table-bordered fs-6 shadow">
       <thead class="table-secondary ">
         <tr>
@@ -146,9 +150,10 @@
 
         </tr>
       </thead>
-      <form action="/administracao/guias/excluir" method="post">
-        {{#each guias}}
+      <form action="/administracao/guias/excluir" method="post" onsubmit="confirmDell(event, this)">
+
         <tbody>
+          {{#each guias}}
           <tr>
             <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
             <td>{{origem.cidade}}</td>
@@ -162,14 +167,17 @@
             <td>{{statusBaixa}}</td>
             <th><input type="checkbox" name="ident" value="{{_id}}"></th>
           </tr>
+          {{else}}
         </tbody>
-        {{else}}
+
         {{/each}}
     </table>
-    <button class="btn btn-sm btn-outline-danger shadow" type="submit">Excluir Selecionados</button>
-    </form>
+
   </div>
+  <button class="btn btn-sm btn-outline-danger mt-2 shadow" type="submit">Excluir Selecionados</button>
+  </form>
+  {{else}}
+  {{/if}}
+  <br>
+
 </div>
-{{else}}
-{{/if}}
-<br>
