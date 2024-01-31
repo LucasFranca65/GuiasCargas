@@ -515,7 +515,7 @@ router.get('/empresas/excluir/:ident', eAdmin, (req, res) => {
 
 //Rotas Administração de Clientes
 router.get('/clientes', lOgado, (req, res) => {
-    Cliente.find().then((clientes) => {
+    Cliente.find().sort({ name_client: 1 }).then((clientes) => {
         if (clientes.length == 0) {
             res.render('administracao/clientes/index_clientes')
         } else {
@@ -560,7 +560,8 @@ router.post('/clientes/add_cliente', lOgado, (req, res) => {
 
 })
 
-router.post('/clientes/excluir/', eAdmin, (req, res) => {
+router.post('/clientes/excluir/', lOgado, (req, res) => {
+
     const ident = req.body.ident
     if (ident == undefined) {
         req.flash('error_msg', "Nenhum cliente selecionado para exclusão")
@@ -577,6 +578,73 @@ router.post('/clientes/excluir/', eAdmin, (req, res) => {
         })
 
     }
+})
+
+router.get('/clientes/ver_cliente/:ident', lOgado, (req, res) => {
+    const ident = req.params.ident
+    Cliente.findById(ident).then((client) => {
+        if (!client) {
+            req.flash('error_msg', "Não Foi encontrado cliente")
+            res.redirect('/administracao/clientes')
+        } else {
+            if (client.perm_fatura == true) {
+                client['perm_faturaExib'] = "Permite faturar"
+            } else {
+                client['perm_faturaExib'] = "Não permite faturar"
+            }
+            GuiaCarga.find({ cliente: client._id }).populate('origem').populate('destino').populate('empresa').then((guias) => {
+                for (let i = 0; i < guias.length; i++) {
+                    guias[i]["date_entrada"] = moment(guias[i].dateEntrada).format('DD/MM/YYYY')
+                    guias[i]["date_vencimento"] = moment(guias[i].vencimento).format('DD/MM/YYYY')
+                    guias[i]["valorExib"] = guias[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                    if (guias[i].baixaPag == true || guias[i].baixaPag == "true") {
+                        guias[i]["statusBaixa"] = "PAGO"
+                    } else {
+                        if (moment(guias[i].vencimento).format("YYYY-MM-DD") < moment(new Date()).format("YYYY-MM-DD")) {
+                            guias[i]["statusBaixa"] = "VENCIDO"
+                        } else {
+                            guias[i]["statusBaixa"] = "PENDENTE"
+                        }
+                    }
+                }
+                res.render('administracao/clientes/edit_cliente', { guias, client })
+            }).catch((err) => {
+                req.flash('error_msg', "Erro ao Carregar guias do cliente")
+                res.redirect('/administracao/clientes')
+            })
+        }
+    }).catch((err) => {
+        req.flash('error_msg', "Erro ao Carregar cadastro do cliente")
+        res.redirect('/administracao/clientes')
+    })
+})
+
+router.post('/clientes/edit_client/editar', lOgado, (req, res) => {
+    const { name_client, tipo_doc, documento, contato, perm_fatura, ident } = req.body
+    Cliente.findById(ident).then((client) => {
+
+        client.name_client = name_client
+        client.tipo_doc = tipo_doc
+        client.documento = documento
+        client.contato = contato
+        client.perm_fatura = perm_fatura
+        client.user = req.user._id
+
+        client.save().then(() => {
+            req.flash('success_msg', "Cliente Cadastrado com sucesso")
+            res.redirect('/administracao/clientes/ver_cliente/' + ident)
+        }).catch((err) => {
+            req.flash('error_msg', "Erro ao cadastrar Cliente")
+            res.redirect('/administracao/clientes/ver_cliente/' + ident)
+        })
+    }).catch((err) => {
+        req.flash('error_msg', "Erro ao buscar Cliente")
+        res.redirect('/administracao/clientes/ver_cliente/' + ident)
+    })
+
+
+
+
 })
 
 

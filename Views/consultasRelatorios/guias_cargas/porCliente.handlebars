@@ -3,62 +3,72 @@
 {{else}}
 {{/each}}
 
-   <form action="/consultas/por_cliente/pesquisar" class="d-flex" role="search" method="get">
-        <input class="form-control me-2" type="search" name="cliente" aria-label="Buscar">
-        <button class="btn btn-outline-success" type="submit">Buscar</button>
-    </form>
-    <hr>
+<h5>Selecione um cliente</h5>
+<form action="/consultas/por_cliente/pesquisar" class="d-flex mt-4" role="search" method="get">
 
-    <form action="/administracao/guias/excluir" method="post">
-    <div class="table-responsive-xl fs-6">  
+    <select name="cliente" class="form-select">
+        <option value="selecione">---selecione---</option>
+        {{#each clientes}}
+        <option value="{{_id}}">{{name_client}}</option>
+        {{else}}
+        {{/each}}
+    </select>
+    <button class="btn btn-outline-success" type="submit">Buscar</button>
+</form>
+<hr>
+
+<h5>Dados do Cliente</h5>
+<p>Nome: {{clienteExib.name_client}}</p>
+<p>{{clienteExib.tipo_doc}}: {{clienteExib.documento}}</p>
+<p>Contato: {{clienteExib.contato}}</p>
+<p>Fatura: {{clienteExib.fatura}}</p>
+<form action="/administracao/guias/excluir" method="post" class="mt-4">
+    <div class="table-responsive-xl fs-6">
         <table class="table table-bordered">
             <thead class="table-dark ">
                 <tr class="fs-6">
-                <th scope="col">Nº</th>
-                <th scope="col">Conh.</th>
-                <th scope="col">Origem</th>
-                <th scope="col">Destino</th>
-                <th scope="col">Cliente</th>
-                <th scope="col">Empresa</th>
-                <th scope="col">Entrada</th>
-                <th scope="col">Pagamento</th>
-                <th scope="col">Valor</th>
-                <th scope="col">Status </th>
-                <th scope="col">Baixa </th>
-                <th scope="col">#</th>
+                    <th scope="col">Conh.</th>
+                    <th scope="col">Origem</th>
+                    <th scope="col">Destino</th>
+                    <th scope="col">Cliente</th>
+                    <th scope="col">Empresa</th>
+                    <th scope="col">Entrada</th>
+                    <th scope="col">Pagamento</th>
+                    <th scope="col">Valor</th>
+                    <th scope="col">Entrega </th>
+                    <th scope="col">Pagamento </th>
                 </tr>
-            </thead>          
-            {{#each dados}}   
+            </thead>
+            {{#each dados}}
             <tbody>
                 <tr class="fs-6 fst-normal">
-                <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{n}}</a></th>             
-                <td>{{numero}}</td>
-                <td>{{origem}}</td>
-                <td>{{destino}}</td>
-                <td>{{cliente}}</td>
-                <td>{{empresa}}</td>
-                <td>{{date_entrada}}</td>
-                <td>{{date_pagamento}}</td>
-                <td>{{valor_exib}}</td>
-                <td>{{statusPag}}</td>  
-                <td>{{statusBaixa}}</td>             
-                <td><input id="ckbox" type="checkbox" name="id" value="{{_id}}"></td>
-                </tr>    
-            </tbody>  
-            {{else}}                    
+                    <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
+                    <td>{{origem.cidade}}</td>
+                    <td>{{destino.cidade}}</td>
+                    <td>{{cliente.name_client}}</td>
+                    <td>{{empresa.empresa}}</td>
+                    <td>{{date_entrada}}</td>
+                    <td>{{date_vencimento}}</td>
+                    <td>{{valorExib}}</td>
+                    <td>{{statusEntrega}}</td>
+                    <td>{{statusBaixa}}</td>
+                </tr>
+            </tbody>
+            {{else}}
             {{/each}}
-    </table>
+        </table>
         <nav aria-label="Page navigation example">
             <ul class="pagination justify-content-center">
-            <li class="page-item {{prev}}">
-                <a class="page-link " href="/consultas/por_cliente/pesquisar?cliente={{prevUrl.client}}&offset={{prevUrl.ofst}}&page={{prevUrl.pag}}">Anterior</a>
-            </li>
-            <li class="page-item"><a class="page-link">-- {{page}} --</a></li>
-            <li class="page-item {{next}}">
-                <a class="page-link " href="/consultas/por_cliente/pesquisar?cliente={{nextUrl.client}}&offset={{nextUrl.ofst}}&page={{nextUrl.pag}}">Proximo</a>
-            </li>
+                <li class="page-item {{prev}}">
+                    <a class="page-link "
+                        href="/consultas/por_cliente/pesquisar?cliente={{prevUrl.client}}&offset={{prevUrl.ofst}}&page={{prevUrl.pag}}">Anterior</a>
+                </li>
+                <li class="page-item"><a class="page-link">-- {{page}} --</a></li>
+                <li class="page-item {{next}}">
+                    <a class="page-link "
+                        href="/consultas/por_cliente/pesquisar?cliente={{nextUrl.client}}&offset={{nextUrl.ofst}}&page={{nextUrl.pag}}">Proximo</a>
+                </li>
             </ul>
         </nav>
-    <button class="btn btn-sm btn-outline-danger" type="submit">Excluir Selecionados</button>
-    </form>
-
+        <button class="btn btn-sm btn-outline-danger" type="submit">Excluir Selecionados</button>
+</form>

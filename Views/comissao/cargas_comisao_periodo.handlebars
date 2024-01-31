@@ -1,0 +1,38 @@
+{{#each error}}
+<div class="alert alert-danger">{{text}}</div>
+{{else}}
+{{/each}}
+
+<div class="table-responsive-xl">
+    <form action="/comissao/excluir" method="post">
+        <table class="table">
+            <hr>
+            <p style="font-weight: bold;">Comissões Calculadas</p>
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">Agencia</th>
+                    <th scope="col">Periodo</th>
+                    <th scope="col">Empresa</th>
+                    <th scope="col">Valor Comissão</th>
+                    <th scope="col">Total Vendido</th>
+                    <th scope="col">Quantidade</th>
+                </tr>
+            </thead>
+            {{#each comissoes}}
+            <tbody>
+                <tr>
+                    <td>{{agencia.cidade}}</td>
+                    <td><a href="/periodos/dadosPeriododeControle/{{periodo._id}}">{{periodo.nome}}</a></td>
+                    <td>{{empresa.empresa}}</td>
+                    <td>{{valorExib}}</td>
+                    <td>{{totalExib}}</td>
+                    <td>{{qtdVendas}}</td>
+                </tr>
+            </tbody>
+            {{else}}
+            {{/each}}
+        </table>
+        <button class="btn btn-outline-danger btn-sm" type="submit">Excluir</button>
+    </form>
+</div>
+</div>

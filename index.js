@@ -35,7 +35,7 @@ app.use(session({
     saveUninitialized: true,
     cookie: {
         // Session expires after 2 horas of inactivity.
-        expires: 720000
+        expires: 7200000
     }
 }))
 app.use(passport.initialize())

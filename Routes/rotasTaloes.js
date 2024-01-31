@@ -18,17 +18,24 @@ const GuiaCarga = mongoose.model('guiascargas')
 //Painel principal das guias
 router.get('/', lOgado, (req, res) => {
     let numCont = 0
-    Agencia.find().sort({ cidade: 1 }).then((agencias) => {
-        System.findOne().then((system) => {
-            Talao.find().populate("agencia").sort({ _id: -1 }).limit(20).then((taloes) => {
-                for (let i = 0; i < taloes.length; i++) {
-                    taloes[i]['date_exib'] = moment(taloes[i].date).format('DD/MM/YYYY')
-                }
-                numCont = system.nTalao + 1
-                res.render('taloes/index_talao', { numCont, agencias, taloes })
+    const usuario = req.user
+    if (usuario.eAdmin) {
+        Agencia.find().sort({ cidade: 1 }).then((agencias) => {
+            System.findOne().then((system) => {
+                Talao.find().populate("agencia").sort({ _id: -1 }).limit(20).then((taloes) => {
+                    for (let i = 0; i < taloes.length; i++) {
+                        taloes[i]['date_exib'] = moment(taloes[i].date).format('DD/MM/YYYY')
+                    }
+                    numCont = system.nTalao + 1
+                    res.render('taloes/index_talao', { numCont, agencias, taloes })
+                }).catch((err) => {
+                    console.log(err)
+                    req.flash('error_msg', "Erro ao carregar talões para exibição")
+                    res.redirect('/painel')
+                })
             }).catch((err) => {
                 console.log(err)
-                req.flash('error_msg', "Erro ao carregar talões para exibição")
+                req.flash('error_msg', "Erro ao conferir proxima numeração de talao")
                 res.redirect('/painel')
             })
         }).catch((err) => {
@@ -36,14 +43,35 @@ router.get('/', lOgado, (req, res) => {
             req.flash('error_msg', "Erro ao conferir proxima numeração de talao")
             res.redirect('/painel')
         })
-    }).catch((err) => {
-        console.log(err)
-        req.flash('error_msg', "Erro ao conferir proxima numeração de talao")
-        res.redirect('/painel')
-    })
+    } else {
+        Agencia.findById(usuario.agencia).sort({ cidade: 1 }).then((agencia) => {
+            System.findOne().then((system) => {
+                Talao.find({ agencia: usuario.agencia }).populate("agencia").sort({ _id: -1 }).limit(20).then((taloes) => {
+                    for (let i = 0; i < taloes.length; i++) {
+                        taloes[i]['date_exib'] = moment(taloes[i].date).format('DD/MM/YYYY')
+                    }
+                    numCont = system.nTalao + 1
+                    res.render('taloes/index_talao', { numCont, agencia, taloes })
+                }).catch((err) => {
+                    console.log(err)
+                    req.flash('error_msg', "Erro ao carregar talões para exibição")
+                    res.redirect('/painel')
+                })
+            }).catch((err) => {
+                console.log(err)
+                req.flash('error_msg', "Erro ao conferir proxima numeração de talao")
+                res.redirect('/painel')
+            })
+        }).catch((err) => {
+            console.log(err)
+            req.flash('error_msg', "Erro ao conferir proxima numeração de talao")
+            res.redirect('/painel')
+        })
+    }
+
 })
 
-router.post('/adicionar', eAdmin, (req, res) => {
+router.post('/adicionar', lOgado, (req, res) => {
     let erro = []
     const { numCont, numFin, numInit, tipo, agencia } = req.body
     if (tipo == "selecione") {

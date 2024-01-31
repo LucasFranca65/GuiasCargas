@@ -4,7 +4,8 @@ const Schema = mongoose.Schema
 const GuiaCarga = new Schema({
     numero: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     tipo: {
         type: String,
@@ -88,6 +89,16 @@ const GuiaCarga = new Schema({
         type: Schema.Types.ObjectId,
         ref: "users"
     },
+    acompanhamento: [
+        {
+            date: {
+                type: Date
+            },
+            dados: {
+                type: String
+            }
+        }
+    ],
     entrega: {
         type: String,
         default: "NA ORIGEM PARA ENVIO"

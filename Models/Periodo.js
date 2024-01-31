@@ -2,24 +2,24 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const Periodo = new Schema({
-    nome:{
+    nome: {
         type: String,
         required: true
     },
-    empresa:{
+    empresa: {
         type: Schema.Types.ObjectId,
         ref: "empresas",
         required: true
     },
-    dateInit:{
+    dateInit: {
         type: Date,
         required: true
     },
-    dateFin:{
+    dateFin: {
         type: Date,
         required: true
     },
-    date:{
+    date: {
         type: Date,
         default: new Date()
     },
@@ -27,7 +27,11 @@ const Periodo = new Schema({
         type: Boolean,
         default: false
     },
-    totalComiss:{
+    totalComiss: {
+        type: Number,
+        default: 0.0
+    },
+    totalVendas: {
         type: Number,
         default: 0.0
     },
@@ -35,7 +39,7 @@ const Periodo = new Schema({
         type: String,
         default: "Aberto"
     }
-    
+
 })
 
-mongoose.model('periodos',Periodo)
+mongoose.model('periodos', Periodo)

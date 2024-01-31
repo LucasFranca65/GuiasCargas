@@ -3,17 +3,17 @@
 {{else}}
 {{/each}}
 
-<div class="table-responsive-xl">
+<div class="table-responsive-xl mt-4">
 
     <form action="/administracao/clientes/add_cliente" method="post">
         <table class="table">
-            <p style="font-weight: bold;">Cadastrar Novo Cliente gencia</p>
+            <h5>Cadastrar novos clientes</h5>
             <thead class="table-dark">
                 <tr>
                     <th scope="col">Nome</th>
                     <th scope="col">Tipo</th>
                     <th scope="col">CNPJ/CPF</th>
-                    <th scope="col">Contato Tel</th>
+                    <th scope="col">Contato</th>
                     <th scope="col">Permite Faturar</th>
                 </tr>
             </thead>
@@ -30,10 +30,10 @@
                         </select>
                     </td>
                     <td>
-                        <input class="form-control" type="number" name="documento">
+                        <input class="form-control" type="number" minlength="11" maxlength="14" name="documento">
                     </td>
                     <td>
-                        <input class="form-control" type="number" name="contato">
+                        <input class="form-control" type="text" name="contato" placeholder="Email ou Telefone">
                     </td>
                     <td>
                         <select name="perm_fatura" class="form-select" id="floatingSelect2" aria-label="perm_fatura">
@@ -45,42 +45,48 @@
                 </tr>
             </tbody>
         </table>
-        <button class="btn btn-secondary" type="submit">Salvar</button>
+        <button class="btn btn-secondary btn-sm" type="submit">Salvar</button><button
+            class="btn btn-outline-secondary btn-sm ms-2" type="reset">Limpar</button>
     </form>
 </div>
 {{#if clientes}}
 <div class="table-responsive-xl">
     <form action="/administracao/clientes/excluir" method="post">
-        <table class="table">
-            <hr>
-            <p style="font-weight: bold;">Agencias Cadastradas</p>
-            <thead class="table-dark">
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Nome</th>
-                    <th scope="col">Tipo</th>
-                    <th scope="col">CNPJ/CPF</th>
-                    <th scope="col">Contato Tel</th>
-                    <th scope="col">Permite Faturar</th>
-                </tr>
-            </thead>
-            {{#each clientes}}
-            <tbody>
-                <tr>
-                    <th scope="row"><input type="checkbox" name="ident" value="{{_id}}"></th>
-                    <td><a href="">{{name_client}}</a></td>
-                    <td>{{tipo_doc}}</td>
-                    <td>{{documento}}</td>
-                    <td>{{contato}}</td>
-                    <td>{{premFatExib}}</td>
-                </tr>
-            </tbody>
-            {{else}}
-            {{/each}}
-        </table>
-        <button class="btn btn-outline-danger" type="submit">Excluir</button>
+        <hr>
+        <h5>Clientes Cadastrados</h5>
+
+        <div style="overflow-y: scroll; max-height: 400px;">
+            <table class="table">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Nome</th>
+                        <th scope="col">Tipo</th>
+                        <th scope="col">CNPJ/CPF</th>
+                        <th scope="col">Contato Tel</th>
+                        <th scope="col">Permite Faturar</th>
+                    </tr>
+                </thead>
+                {{#each clientes}}
+                <tbody>
+                    <tr>
+                        <th scope="row"><input type="checkbox" name="ident" value="{{_id}}"></th>
+                        <td><a href="/administracao/clientes/ver_cliente/{{_id}}">{{name_client}}</a></td>
+                        <td>{{tipo_doc}}</td>
+                        <td>{{documento}}</td>
+                        <td>{{contato}}</td>
+                        <td>{{premFatExib}}</td>
+                    </tr>
+                </tbody>
+
+                {{else}}
+                {{/each}}
+            </table>
+        </div>
+        <button class="btn btn-outline-danger btn-sm mt-2" type="submit">Excluir</button>
     </form>
 </div>
+
 {{else}}
 {{/if}}
 <br><br>

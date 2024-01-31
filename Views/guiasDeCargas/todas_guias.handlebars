@@ -4,11 +4,10 @@
 {{/each}}
 
 <form action="/administracao/guias/excluir" method="post">
-    <div class="table-responsive-xl fs-6">
+    <div class="table-responsive-xl fs-6 mt-4">
         <table class="table table-bordered">
             <thead class="table-dark ">
                 <tr class="fs-6">
-                    <th scope="col">Nº</th>
                     <th scope="col">Conh.</th>
                     <th scope="col">Origem</th>
                     <th scope="col">Destino</th>
@@ -25,8 +24,7 @@
             {{#each dados}}
             <tbody>
                 <tr class="fs-6 fst-normal">
-                    <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{n}}</a></th>
-                    <td>{{numero}}</td>
+                    <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
                     <td>{{origem.cidade}}</td>
                     <td>{{destino.cidade}}</td>
                     <td>{{cliente.name_client}}</td>

@@ -1,0 +1,96 @@
+{{#each error}}
+<div class="alert alert-danger">{{texto}}</div>
+{{else}}
+{{/each}}
+
+<div class="table-responsive-xl">
+
+    <form action="/administracao/clientes/edit_client/editar" method="post">
+        <input type="hidden" name="ident" value="{{client._id}}">
+        <table class="table">
+            <p style="font-weight: bold;">Cadastrar Novo Cliente gencia</p>
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">Nome</th>
+                    <th scope="col">Tipo</th>
+                    <th scope="col">CNPJ/CPF</th>
+                    <th scope="col">Contato Tel</th>
+                    <th scope="col">Permite Faturar</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <input class="form-control" type="text" name="name_client" value="{{client.name_client}}">
+                    </td>
+                    <td>
+                        <select name="tipo_doc" class="form-select" id="floatingSelect2" aria-label="tipo">
+                            <option value="{{client.tipo_doc}}">{{client.tipo_doc}}</option>
+                            <option value="CPF">CPF</option>
+                            <option value="CNPJ">CNPJ</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input class="form-control" type="number" name="documento" value="{{client.documento}}">
+                    </td>
+                    <td>
+                        <input class="form-control" type="number" name="contato" value="{{client.contato}}">
+                    </td>
+                    <td>
+                        <select name="perm_fatura" class="form-select" id="floatingSelect2" aria-label="perm_fatura">
+                            <option value="{{client.perm_fatura}}">{{client.perm_faturaExib}}</option>
+                            <option value="true">Premite faturar</option>
+                            <option value="false">Não permite faturar</option>
+                        </select>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="btn btn-secondary btn-sm" type="submit">Editar</button>
+    </form>
+</div>
+
+<form action="/administracao/guias/excluir" method="post" class="mt-4">
+    <div class="table-responsive-xl fs-6 shadow p-2">
+        <h6>Guias Encontradas</h6>
+        <div style="max-height: 400px;overflow-y: scroll;">
+            <table class="table table-bordered">
+                <thead class="table-dark ">
+                    <tr class="fs-6">
+                        <th scope="col">Conh.</th>
+                        <th scope="col">Origem</th>
+                        <th scope="col">Destino</th>
+                        <th scope="col">Cliente</th>
+                        <th scope="col">Empresa</th>
+                        <th scope="col">Entrada</th>
+                        <th scope="col">Vencimento</th>
+                        <th scope="col">Valor</th>
+                        <th scope="col">Entrega </th>
+                        <th scope="col">Pagamento </th>
+                        <th scope="col">#</th>
+                    </tr>
+                </thead>
+                {{#each guias}}
+                <tbody>
+                    <tr class="fs-6 fst-normal">
+                        <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
+                        <td>{{origem.cidade}}</td>
+                        <td>{{destino.cidade}}</td>
+                        <td>{{cliente.name_client}}</td>
+                        <td>{{empresa.empresa}}</td>
+                        <td>{{date_entrada}}</td>
+                        <td>{{date_vencimento}}</td>
+                        <td>{{valorExib}}</td>
+                        <td>{{statusEntrega}}</td>
+                        <td>{{statusBaixa}}</td>
+                        <td><input type="checkbox" name="ident" value="{{_id}}"></td>
+                    </tr>
+                </tbody>
+                {{else}}
+                {{/each}}
+            </table>
+        </div>
+        <button class="btn btn-sm btn-outline-danger mt-2" type="submit">Excluir Selecionados</button>
+</form>
+
+</div>

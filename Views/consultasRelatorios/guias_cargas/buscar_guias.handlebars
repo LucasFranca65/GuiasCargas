@@ -1,0 +1,117 @@
+{{#each error}}
+<div class="alert alert-danger">{{texto}}</div>
+{{else}}
+{{/each}}
+
+<form action="/consultas/buscar_guias/pesquisar" method="get">
+    <h3>Buscador de Guias</h3>
+    <div class="table-responsive-xl  ">
+        <table class="table shadow p-2">
+            <thead class="table-secondary">
+                <tr>
+                    <th scope="col">Agencia</th>
+                    <th scope="col">Cliente</th>
+                    <th scope="col">Empresa</th>
+                    <th scope="col">Data Inicial</th>
+                    <th scope="col">Data Final</th>
+                    <th scope="col">Status Pag</th>
+                    <th scope="col">Status Ent</th>
+                </tr>
+            </thead>
+            <tbody>
+                <td>
+                    <select name="agencia" class="form-select" id="floatingSelect2" aria-label="agencia">
+                        <option value="">Todas</option>
+                        {{#each agencias}}
+                        <option value="{{_id}}">{{numero}} - {{cidade}}</option>
+                        {{else}}
+                        {{/each}}
+                    </select>
+                </td>
+                <td>
+                    <select name="cliente" class="form-select" id="floatingSelect2" aria-label="agencia">
+                        <option value="">Todos</option>
+                        {{#each clientes}}
+                        <option value="{{_id}}">{{name_client}}</option>
+                        {{else}}
+                        {{/each}}
+                    </select>
+                </td>
+                <td>
+                    <select name="empresa" class="form-select" id="floatingSelect2" aria-label="agencia">
+                        <option value="">Todas</option>
+                        {{#each empresas}}
+                        <option value="{{_id}}">{{empresa}}</option>
+                        {{else}}
+                        {{/each}}
+                    </select>
+                </td>
+                <td><input type="date" class="form-control" name="dateMin" required></td>
+                <td><input type="date" class="form-control" name="dateMax" required></td>
+                <td>
+                    <select name="statusPag" class="form-select" id="floatingSelect2" aria-label="agencia">
+                        <option value="">Todas</option>
+                        <option value="true">Paga</option>
+                        <option value="false">Pendente</option>
+                    </select>
+                </td>
+                <td>
+                    <select name="statusEntre" class="form-select" id="floatingSelect2" aria-label="agencia">
+                        <option value="">Todas</option>
+                        <option value="true">Entregue</option>
+                        <option value="false">Pendente</option>
+
+                    </select>
+                </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <button type="submit" class="btn btn-outline-success btn-sm">Buscar</button>
+</form>
+<hr>
+
+<form action="/administracao/guias/baixar_em_lote" method="get">
+    <div class="table-responsive-xl fs-6">
+        <table data-js="table" class="table table-bordered shadow">
+            <thead class="table-dark  ">
+                <tr id="table-rowns" class="fs-6">
+                    <th scope="col">Nº Conh.</th>
+                    <th scope="col">Origem</th>
+                    <th scope="col">Destino</th>
+                    <th scope="col">Cliente</th>
+                    <th scope="col">Empresa</th>
+                    <th scope="col">Entrada</th>
+                    <th scope="col">Vencimento</th>
+                    <th scope="col">Forma Pg</th>
+                    <th scope="col">Valor</th>
+                    <th scope="col">Status </th>
+                    <th scope="col">#</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {{#each dados}}
+                <tr id="table-rowns" class="fs-6 fst-normal">
+                    <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
+                    <td>{{origem.cidade}}</td>
+                    <td>{{destino.cidade}}</td>
+                    <td>{{cliente.name_client}}</td>
+                    <td>{{empresa.empresa}}</td>
+                    <td>{{date_entrada}}</td>
+                    <td>{{venc_exib}}</td>
+                    <td>{{condPag}}</td>
+                    <td>{{valor_exib}}</td>
+                    <td>{{statusBaixa}}</td>
+                    <td><input id="ckbox" type="checkbox" name="id" value="{{_id}}"></td>
+                </tr>
+                {{else}}
+                {{/each}}
+            </tbody>
+        </table>
+        <a role="button" id="btn-export-csv" class="btn btn-secondary btn-sm">Exportar .CSV</a>
+
+        <button class="btn btn-sm btn-outline-danger" type="submit">Excluir Selecionados</button>
+</form>
+
+<br><br>

@@ -56,6 +56,21 @@ function confirmEdditParams(event, form) {
     }
 }
 
+const tableRows = document.querySelectorAll('#table-rowns')
+const exportBtn = document.getElementById('btn-export-csv')
+exportBtn.addEventListener('click', () => {
+
+    const csvString = Array.from(tableRows)
+        .map(row => Array.from(row.cells)
+            .map(cell => cell.textContent).join(',')
+        ).join('\n')
+    exportBtn.setAttribute('href',
+        `data:text/csvcharset=utf-8,${encodeURIComponent(csvString)}`
+    )
+    exportBtn.setAttribute('download', 'table.csv')
+})
+
+
 /*const btn_imp = document.getElementById('btn_imp')
 
 btn_imp.addEventListener("click", (evt) => {

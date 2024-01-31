@@ -3,45 +3,38 @@ const Schema = mongoose.Schema
 
 const Comissao = new Schema({
 
-    periodo:{
-        type: String,
+    periodo: {
+        type: Schema.Types.ObjectId,
+        ref: "periodos",
         required: true
     },
-    agencia:{
+    agencia: {
         type: Schema.Types.ObjectId,
         ref: "agencias",
         required: true
-    },    
-    empresa:{
+    },
+    empresa: {
         type: Schema.Types.ObjectId,
         ref: "empresas",
         required: true
-    },    
-    dateInit:{
-        type: Date,
-        required: true
-        
     },
-    dateFin:{
-        type: Date,
-        required: true
-    },
-    date:{
+    date: {
         type: Date,
         default: new Date()
     },
-    indiceComissao:{
+    valor: {
         type: Number,
         required: true
     },
-    valor:{
+    totalVendas: {
         type: Number,
         required: true
     },
-    totalVendas:{
+    qtdVendas: {
         type: Number,
         required: true
     },
+
 })
 
-mongoose.model('comissoes',Comissao)
+mongoose.model('comissoes', Comissao)

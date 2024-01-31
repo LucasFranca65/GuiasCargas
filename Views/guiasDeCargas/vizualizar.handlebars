@@ -170,8 +170,17 @@
     <button type="submit" class="btn btn-outline-success btn-sm mt-2" {{#if
       guia.dateEntrega}}disabled{{else}}{{/if}}>Atualizar status
     </button>
-  </form>
-  <hr>
+  </form><br>
+  <h5>Atualizações</h5>
+  <div class="card">
+    <div class="card-body">
+      {{#each guia.acompanhamento}}
+      <p>{{dateExib}} - {{dados}}</p>
+      {{else}}
+      {{/each}}
+    </div>
+  </div><br>
+
   {{#if guia.datePagamento}}
 
   <h4>Informar Pagamento</h4>
@@ -244,3 +253,5 @@
   </div>
 
 </div>
+
+<br><br>

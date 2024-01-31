@@ -14,6 +14,7 @@ const { lOgado } = require('../helpers/eAdmin')
 router.get('/', (req, res) => {
     System.find().then((info) => {
         //console.log(info.length)
+        let msg
         if (info.length == 0) {
 
             const novoInfo = new System({
@@ -24,51 +25,56 @@ router.get('/', (req, res) => {
             })
 
             novoInfo.save().then(() => {
-                req.flash('success_msg', "Esse é seu Primeiro Acesso")
-            }).catch((err) => {
-                req.flash('error_msg', "Erro ao cadastrar primrio acesso")
-                res.redirect('/error')
-            })
-            const newAgencia = new Agencia({
-                numero: "99",
-                cidade: "Geral",
-                indiceComissao: "0"
-            })
+                console.log("Info Criado")
+                msg = "INFO OK, "
 
-            newAgencia.save().then(() => {
-                req.flash('success_msg', "Agencia Geral Cadastrada")
-            }).catch((err) => {
-                req.flash('error_msg', "Erro ao cadastrar primrio acesso")
-                res.redirect('/error')
-            })
-            Agencia.findOne().then((agencia) => {
-                const novoUsuario = new User({
-                    nome: "Administrador",
-                    perfil: "ADMINISTRADOR",
-                    login: "admin",
-                    senha: "admin",
-                    agencia: agencia._id,
-                    eAdmin: true
+                const newAgencia = new Agencia({
+                    numero: "99",
+                    cidade: "Geral",
+                    indiceComissao: "0"
                 })
 
-                bcrypt.genSalt(10, (erro, salt) => {
-                    bcrypt.hash(novoUsuario.senha, salt, (erro, hash) => {
-                        if (erro) {
-                            req.flash('error_msg', "Houve um erro ao criar usuario Administrador")
-                            res.redirect('/error')
-                        }
-                        novoUsuario.senha = hash
-                        novoUsuario.save().then(() => {
-                            req.flash('success_msg', "Usuario Administrador Cadastrado com sucesso utilise Usuario : admin, Senha: admin no seu primeiro acesso, recomendamos alterar a senha")
-                            res.redirect('/validation/login')
-                        }).catch((err) => {
-                            req.flash('error_msg', "Erro ao criar usuario Administrador")
-                            res.redirect('/error')
+                newAgencia.save().then(() => {
+                    console.log("Agencia Criado")
+                    msg = msg + "AGENCIA OK, "
+
+                    Agencia.find().then((agencia) => {
+                        console.log(agencia)
+                        const novoUsuario = new User({
+                            nome: "Administrador",
+                            perfil: "ADMINISTRADOR",
+                            login: "admin",
+                            senha: "admin",
+                            agencia: agencia[0]._id,
+                            eAdmin: true
                         })
+
+                        bcrypt.genSalt(10, (erro, salt) => {
+                            bcrypt.hash(novoUsuario.senha, salt, (erro, hash) => {
+                                if (erro) {
+                                    req.flash('error_msg', "Houve um erro ao criar usuario Administrador")
+                                    res.redirect('/error')
+                                }
+                                novoUsuario.senha = hash
+                                novoUsuario.save().then(() => {
+                                    req.flash('success_msg', "Usuario Administrador Cadastrado com sucesso utilise Usuario : admin, Senha: admin no seu primeiro acesso, recomendamos alterar a senha! ---->>>>" + msg)
+                                    res.redirect('/validation/login')
+                                }).catch((err) => {
+                                    req.flash('error_msg', "Erro ao criar usuario Administrador")
+                                    res.redirect('/error')
+                                })
+                            })
+                        })
+                    }).catch((err) => {
+                        req.flash('error_msg', "Erro Interno", err)
+                        res.redirect('/error')
                     })
+                }).catch((err) => {
+                    req.flash('error_msg', "Erro ao cadastrar primrio acesso AGENCIA")
+                    res.redirect('/error')
                 })
             }).catch((err) => {
-                req.flash('error_msg', "Erro Interno", err)
+                req.flash('error_msg', "Erro ao cadastrar primrio acesso INFO")
                 res.redirect('/error')
             })
 
@@ -76,6 +82,7 @@ router.get('/', (req, res) => {
             if (req.isAuthenticated()) {
                 res.redirect('/painel');
             } else {
+                req.flash('error_msg', "Falha na tentativa de Login")
                 res.redirect('/validation/login')
             }
         }

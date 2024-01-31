@@ -10,6 +10,8 @@ require('../Models/Empresa')
 const Empresa = mongoose.model('empresas')
 require('../Models/Periodo')
 const Periodo = mongoose.model('periodos')
+require('../Models/GuiaCarga')
+const GuiaCarga = mongoose.model('guiascargas')
 
 
 //Painel principal das guias
@@ -101,91 +103,68 @@ router.post('/adicionar', eAdmin, (req, res) => {
 
 })
 
-router.get('/dadosPeriododeControle/:reference', eAdmin, async (req, res) => {
-    const reference = req.params.reference
-    /*await Periodo.findOne({nome: reference}).then((periodo)=>{
-        periodo['inicio'] = moment(periodo.dateInit).format('DD/MM/YYYY')
-        periodo['final'] = moment(periodo.dateFin).format('DD/MM/YYYY')
-        Controle.find({periodo: periodo.nome }).then((dados)=>{                
-            if(dados.length > 0){                    
-                for(let i = 0; i < dados.length; i++){
-                    dados[i]["pgExib"] = dados[i].pg.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-                    dados[i]["acExib"] = dados[i].ac.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-                    dados[i]["ccExib"] = dados[i].cc.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-                    dados[i]["totalexib"] = dados[i].total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-                    
+router.get('/dadosPeriododeControle/:id', lOgado, (req, res) => {
+    const id = req.params.id
+    Periodo.findById(id).populate('empresa').then((periodo) => {
+        if (periodo) {
+            periodo['inicial'] = moment(periodo.dateInit).format('DD/MM/YYYY')
+            periodo['final'] = moment(periodo.dateFin).format('DD/MM/YYYY')
+            periodo['vendasT'] = periodo.totalVendas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+            periodo['comissaoT'] = periodo.totalComiss.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+            GuiaCarga.find({ periodo: id }).then((guias) => {
+                //console.log(guias)
+                var guiasPagas = guias.filter(g => g.baixaPag == true)
+                //console.log(guiasPagas)
+                var guiasPendentes = guias.filter(g => g.baixaPag == false && moment(g.vencimento).format('YYYY-MM-DD') > moment(new Date()).format('YYYY-MM-DD'))
+                var guiasVencidas = guias.filter(g => g.baixaPag == false && moment(g.vencimento).format('YYYY-MM-DD') < moment(new Date()).format('YYYY-MM-DD'))
+                var guiasCanceladas = guias.filter(g => g.baixaPag == true && g.condPag == "CANCELADO")
+
+                var resumo = {
+                    pagasValor: 0,
+                    pagasQtd: 0,
+                    pendentesValor: 0,
+                    pendentesQtd: 0,
+                    vencidasValor: 0,
+                    vencidasQtd: 0,
+                    canceladasValor: 0,
+                    canceladasQtd: 0,
+                    total: 0,
+                    qtdTotal: 0
                 }
-                res.render('administracao/dadosPeriodo',{dados,periodo})
-            }else{
-                Agencia.find({empresa: periodo.empresa}).sort({cidade: 1}).then((agencia)=>{
-                    var dateMax = periodo.dateFin
-                    var dateMin = periodo.dateInit
-                    var empresa = periodo.empresa
-                    let totalPg = []
-                    let totalAc = []
-                    let totalCc = []
-                    let total = []                                               
-                    for(let j = 0; j<agencia.length; j ++){                               
-                         GuiaCarga.find({dateEntrada: {$gte: dateMin, $lt: dateMax}, statusPag: "PAGO", origem: agencia[j].cidade}).then((guiasPg)=>{                                    
-                            GuiaCarga.find({dateEntrada: {$gte: dateMin, $lt: dateMax}, empresa: empresa, statusPag: "A COBRAR", origem: agencia[j].cidade}).then((guiasAc)=>{                                        
-                                GuiaCarga.find({dateEntrada: {$gte: dateMin, $lt: dateMax}, empresa: empresa, statusPag: "CONTA CORRENTE", origem: agencia[j].cidade}).then((guiasCc)=>{                                            
-                                    totalPg[j] = 0
-                                    totalAc[j] = 0
-                                    totalCc[j] = 0
-                                    total[j] = 0
-                                    for(let i=0; i<guiasPg.length; i++){
-                                        totalPg[j] = totalPg[j] + guiasPg[i].valor
-                                    }
-                                    for(let i=0; i<guiasAc.length; i++){
-                                        totalAc[j] = totalAc[j] + guiasAc[i].valor
-                                    }
-                                    for(let i=0; i<guiasCc.length; i++){
-                                        totalCc[j] = totalCc[j] + guiasCc[i].valor
-                                    }                                        
-                                    total[j] = totalPg[j] + totalAc[j] + totalCc[j]
-                                    console.log("Agencia: "+agencia[j].cidade+" Pago: "+ totalPg[j] +" A Cobrar: "+totalAc[j]+" Conta Corrente: "+totalCc[j] )
-                                    const newControle = {
-                                        periodo: periodo.nome,
-                                        agencia: agencia[j].cidade,
-                                        cc: totalCc[j], 
-                                        ac: totalAc[j],
-                                        pg: totalPg[j],
-                                        total: total[j],
-                                        empresa: empresa,
-                                        dateInit: dateMin,
-                                        dateFin: dateMax,
-                                        user: req.user.nome
-                                    }                                        
-                                    //console.log(newControle)                                      
-                                    new BalancoEnc(newControle).save().then(()=>{
-                                        console.log('Controle da agencia: '+newControle.agencia +' criada com suceso ')
-                                    }).catch((err)=>{
-                                        console.log('Controle da agencia: '+newControle.agencia + ' erro ao criar '+err)    
-                                    })                                   
-                                }).catch((err)=>{
-                                    console.log("Falha ao localizar Guias CONTA CORRENTE para a agencia "+agencia[j].cidade+"Erro: " + err) 
-                                })           
-                            }).catch((err)=>{
-                                console.log("Falha ao localizar Guias A COBRAR para a agencia "+agencia[j].cidade+"Erro: " + err)  
-                            })                      
-                        }).catch((err)=>{
-                            console.log("Falha ao localizar Guias PAGAS para a agencia "+agencia[j].cidade+"Erro: " + err)                                 
-                        }) 
-                    }
-                }).catch((err)=>{
-                    req.flash('error_msg',"Falha ao localizar agencias" + err)
-                    res.redirect('/administracao/controle')  
-                }) 
-                res.redirect('/administracao/dadosPeriododeControle/'+periodo.nome)
-            }
-        }).catch((err)=>{
-            req.flash('error_msg',"Falha ao carregar dados do periodo ou dados inexistentes" + err)
-            res.redirect('/administracao/controle')
-        })                     
-    }).catch((err)=>{
-        req.flash('error_msg',"Esse Periodo não foi encontrado ou não existe"+err)
-        res.redirect('/administracao/controle')
-    })*/
+
+                for (let i = 0; i < guiasPagas.length; i++) {
+                    resumo.pagasValor += guiasPagas[i].valor
+                    resumo.pagasQtd++
+                }
+                for (let i = 0; i < guiasPendentes.length; i++) {
+                    resumo.pendentesValor += guiasPendentes[i].valor
+                    resumo.pendentesQtd++
+                }
+                for (let i = 0; i < guiasVencidas.length; i++) {
+                    resumo.vencidasValor += guiasVencidas[i].valor
+                    resumo.vencidasQtd++
+                }
+                for (let i = 0; i < guiasCanceladas.length; i++) {
+                    resumo.canceladasValor += guiasCanceladas[i].valor
+                    resumo.canceladasQtd++
+                }
+                resumo.total = resumo.pagasValor + resumo.pendentesValor + resumo.vencidasValor + resumo.canceladasValor
+                resumo.qtdTotal = resumo.pagasQtd + resumo.pendentesQtd + resumo.vencidasQtd + resumo.canceladasQtd
+
+                res.render('administracao/periodos/dados_periodo', { periodo, resumo })
+            }).catch((err) => {
+                req.flash('error_msg', "Erro ao Buscar Guias, ERRO: " + err)
+                res.redirect('/periodos')
+            })
+
+        } else {
+            req.flash('error_msg', 'N?ão foi encontrado dados para os parametros informados')
+            res.redirect('/periodos')
+        }
+    }).catch((err) => {
+        req.flash('error_msg', "Erro ao Buscar Periodos, ERRO: " + err)
+        res.redirect('/periodos')
+    })
 })
 
 router.post('/encerrar', eAdmin, (req, res) => {

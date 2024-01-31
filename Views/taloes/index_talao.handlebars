@@ -26,6 +26,7 @@
               </div>
             </td>
             <td>
+              {{#if user.eAdmin}}
               <div class="form-floating">
                 <select name="agencia" class="form-select" id="floatingSelect" aria-label="Agencia Origem">
                   <option value="selecione">---Selecione---</option>
@@ -36,6 +37,9 @@
                 </select>
                 <label for="floatingSelect">Agencia</label>
               </div>
+              {{else}}
+              <p>{{agencia.cidade}}</p><input type="hidden" name="agencia" value="{{agencia._id}}">
+              {{/if}}
             </td>
             <td>
               <div class="form-floating mb-3">

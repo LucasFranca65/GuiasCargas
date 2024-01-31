@@ -31,8 +31,10 @@ router.get('/', lOgado, (req, res) => {
                                 guias[i]["date_entrada"] = moment(guias[i].dateEntrada).format('DD/MM/YYYY')
                                 guias[i]["date_vencimento"] = moment(guias[i].vencimento).format('DD/MM/YYYY')
                                 guias[i]["valorExib"] = guias[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-                                if (guias[i].baixaPag == true || guias[i].baixaPag == "true") {
+                                if (guias[i].baixaPag == true || guias[i].baixaPag == "true" && !guias[i].condPag == "CANCELADO") {
                                     guias[i]["statusBaixa"] = "PAGO"
+                                } else if (guias[i].condPag == "CANCELADO") {
+                                    guias[i]["statusBaixa"] = "CANCELADO"
                                 } else {
                                     if (moment(guias[i].vencimento).format("YYYY-MM-DD") < moment(new Date()).format("YYYY-MM-DD")) {
                                         guias[i]["statusBaixa"] = "VENCIDO"
@@ -102,10 +104,6 @@ router.get('/', lOgado, (req, res) => {
             })
         }
     })
-
-
-
-
 })
 
 router.get('/minhas_guias/remetente', lOgado, (req, res) => {
@@ -248,7 +246,7 @@ router.get('/minhas_guias/destinatario', lOgado, (req, res) => {
                     if (dados[i].baixaPag == true) {
                         dados[i]["statusBaixa"] = "BAIXADO"
                     }
-                    if (dados[i].statusPag = "CANCELADO") {
+                    if (dados[i].statusPag == "CANCELADO") {
                         dados[i]["statusBaixa"] = "CANCELADO"
                     }
                     else {
@@ -271,81 +269,84 @@ router.get('/minhas_guias/destinatario', lOgado, (req, res) => {
 })
 
 router.get('/guias_cadastradas', lOgado, (req, res) => {
-
-    var { offset, page } = req.query
-    const limit = 30
-    if (!offset) {
-        offset = 0
-    }
-    if (offset < 0) {
-        offset = 0
-    }
-    else {
-        offset = parseInt(offset)
-    }
-    if (!page) {
-        page = 1
-    }
-    if (page < 1) {
-        page = 1
-    } else {
-        page = parseInt(page)
-    }
-
-    GuiaCarga.find().limit(limit).skip(offset).populate('cliente').populate('destino').populate('origem').sort({ dateEntrada: -1 }).then((dados) => {
-        var next = ""
-        var prev = ""
-
-        if (page == 1) {
-            prev = "disabled"
+    GuiaCarga.count().then((qtd) => {
+        console.log(qtd)
+        var { offset, page } = req.query
+        const limit = 10
+        if (!offset) {
+            offset = 0
         }
-        if (limit > dados.length) {
-            next = "disabled"
+        if (offset < 0) {
+            offset = 0
         }
-        var nextUrl = {
-            ofst: offset + limit,
-            pag: page + 1,
+        else {
+            offset = parseInt(offset)
         }
-        var prevUrl = {
-            ofst: offset - limit,
-            pag: page - 1
+        if (!page) {
+            page = 1
         }
-
-        if (dados.length < 1) {
-            req.flash('error_msg', "Não há mais guias cadastradas")
-            res.redirect('/guias/guias_cadastradas')
+        if (page < 1) {
+            page = 1
         } else {
-            var i = 0
-            while (i < dados.length) {
-                dados[i]["date_entrada"] = moment(dados[i].dateEntrada).format('DD/MM/YYYY')
-                dados[i]["date_pagamento"] = moment(dados[i].datePagamento).format('DD/MM/YYYY')
-                dados[i]["valor_exib"] = dados[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-                dados[i]["n"] = (i + 1) + offset
-                if (dados[i].baixaPag == true && dados[i].statusPag == "CANCELADO") {
-                    dados[i]["statusBaixa"] = "CANCELADO"
-                }
-                if (dados[i].baixaPag == true) {
-                    dados[i]["statusBaixa"] = "PAGO"
-                }
-                else {
-                    dados[i]["statusBaixa"] = "PENDENTE"
-                }
-                i++
-            }
-            res.render('guiasDeCargas/todas_guias', { dados, nextUrl, prevUrl, page, prev, next })
+            page = parseInt(page)
         }
 
+        GuiaCarga.find().limit(limit).skip(offset).populate('cliente').populate('destino').populate('origem').sort({ numero: 1 }).then((dados) => {
+            var next = ""
+            var prev = ""
+
+            if (page == 1) {
+                prev = "disabled"
+            }
+            if (limit > dados.length || offset + limit >= qtd) {
+                next = "disabled"
+            }
+            var nextUrl = {
+                ofst: offset + limit,
+                pag: page + 1,
+            }
+            var prevUrl = {
+                ofst: offset - limit,
+                pag: page - 1
+            }
+
+            if (dados.length < 1) {
+                req.flash('error_msg', "Não há mais guias cadastradas")
+                res.redirect('/guias/guias_cadastradas')
+            } else {
+                var i = 0
+                while (i < dados.length) {
+                    dados[i]["date_entrada"] = moment(dados[i].dateEntrada).format('DD/MM/YYYY')
+                    dados[i]["date_pagamento"] = moment(dados[i].datePagamento).format('DD/MM/YYYY')
+                    dados[i]["valor_exib"] = dados[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                    dados[i]["n"] = (i + 1) + offset
+                    if (dados[i].baixaPag == true && dados[i].statusPag == "CANCELADO") {
+                        dados[i]["statusBaixa"] = "CANCELADO"
+                    }
+                    if (dados[i].baixaPag == true) {
+                        dados[i]["statusBaixa"] = "PAGO"
+                    }
+                    else {
+                        dados[i]["statusBaixa"] = "PENDENTE"
+                    }
+                    i++
+                }
+                res.render('guiasDeCargas/todas_guias', { dados, nextUrl, prevUrl, page, prev, next })
+            }
+
+        }).catch((err) => {
+            req.flash('error_msg', "Não foi encontrado guias para os parametros no periodo informado", err)
+            res.redirect('/painel')
+        })
     }).catch((err) => {
-        req.flash('error_msg', "Não foi encontrado guias para os parametros no periodo informado", err)
+        req.flash('error_msg', "Impossivel contar guias", err)
         res.redirect('/painel')
     })
-
-
 })
 //Rota de adição de guia
 router.post('/adicionar', lOgado, (req, res) => {
     const { numero, origem, destino, client, empresa, dateEntrada, vencimento, valor, condPag, baixa, n_fatura } = req.body
-
+    const usuario = req.user
     var erro = []
     if (condPag == "FATURADO" && !n_fatura) {
         erro.push({ text: "Para venda Faturada o numero da Fatura é Obrigatorio" })
@@ -430,6 +431,16 @@ router.post('/adicionar', lOgado, (req, res) => {
                                         res.redirect('/guias')
                                     } else {
                                         const newGuia = {
+                                            acompanhamento: [
+                                                {
+                                                    date: moment(new Date()).format(),
+                                                    dados: "GUIA CRIADA POR - " + usuario.nome,
+                                                },
+                                                {
+                                                    date: moment(new Date()).format(),
+                                                    dados: "NA ORIGEM PARA ENVIO" + " - " + usuario.nome,
+                                                }
+                                            ],
                                             numero: numero,
                                             n_fatura: n_fatura,
                                             periodo: periodo._id,
@@ -442,7 +453,7 @@ router.post('/adicionar', lOgado, (req, res) => {
                                             vencimento: vencimento,
                                             condPag: condPag,
                                             valor: valor,
-                                            user: req.user._id
+                                            user: usuario._id
                                         }
                                         GuiaCarga.findOne({ $or: [{ numero: numero, empresa: empresa }, { n_fatura: n_fatura, empresa: empresa, condPag: "FATURADO" }] }).then((guia) => {
                                             if (guia) {
@@ -477,6 +488,80 @@ router.post('/adicionar', lOgado, (req, res) => {
                 req.flash('error_msg', "Erro ao tentar buscar Clientes, ERRO: " + err)
                 res.redirect('/guias')
             })
+        } else if (condPag == "A VISTA") {
+            Periodo.findOne({ dateInit: { $lte: moment(dateEntrada).format() }, dateFin: { $gte: moment(dateEntrada).format() }, empresa: empresa }).then((periodo) => {
+                if (!periodo) {
+                    req.flash('error_msg', "Não foi encontrado periodo para a data de entrada informada, favor criar um periodo para essa data")
+                    res.redirect('/guias')
+                } else {
+                    if (periodo.status != "Aberto") {
+                        req.flash('error_msg', "Periodo referente a data de entrada informada, Já está encerrado, caso necessario reabra o periodo")
+                        res.redirect('/guias')
+                    } else {
+                        Talao.findOne({ numeroInicial: { $lte: numero }, numeroFinal: { $gte: numero }, tipo: "ENCOMENDAS", agencia: origem }).then((talao) => {
+                            if (!talao) {
+                                req.flash('error_msg', "Não foi encontrado talão cadastrado para a numeração de guia ou agencia, a oriegem deve corresponder a agengia que foi destinado o talão, favor verificar")
+                                res.redirect('/guias')
+                            } else {
+                                const newGuia = {
+                                    acompanhamento: [
+                                        {
+                                            date: moment(new Date()).format(),
+                                            dados: "GUIA CRIADA POR - " + usuario.nome,
+                                        },
+                                        {
+                                            date: moment(new Date()).format(),
+                                            dados: "NA ORIGEM PARA ENVIO" + " - " + usuario.nome,
+                                        }
+                                    ],
+
+                                    user_conf_pag: req.user._id,
+                                    datePagamento: moment(dateEntrada).format(),
+                                    numero: numero,
+                                    formaPag: "DINHEIRO",
+                                    n_fatura: n_fatura,
+                                    periodo: periodo._id,
+                                    talao: talao._id,
+                                    origem: origem,
+                                    destino: destino,
+                                    cliente: client,
+                                    empresa: empresa,
+                                    dateEntrada: moment(dateEntrada).format(),
+                                    vencimento: moment(vencimento).format(),
+                                    condPag: condPag,
+                                    valor: parseFloat(valor),
+                                    baixaPag: true,
+                                    user: req.user._id
+                                }
+                                GuiaCarga.findOne({ numero: numero, empresa: empresa }).then((guia) => {
+                                    if (guia) {
+                                        req.flash('error_msg', "Numero de Guia informada já cadastrado para essa empresa")
+                                        res.redirect('/guias')
+                                    } else {
+
+                                        new GuiaCarga(newGuia).save().then(() => {
+                                            req.flash('success_msg', "Guia de Encomenda Nº " + numero + " cadastrada com sucesso")
+                                            res.redirect('/guias')
+                                        }).catch((err) => {
+                                            req.flash('error_msg', "Erro na Salvar nova guia Pg, ERRO: " + err)
+                                            res.redirect('/guias')
+                                        })
+                                    }
+                                }).catch((err) => {
+                                    req.flash('error_msg', "Erro na busca das guias Pagas, ERRO: " + err)
+                                    res.redirect('/guias')
+                                })
+                            }
+                        }).catch((err) => {
+                            req.flash('error_msg', "Erro ao Buscar Talão, ERRO: " + err)
+                            res.redirect('/guias')
+                        })
+                    }
+                }
+            }).catch((err) => {
+                req.flash('error_msg', "Erro ao tentar buscar Periodo, ERRO: " + err)
+                res.redirect('/guias')
+            })
         } else {
             Periodo.findOne({ dateInit: { $lte: moment(dateEntrada).format() }, dateFin: { $gte: moment(dateEntrada).format() }, empresa: empresa }).then((periodo) => {
                 if (!periodo) {
@@ -493,6 +578,16 @@ router.post('/adicionar', lOgado, (req, res) => {
                                 res.redirect('/guias')
                             } else {
                                 const newGuia = {
+                                    acompanhamento: [
+                                        {
+                                            date: moment(new Date()).format(),
+                                            dados: "GUIA CRIADA POR - " + usuario.nome,
+                                        },
+                                        {
+                                            date: moment(new Date()).format(),
+                                            dados: "NA ORIGEM PARA ENVIO" + " - " + usuario.nome,
+                                        }
+                                    ],
                                     numero: numero,
                                     n_fatura: n_fatura,
                                     periodo: periodo._id,
@@ -603,6 +698,9 @@ router.get('/selectEdit/:id', lOgado, (req, res) => {
                             guia["statusBaixa"] = "NO PRAZO"
                         }
                     }
+                    for (let i = 0; i < guia.acompanhamento.length; i++) {
+                        guia.acompanhamento[i]["dateExib"] = moment(guia.acompanhamento[i].date).format('DD/MM/YYYY - HH:mm:ss')
+                    }
 
                     res.render('guiasDeCargas/vizualizar', { guia, empresas, agencias, clientes })
 
@@ -704,7 +802,6 @@ router.post('/editar', lOgado, (req, res) => {
                     req.flash('error_msg', "Guia não encontrada")
                     res.redirect('/guias')
                 } else {
-
                     guia.user = user
                     guia.origem = origem
                     guia.destino = destino
@@ -792,7 +889,10 @@ router.post('/atualizar_entrega', lOgado, (req, res) => {
                 guia.baixaEntr = true
                 guia.user_conf_entr = usuario._id
             }
-
+            guia.acompanhamento.push({
+                date: moment(new Date()).format(),
+                dados: status_entrega + " - " + usuario.nome
+            })
             guia.entrega = status_entrega
             guia.date = moment(new Date()).format()
             guia.user = usuario._id
@@ -817,11 +917,14 @@ router.post('/atualizar_entrega', lOgado, (req, res) => {
 //Rotas de buscar guias por numero de conhecimento
 router.post('/buscar', lOgado, (req, res) => {
     GuiaCarga.findOne({ numero: req.body.numero }).then((guia) => {
-        guia["date_entrada"] = moment(guia.dateEntrada).format('YYYY-MM-DD')
-        guia["date_vencimento"] = moment(guia.vencimento).format('YYYY-MM-DD')
-        res.render('guiasDeCargas/vizualizar', { guia })
+        if (!guia) {
+            req.flash('error_msg', "Guias Nº " + req.body.numero + " não encontrada")
+            res.redirect('/guias')
+        } else {
+            res.redirect('/guias/selectEdit/' + guia._id)
+        }
     }).catch((err) => {
-        req.flash('error_msg', "Guias Nº " + req.body.numero + " não encontrada")
+        req.flash('error_msg', "Falha ao buscar Guias Nº " + req.body.numero + " não encontrada")
         res.redirect('/guias')
     })
 })
@@ -862,7 +965,7 @@ router.post('/informar_pagamento_guia', lOgado, (req, res) => {
 
             } else {
                 if (formaPag == "BOLETO FATURA") {
-                    if (req.user.perfil == "FINANCEIRO") {
+                    if (req.user.perfil == "FINANCEIRO" || req.user.eAdmin || req.user.perfil == "GARAGEM") {
                         GuiaCarga.findById(ident).then((guia) => {
                             guia.user_conf_pag = req.user._id
                             guia.date = moment(new Date()).format("YYYY-MM-DDTHH:mm:ss.SSSZ")
@@ -905,6 +1008,54 @@ router.post('/informar_pagamento_guia', lOgado, (req, res) => {
                 }
             }
         }
+    }
+})
+
+router.get('/baixar_em_lote', lOgado, (req, res) => {
+    const usuario = req.user
+    const { ids, agencia, dateMin, dateMax, status } = req.query
+    if (Array.isArray(ids)) {
+        var success = []
+        var error = []
+        for (let i = 0; i < ids.length; i++) {
+            GuiaCarga.findById(ids[i]).then((guia) => {
+                guia.user_conf_pag = usuario._id
+                guia.date = moment(new Date()).format("YYYY-MM-DDTHH:mm:ss.SSSZ")
+                guia.datePagamento = moment(new Date()).format("YYYY-MM-DDTHH:mm:ss.SSSZ")
+                guia.formaPag = "DINHEIRO"
+                guia.baixaPag = true
+                guia.save().then(() => {
+                    success.push("Guia " + guia.numero + " baixada com sucesso !")
+                }).catch((err) => {
+                    error.push("Erro ao baixar guia" + guia.numero + "! ERROR: " + err)
+                })
+            }).catch((err) => {
+                error.push("Erro ao buscar guia" + guia.numero + "! ERROR: " + err)
+            })
+            if (i + 1 == ids.length) {
+                req.flash('success_msg', "" + success)
+                req.flash('error_msg', "" + error)
+                res.redirect("/consultas/por_agencia/pesquisar?agencia=" + agencia + "&status=" + status + "&dateMin=" + dateMin + "&dateMax=" + dateMax)
+            }
+        }
+    } else {
+        GuiaCarga.findById(ids).then((guia) => {
+            guia.user_conf_pag = req.user._id
+            guia.date = moment(new Date()).format("YYYY-MM-DDTHH:mm:ss.SSSZ")
+            guia.datePagamento = moment(new Date()).format("YYYY-MM-DDTHH:mm:ss.SSSZ")
+            guia.formaPag = "DINHEIRO"
+            guia.baixaPag = true
+            guia.save().then(() => {
+                req.flash('success_msg', "Guia " + guia.numero + " baixada com sucesso !")
+                res.redirect("/consultas/por_agencia/pesquisar?agencia=" + agencia + "&status=" + status + "&dateMin=" + dateMin + "&dateMax=" + dateMax)
+            }).catch((err) => {
+                req.flash('error_msg', "Erro ao Buscar a guia" + err)
+                res.redirect('/guias/selectEdit/' + ident)
+            })
+        }).catch((err) => {
+            req.flash('error_msg', "Erro ao buscar guia" + guia.numero + "! ERROR: " + err)
+            res.redirect('/guias/selectEdit/' + ident)
+        })
     }
 })
 

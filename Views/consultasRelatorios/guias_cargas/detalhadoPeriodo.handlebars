@@ -1,0 +1,22 @@
+<div class="table-responsive-xl fs-6 mt-4" id="content">
+  <table class="table table-bordered shadow">
+    <thead class="table-secondary">
+      <tr>
+        <th scope="col">Periodo</th>
+        <th scope="col">Data Inicial</th>
+        <th scope="col">Data Final</th>
+        <th scope="col">Digitação</th>
+      </tr>
+    </thead>
+    {{#each periodos}}
+    <tbody>
+      <tr>
+        <td><a href="/periodos/dadosPeriododeControle/{{_id}}">{{nome}}</a></td>
+        <td>{{inicial}}</td>
+        <td>{{final}}</td>
+        <td>{{status}}</td>
+      </tr>
+    </tbody>
+    {{else}}
+    {{/each}}
+  </table>

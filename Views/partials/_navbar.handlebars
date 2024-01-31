@@ -16,18 +16,22 @@
           </a>
           <ul class="dropdown-menu">
             <li><a class="dropdown-item" href="/guias">Cadastrar Guia de Excesso</a></li>
-            {{#if user.eAdmin}}<li><a class="dropdown-item" href="/guias/guias_cadastradas">Guias Cadastradas</a></li>
+            {{#if user.eAdmin}}
+            <!--<li><a class="dropdown-item" href="/consultas/buscar_guias">Buscador Guias</a></li>-->
+            <li><a class="dropdown-item" href="/guias/guias_cadastradas">Guias Cadastradas</a></li>
+            <li><a class="dropdown-item" href="/consultas/por_entrega">Buscar status de entrega</a></li>
+            <li><a class="dropdown-item" href="/consultas/por_agencia">Buscar status de pagamento</a></li>
             {{else}}
+            <!--<li><a class="dropdown-item" href="/consultas/buscar_guias">Buscador Guias</a></li>-->
             <li><a class="dropdown-item" href="/guias/minhas_guias/remetente">Guias como Remetente</a></li>
             <li><a class="dropdown-item" href="/guias/minhas_guias/destinatario">Guias com Destinatario</a></li>
+            <li><a class="dropdown-item" href="/consultas/por_agencia">Buscar por Agencia status de pagamento</a></li>
             {{/if}}
-            <li><a class="dropdown-item" href="/ctes">Cadastrar CTE</a></li>
-            <li><a class="dropdown-item" href="/consultas/por_empresa">Buscar Por Empresa</a></li>
-            <li><a class="dropdown-item" href="/consultas/por_usuario">Buscar Por Usuario</a></li>
-            <li><a class="dropdown-item" href="/consultas/por_agencia">Buscar Por Agencia</a></li>
+            {{#if agencia.emitecte}}<li><a class="dropdown-item" href="/ctes">Cadastrar CTE</a></li>{{else}}{{/if}}
+
           </ul>
         </li>
-        <li class="nav-item dropdown">
+        <!--<li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             Prestação de Contas
           </a>
@@ -35,17 +39,34 @@
             <li><a class="dropdown-item" href="/arrecadacao">Cadastrar Prestação Contas</a></li>
             <li><a class="dropdown-item" href="/arrecadacao/buscar_guias">Buscar P. de Contas</a></li>
           </ul>
+        </li>-->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Cadastros
+          </a>
+          <ul class="dropdown-menu">
+            {{#if user.eAdmin}}
+            <li><a class="dropdown-item" href="/administracao/clientes">Cadastrar Clientes</a></li>
+            <li><a class="dropdown-item" href="/talao">Cadastrar Talões</a></li>
+            {{else}}
+            <li><a class="dropdown-item" href="/administracao/clientes">Cadastrar Clientes</a></li>
+            <li><a class="dropdown-item" href="/talao">Meus Talões</a></li>
+            {{/if}}
+          </ul>
         </li>
         {{#if user.eAdmin}}
 
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Comissão
+            Relatorios
           </a>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="/comissao/bilhetes">Comissão dos Bilhetes</a></li>
-            <li><a class="dropdown-item" href="/comissao/cargas">Comissão de Excesso de Bagagem</a></li>
-            <li><a class="dropdown-item" href="/comissao/seguro">Comissão de Seguro</a></li>
+            <!--<li><a class="dropdown-item" href="/comissao/bilhetes">Comissão dos Bilhetes</a></li>-->
+            <li><a class="dropdown-item" href="/consultas/vendas_por_agencia">Vendas por Agencia</a></li>
+            <li><a class="dropdown-item" href="/consultas/detalhado_do_periodo">Detalhamento do Periodo</a></li>
+            <li><a class="dropdown-item" href="/consultas/hitorico_de_comissao">Historico de comissão</a></li>
+
+            <!--<li><a class="dropdown-item" href="/comissao/seguro">Comissão de Seguro</a></li>-->
           </ul>
         </li>
 
@@ -55,11 +76,10 @@
           </a>
           <ul class="dropdown-menu">
             <li><a class="dropdown-item" href="/periodos">Abrir e Encerrar Digitação</a></li>
+            <li><a class="dropdown-item" href="/comissao/cargas">Calcular Comissão de Excesso de Bagagem</a></li>
             <li><a class="dropdown-item" href="/administracao/empresas">Cadastrar Empresas</a></li>
             <li><a class="dropdown-item" href="/administracao/users">Cadastrar Usuarios</a></li>
             <li><a class="dropdown-item" href="/administracao/agencias">Cadastrar Agencias</a></li>
-            <li><a class="dropdown-item" href="/administracao/clientes">Cadastrar Clientes</a></li>
-            <li><a class="dropdown-item" href="/talao">Cadastrar Talão</a></li>
             <li><a class="dropdown-item" href="#">Log dos Usuarios</a></li>
           </ul>
         </li>
@@ -75,6 +95,7 @@
           <ul class="dropdown-menu">
             <li><a class="dropdown-item" href="/user/reset_pass">Alterar Senha</a></li>
             <li><a class="dropdown-item" href="/user/logout">Sair</a></li>
+
           </ul>
         </li>
       </ul>
