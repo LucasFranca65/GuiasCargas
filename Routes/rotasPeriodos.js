@@ -113,7 +113,7 @@ router.get('/dadosPeriododeControle/:id', lOgado, (req, res) => {
             periodo['comissaoT'] = periodo.totalComiss.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
             GuiaCarga.find({ periodo: id }).then((guias) => {
                 //console.log(guias)
-                var guiasPagas = guias.filter(g => g.baixaPag == true)
+                var guiasPagas = guias.filter(g => g.baixaPag == true && !g.condPag == "CANCELADO")
                 //console.log(guiasPagas)
                 var guiasPendentes = guias.filter(g => g.baixaPag == false && moment(g.vencimento).format('YYYY-MM-DD') > moment(new Date()).format('YYYY-MM-DD'))
                 var guiasVencidas = guias.filter(g => g.baixaPag == false && moment(g.vencimento).format('YYYY-MM-DD') < moment(new Date()).format('YYYY-MM-DD'))
