@@ -1,0 +1,28 @@
+<div style="width: 47%;max-height: 450px;">
+    <canvas id="myChart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const ctx = document.getElementById('myChart');
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Vendidos', 'Cancelados', 'Pagos', 'Pendentes', 'Vencidos'],
+            datasets: [{
+                label: '# of Votes',
+                data: [795, 19, 532, 32, 7],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>

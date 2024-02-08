@@ -3,14 +3,15 @@
 {{else}}
 {{/each}}
 
+<h5>Comissões Calculadas por Agencia</h5>
+<a href="/periodos/dadosPeriododeControle/{{periodo._id}}"><small>Resumo {{periodo.nome}}</small></a><br>
+<small>Total Vendido:{{periodo.totalVendasExib}}</small><br>
+<small>Total Comissão: {{periodo.totalComissExib}}</small>
+
 <div class="table-responsive-xl">
-    <h5>Comissões Calculadas por Agencia</h5>
-    <a href="/periodos/dadosPeriododeControle/{{periodo._id}}"><small>Resumo {{periodo.nome}}</small></a><br>
-    <small>Total Vendido:{{periodo.totalVendasExib}}</small><br>
-    <small>Total Comissão: {{periodo.totalComissExib}}</small>
     <form action="/comissao/cargas/excluir_calculos" onsubmit="confirmDell(event, this)">
         <input type="hidden" name="periodo" value="{{periodo.id}}">
-        <table class="table table-bordered shadow mt-4">
+        <table class="table table-bordered shadow mt-2">
             <thead class="table-dark">
                 <tr>
                     <th scope="col">Agencia</th>

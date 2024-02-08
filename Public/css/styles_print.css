@@ -1,18 +1,18 @@
 @charset "UTF-8";
 
-
-
 nav,
 hr,
 section,
 footer,
-button {
+button,
+.btn {
     display: none;
 }
 
 table,
 th,
 td {
+    font-size: 12px;
     border: 1px solid;
     border-collapse: collapse;
     padding: 5px 2px 5px 2px;
@@ -20,5 +20,5 @@ td {
 }
 
 table {
-    width: 95%;
+    width: 100%;
 }

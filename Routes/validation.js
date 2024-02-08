@@ -14,7 +14,6 @@ const { lOgado } = require('../helpers/eAdmin')
 router.get('/', (req, res) => {
     System.find().then((info) => {
         //console.log(info.length)
-        let msg
         if (info.length == 0) {
 
             const novoInfo = new System({
@@ -25,8 +24,7 @@ router.get('/', (req, res) => {
             })
 
             novoInfo.save().then(() => {
-                console.log("Info Criado")
-                msg = "INFO OK, "
+                //console.log("Info Criado")
 
                 const newAgencia = new Agencia({
                     numero: "99",
@@ -36,7 +34,6 @@ router.get('/', (req, res) => {
 
                 newAgencia.save().then(() => {
                     console.log("Agencia Criado")
-                    msg = msg + "AGENCIA OK, "
 
                     Agencia.find().then((agencia) => {
                         console.log(agencia)
