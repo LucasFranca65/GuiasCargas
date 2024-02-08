@@ -1059,4 +1059,57 @@ router.get('/baixar_em_lote', lOgado, (req, res) => {
     }
 })
 
+router.get('/baixar_em_lote/periodo', lOgado, (req, res) => {
+    const usuario = req.user
+    const { ids, periodo } = req.query
+    if (Array.isArray(ids)) {
+        Periodo.findById(periodo).then((per) => {
+            var success = []
+            var error = []
+            for (let i = 0; i < ids.length; i++) {
+                GuiaCarga.findById(ids[i]).then((guia) => {
+                    guia.user_conf_pag = usuario._id
+                    guia.date = moment(new Date()).format("YYYY-MM-DDTHH:mm:ss.SSSZ")
+                    guia.datePagamento = moment(new Date()).format("YYYY-MM-DDTHH:mm:ss.SSSZ")
+                    guia.formaPag = "DINHEIRO"
+                    guia.baixaPag = true
+                    guia.save()
+
+                }).catch((err) => {
+                    error.push("Erro ao buscar guia" + guia.numero + "! ERROR: " + err)
+                })
+                if (i + 1 == ids.length) {
+                    req.flash('success_msg', "Guias selecionadas paixadas com sucesso")
+                    res.redirect("/periodos/dadosPeriododeControle/" + per._id)
+                }
+            }
+        }).catch((err) => {
+            req.flash('error_msg', "Erro ao buscar periodo! ERROR: " + err)
+            res.redirect("/consultas/detalhado_do_periodo")
+        })
+
+    } else {
+        GuiaCarga.findById(ids).then((guia) => {
+            guia.user_conf_pag = req.user._id
+            guia.date = moment(new Date()).format("YYYY-MM-DDTHH:mm:ss.SSSZ")
+            guia.datePagamento = moment(new Date()).format("YYYY-MM-DDTHH:mm:ss.SSSZ")
+            guia.formaPag = "DINHEIRO"
+            guia.baixaPag = true
+            guia.save().then(() => {
+                req.flash('success_msg', "Guia " + guia.numero + " baixada com sucesso !")
+                res.redirect("/periodos/dadosPeriododeControle/" + periodo)
+
+            }).catch((err) => {
+                req.flash('error_msg', "Erro ao Salvar a guia" + err)
+                res.redirect("/periodos/dadosPeriododeControle/" + periodo)
+
+            })
+        }).catch((err) => {
+            req.flash('error_msg', "Erro ao buscar guia! ERROR: " + err)
+            res.redirect("/periodos/dadosPeriododeControle/" + periodo)
+
+        })
+    }
+})
+
 module.exports = router

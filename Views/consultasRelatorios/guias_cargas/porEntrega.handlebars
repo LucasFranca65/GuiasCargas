@@ -3,14 +3,14 @@
 {{else}}
 {{/each}}
 
-<form action="/consultas/por_agencia/pesquisar" method="get">
+<form action="/consultas/por_entrega/pesquisar" method="get">
   <h3>Buscar por status de pagamento</h3>
   <div class="table-responsive-xl  ">
     <table class="table shadow p-2">
       <thead class="table-secondary">
         <tr>
           <th scope="col">Agencia</th>
-          <th scope="col">Pagamento</th>
+          <th scope="col">Entrega</th>
           <th scope="col">Data Inicial</th>
           <th scope="col">Data Final</th>
         </tr>
@@ -21,7 +21,7 @@
             <option value="selecione">---Selecione---</option>
             <option value="1">Todas</option>
             {{#each agencias}}
-            <option value="{{_id}}">{{numero}} - {{cidade}}</option>
+            <option value="{{_id}}">{{cidade}} - {{numero}}</option>
             {{else}}
             {{/each}}
           </select>
@@ -29,11 +29,9 @@
         <td>
           <select name="status" class="form-select" id="floatingSelect2" aria-label="agencia" required>
             <option value="1">Todas</option>
-            <option value="2">Pagas</option>
+            <option value="2">Entregue</option>
             <option value="3">Pendente</option>
-            <option value="4">Vencidas</option>
-            <option value="5">Canceladas</option>
-
+            <option value="4">Canceladas</option>
           </select>
         </td>
         <td><input type="date" class="form-control" name="dateMin" required></td>
@@ -74,6 +72,7 @@
             <th scope="col">#</th>
           </tr>
         </thead>
+
         <tbody>
           {{#each dados}}
           <tr id="table-rowns" class="fs-6 fst-normal">
@@ -98,6 +97,10 @@
         <input type="hidden" name="dateMin" value="{{title.dateMin}}">
         <input type="hidden" name="dateMax" value="{{title.dateMax}}">
         <input type="hidden" name="status" value="{{title.status}}">
+
+
+
+
       </table>
     </div>
     <a role="button" id="btn-export-csv" class="btn btn-secondary btn-sm mt-2">Exportar .CSV</a>

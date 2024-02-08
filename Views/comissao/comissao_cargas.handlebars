@@ -1,13 +1,22 @@
-{{#each error}}
+{{#each success}}
+<div class="alert alert-success">{{text}}</div>
+{{else}}
+{{/each}}
+{{#each erros}}
 <div class="alert alert-danger">{{text}}</div>
 {{else}}
 {{/each}}
 
+
+
 <div class="table-responsive-xl">
 
-    <form action="/comissao/cargas/calcular">
-        <table class="table">
-            <p style="font-weight: bold;">Calcular Comissão do periodo</p>
+    <form action="/comissao/cargas/calcular" onsubmit="confirmAction(event, this)">
+        <h5>Calcular Comissão do periodo</h5>
+        <small>Calculos de uma agencia em especifico somente exibe as informações, os calculos não são
+            salvos, para salvar é necessario gerar e todas as agencias.</small>
+        <table class="table mt-2">
+
             <thead class="table-dark">
                 <tr>
                     <th scope="col">Periodo</th>

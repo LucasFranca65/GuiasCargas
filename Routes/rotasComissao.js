@@ -18,6 +18,8 @@ const Comissao = mongoose.model('comissoes')
 require('../Models/GuiaCarga')
 const GuiaCarga = mongoose.model('guiascargas')
 
+
+
 router.get('/bilhetes', lOgado, (req, res) => {
     Agencia.find().then((agencias) => {
         Periodo.find({ comissao: "true" }).then((periodos) => {
@@ -246,33 +248,67 @@ router.get('/cargas', lOgado, (req, res) => {
 
 router.get('/cargas/calcular', eAdmin, (req, res) => {
     const { periodoBusca, agenciaBusca } = req.query
-    var total = 0
+    var erros = []
+    var success = []
     if (agenciaBusca == '1' || agenciaBusca == 1) {
         Periodo.findById(periodoBusca).then((periodo) => {
             Agencia.find().then((agencias) => {
                 agencias.forEach((agencia) => {
-                    GuiaCarga.find({ origem: agencia._id, periodo: periodo._id }).then((guias) => {
-                        var total = 0
-                        for (let i = 0; i < guias.length; i++) {
-                            total += parseFloat(guias[i].valor)
+                    Comissao.findOne({ agencia: agencia._id, periodo: periodo._id }).then((comiss) => {
+                        if (!comiss) {
+                            GuiaCarga.find({ origem: agencia._id, periodo: periodo._id }).then((guias) => {
+                                const guiasValidas = guias.filter(g => g.condPag != "CANCELADO")
+                                var guiasCancel = guias.filter(g => g.condPag == "CANCELADO")
+                                var total = 0
+                                var totalValidas = 0
+                                var totalCancel = 0
+                                for (let i = 0; i < guias.length; i++) {
+                                    total += parseFloat(guias[i].valor)
+                                }
+                                for (let j = 0; j < guiasValidas.length; j++) {
+                                    totalValidas += parseFloat(guiasValidas[j].valor)
+                                }
+                                for (let k = 0; k < guiasCancel.length; k++) {
+                                    totalCancel += parseFloat(guiasCancel[k].valor)
+                                }
+                                var comissao = parseFloat((totalValidas * parseFloat(agencia.indiceComissao)) / 100)
+                                const newComissao = {
+                                    periodo: periodo._id,
+                                    agencia: agencia._id,
+                                    empresa: periodo.empresa,
+                                    valor: comissao,
+                                    totalVendas: total,
+                                    qtdVendas: guias.length,
+                                    totalValidas: totalValidas,
+                                    totalCancelado: totalCancel,
+                                    qtdValidos: guiasValidas.length,
+                                    qtdCancelado: guiasCancel.length
+                                }
+                                new Comissao(newComissao).save()
+                            })
+                            success.push({ text: `Comissão da Agencia ${agencia.cidade}, calculada com sucesso ${periodo.nome} ` })
+                        } else {
+                            erros.push({ text: `Comissão da Agencia ${agencia.cidade}, já calculada para o periodo ${periodo.nome} ` })
                         }
-                        var comissao = parseFloat((total * parseFloat(agencia.indiceComissao)) / 100)
-                        const newComissao = {
-                            periodo: periodo._id,
-                            agencia: agencia._id,
-                            empresa: periodo.empresa,
-                            valor: comissao,
-                            totalVendas: total,
-                            qtdVendas: guias.length
-                        }
-
-                        new Comissao(newComissao).save()
                     })
                 })
                 periodo.comissao = true
                 periodo.save().then(() => {
-                    req.flash('success_msg', "Comissão ds agencias calculadas com sucesso")
-                    res.redirect('/comissao/cargas')
+                    Periodo.find({ comissao: false }).then((periodos) => {
+                        Periodo.find({ comissao: true }).populate('empresa').then((periodosCalculados) => {
+                            for (let i = 0; i < periodosCalculados.length; i++) {
+                                periodosCalculados[i]['dateMin'] = moment(periodosCalculados[i].dateInit).format('DD/MM/YYYY')
+                                periodosCalculados[i]['dateMax'] = moment(periodosCalculados[i].dateFin).format('DD/MM/YYYY')
+                            }
+                            res.render('comissao/comissao_cargas', { periodos, agencias, periodosCalculados, success, erros })
+                        }).catch((err) => {
+                            req.flash('error_msg', "Erro ao tentar buscar comissoes", err)
+                            res.redirect('/error')
+                        })
+                    }).catch((err) => {
+                        req.flash('error_msg', "Erro ao tentar buscar comissoes", err)
+                        res.redirect('/error')
+                    })
                 })
             })
         }).catch((err) => {
@@ -280,14 +316,44 @@ router.get('/cargas/calcular', eAdmin, (req, res) => {
             res.redirect('/comissao/cargas')
         })
     } else {
-        GuiaCarga.find({ periodo: periodoBusca, agencia: agenciaBusca, tipo: '2' }).then((guias) => {
-            console.log(guias)
-
-            res.redirect('/comissao/cargas')
-        }).catch((err) => {
-            req.flash('error_msg', "Erro ao buscar Guias do periodo, Err" + err)
-            res.redirect('/comissao/cargas')
+        Periodo.findById(periodoBusca).then((periodo) => {
+            Agencia.find().then((agencia) => {
+                GuiaCarga.find({ origem: agenciaBusca, periodo: periodoBusca }).then((guias) => {
+                    const guiasValidas = guias.filter(g => g.condPag != "CANCELADO")
+                    var guiasCancel = guias.filter(g => g.condPag == "CANCELADO")
+                    var total = 0
+                    var totalValidas = 0
+                    var totalCancel = 0
+                    for (let i = 0; i < guias.length; i++) {
+                        total += parseFloat(guias[i].valor)
+                    }
+                    for (let j = 0; j < guiasValidas.length; j++) {
+                        totalValidas += parseFloat(guiasValidas[j].valor)
+                    }
+                    for (let k = 0; k < guiasCancel.length; k++) {
+                        totalCancel += parseFloat(guiasCancel[k].valor)
+                    }
+                    var comissao = parseFloat((totalValidas * parseFloat(agencia.indiceComissao)) / 100)
+                    const newComissao = {
+                        periodo: periodo.nome,
+                        agencia: agencia.cidade,
+                        empresa: periodo.empresa,
+                        valor: comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+                        totalVendas: total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+                        qtdVendas: guias.length,
+                        totalValidas: totalValidas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+                        totalCancelado: totalCancel.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+                        qtdValidos: guiasValidas.length,
+                        qtdCancelado: guiasCancel.length
+                    }
+                    res.render('comissao/cargas/cargas_comissao_agencia', { newComissao: newComissao })
+                }).catch((err) => {
+                    req.flash('error_msg', "Erro ao buscar Guias do periodo, Err" + err)
+                    res.redirect('/comissao/cargas')
+                })
+            })
         })
+
     }
 })
 
@@ -303,10 +369,16 @@ router.get('/cargas/detalhado/:id', lOgado, (req, res) => {
                     totalVendas += comissoes[i].totalVendas
                     comissoes[i]['valorExib'] = comissoes[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
                     comissoes[i]['totalExib'] = comissoes[i].totalVendas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                    comissoes[i]['totalValidExib'] = comissoes[i].totalValidas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                    comissoes[i]['totalCancelExib'] = comissoes[i].totalCancelado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+
                 }
+
                 periodo.totalVendas = totalVendas
                 periodo.totalComiss = total
                 periodo.save().then(() => {
+                    periodo['totalComissExib'] = periodo.totalComiss.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                    periodo['totalVendasExib'] = periodo.totalVendas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
                     res.render('comissao/cargas_comisao_periodo', { comissoes, periodo })
                 }).catch((err) => {
                     req.flash('error_msg', "Erro ao salvar Comissões do periodo, Err" + err)
@@ -317,10 +389,15 @@ router.get('/cargas/detalhado/:id', lOgado, (req, res) => {
                 res.redirect('/comissao/cargas')
             })
         } else {
+            periodo['totalComissExib'] = periodo.totalComiss.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+            periodo['totalVendasExib'] = periodo.totalVendas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
             Comissao.find({ periodo: id }).sort({ totalVendas: -1 }).populate('empresa').populate('agencia').populate('periodo').then((comissoes) => {
                 for (let i = 0; i < comissoes.length; i++) {
                     comissoes[i]['valorExib'] = comissoes[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
                     comissoes[i]['totalExib'] = comissoes[i].totalVendas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                    comissoes[i]['totalValidExib'] = comissoes[i].totalValidas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                    comissoes[i]['totalCancelExib'] = comissoes[i].totalCancelado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+
                 }
 
                 res.render('comissao/cargas_comisao_periodo', { comissoes, periodo })
@@ -332,6 +409,55 @@ router.get('/cargas/detalhado/:id', lOgado, (req, res) => {
         }
     }).catch((err) => {
         req.flash('error_msg', "Erro ao buscar  periodo, Err" + err)
+        res.redirect('/comissao/cargas')
+    })
+})
+
+router.get('/cargas/detalhadoAgencia/:id', lOgado, (req, res) => {
+    const idComissao = req.params.id
+    Comissao.findById(idComissao).populate('periodo').populate('empresa').populate('agencia').then((comissao) => {
+        const newComissao = {
+            periodo: comissao.periodo.nome,
+            agencia: comissao.agencia.cidade,
+            empresa: comissao.empresa.empresa,
+            valor: comissao.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+            totalVendas: comissao.totalVendas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+            qtdVendas: comissao.qtdVendas,
+            totalValidas: comissao.totalValidas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+            totalCancelado: comissao.totalCancelado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+            qtdValidos: comissao.qtdValidos,
+            qtdCancelado: comissao.qtdCancelado
+        }
+        res.render('comissao/cargas_comissao_agencia', { newComissao: newComissao })
+
+    }).catch((err) => {
+        req.flash('error_msg', 'Erro ao Buscar comissao')
+        res.redirect('/comissao/cargas')
+    })
+
+})
+
+router.get('/cargas/excluir_calculos', lOgado, (req, res) => {
+    const { periodo } = req.query
+    console.log()
+    Periodo.findById(periodo).then((per) => {
+        Comissao.deleteMany({ periodo: periodo }).then(() => {
+            per.comissao = false
+            per.totalComiss = 0
+            per.totalVendas = 0
+            per.save().then(() => {
+                req.flash('success_msg', "Exclusão realizada com sucesso")
+                res.redirect('/comissao/cargas')
+            }).catch((err) => {
+                req.flash('error_msg', "Erro Ao tentar liberar perido para calculos de comissao " + err)
+                res.redirect('/comissao/cargas')
+            })
+        }).catch((err) => {
+            req.flash('error_msg', "Erro Ao tentar Excuir calculos de comissao " + err)
+            res.redirect('/comissao/cargas')
+        })
+    }).catch((err) => {
+        req.flash('error_msg', "Erro Ao Buscar Periodo " + err)
         res.redirect('/comissao/cargas')
     })
 })

@@ -113,7 +113,7 @@ router.get('/dadosPeriododeControle/:id', lOgado, (req, res) => {
             periodo['comissaoT'] = periodo.totalComiss.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
             GuiaCarga.find({ periodo: id }).then((guias) => {
                 //console.log(guias)
-                var guiasPagas = guias.filter(g => g.baixaPag == true && !g.condPag == "CANCELADO")
+                var guiasPagas = guias.filter(g => g.baixaPag == true && g.condPag != "CANCELADO")
                 //console.log(guiasPagas)
                 var guiasPendentes = guias.filter(g => g.baixaPag == false && moment(g.vencimento).format('YYYY-MM-DD') > moment(new Date()).format('YYYY-MM-DD'))
                 var guiasVencidas = guias.filter(g => g.baixaPag == false && moment(g.vencimento).format('YYYY-MM-DD') < moment(new Date()).format('YYYY-MM-DD'))
@@ -148,9 +148,12 @@ router.get('/dadosPeriododeControle/:id', lOgado, (req, res) => {
                     resumo.canceladasValor += guiasCanceladas[i].valor
                     resumo.canceladasQtd++
                 }
-                resumo.total = resumo.pagasValor + resumo.pendentesValor + resumo.vencidasValor + resumo.canceladasValor
+                resumo.total = (resumo.pagasValor + resumo.pendentesValor + resumo.vencidasValor + resumo.canceladasValor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
                 resumo.qtdTotal = resumo.pagasQtd + resumo.pendentesQtd + resumo.vencidasQtd + resumo.canceladasQtd
-
+                resumo.pagasValor = resumo.pagasValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                resumo.pendentesValor = resumo.pendentesValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                resumo.vencidasValor = resumo.vencidasValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                resumo.canceladasValor = resumo.canceladasValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
                 res.render('administracao/periodos/dados_periodo', { periodo, resumo })
             }).catch((err) => {
                 req.flash('error_msg', "Erro ao Buscar Guias, ERRO: " + err)
@@ -163,6 +166,144 @@ router.get('/dadosPeriododeControle/:id', lOgado, (req, res) => {
         }
     }).catch((err) => {
         req.flash('error_msg', "Erro ao Buscar Periodos, ERRO: " + err)
+        res.redirect('/periodos')
+    })
+})
+
+router.get('/dadosPeriododeControle/listar/:n/:id', lOgado, (req, res) => {
+    const n = req.params.n
+    const id = req.params.id
+    console.log(n, id)
+    switch (n) {
+        case "1":
+            res.redirect(`/periodos/listarGuiasPagas/${id}`)
+            break;
+
+        case "2":
+            res.redirect('/periodos/listarGuiasPendentes/' + id)
+            break;
+
+        case "3":
+            res.redirect('/periodos/listarGuiasVencidas/' + id)
+            break;
+
+        case "4":
+            res.redirect('/periodos/listarGuiasCanceladas/' + id)
+            break;
+        default:
+            req.flash('error_msg', "Falha ao tentar listar guia de controle")
+            res.redirect('/periodos/dadosPeriododeControle/' + id)
+            break;
+    }
+})
+
+router.get('/listarGuiasPagas/:id', lOgado, (req, res) => {
+    const id = req.params.id
+    GuiaCarga.find({ periodo: id, baixaPag: true, $nor: [{ condPag: "CANCELADO" }] }).populate('origem').populate('destino').populate('empresa').populate('cliente').then((dados) => {
+        var title = {
+            tipoDeGuia: "Pagas",
+            qtd: 0,
+            total: 0,
+            baixar: 'disabled',
+            periodo: dados[0].periodo
+        }
+        title.qtd = dados.length
+
+        for (let i = 0; i < dados.length; i++) {
+            dados[i]["date_entrada"] = moment(dados[i].dateEntrada).format('DD/MM/YYYY')
+            dados[i]["venc_exib"] = moment(dados[i].vencimento).format('DD/MM/YYYY')
+            dados[i]["valor_exib"] = dados[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+            dados[i]["statusBaixa"] = "PAGO"
+            title.total += dados[i].valor
+        }
+        title.total = title.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+
+        res.render('guiasDeCargas/listar_guias', { dados, title })
+    }).catch((err) => {
+        req.flash('error_msg', "Erro ao Buscar Guias, ERRO: " + err)
+        res.redirect('/periodos')
+    })
+})
+
+router.get('/listarGuiasPendentes/:id', lOgado, (req, res) => {
+    const id = req.params.id
+    GuiaCarga.find({ periodo: id, baixaPag: false, vencimento: { $gt: moment(new Date().format) } }).populate('origem').populate('destino').populate('empresa').populate('cliente').then((dados, tipo) => {
+        var title = {
+            tipoDeGuia: "Pendentes",
+            qtd: 0,
+            total: 0,
+            periodo: dados[0].periodo
+        }
+        title.qtd = dados.length
+
+        for (let i = 0; i < dados.length; i++) {
+            dados[i]["date_entrada"] = moment(dados[i].dateEntrada).format('DD/MM/YYYY')
+            dados[i]["venc_exib"] = moment(dados[i].vencimento).format('DD/MM/YYYY')
+            dados[i]["valor_exib"] = dados[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+            dados[i]["statusBaixa"] = "Pendente"
+            title.total += dados[i].valor
+        }
+        title.total = title.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+
+        res.render('guiasDeCargas/listar_guias', { dados, title })
+    }).catch((err) => {
+        req.flash('error_msg', "Erro ao Buscar Guias, ERRO: " + err)
+        res.redirect('/periodos')
+    })
+})
+
+router.get('/listarGuiasVencidas/:id', lOgado, (req, res) => {
+    const id = req.params.id
+    GuiaCarga.find({ periodo: id, baixaPag: false, vencimento: { $lt: moment(new Date().format) } }).populate('origem').populate('destino').populate('empresa').populate('cliente').then((dados, tipo) => {
+        var title = {
+            tipoDeGuia: "Vencidas",
+            qtd: 0,
+            total: 0,
+            periodo: dados[0].periodo
+
+        }
+        title.qtd = dados.length
+
+        for (let i = 0; i < dados.length; i++) {
+            dados[i]["date_entrada"] = moment(dados[i].dateEntrada).format('DD/MM/YYYY')
+            dados[i]["venc_exib"] = moment(dados[i].vencimento).format('DD/MM/YYYY')
+            dados[i]["valor_exib"] = dados[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+            dados[i]["statusBaixa"] = "Vencida"
+            title.total += dados[i].valor
+        }
+        title.total = title.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+
+        res.render('guiasDeCargas/listar_guias', { dados, title })
+    }).catch((err) => {
+        req.flash('error_msg', "Erro ao Buscar Guias, ERRO: " + err)
+        res.redirect('/periodos')
+    })
+})
+
+router.get('/listarGuiasCanceladas/:id', lOgado, (req, res) => {
+    const id = req.params.id
+    GuiaCarga.find({ periodo: id, baixaPag: true, condPag: "CANCELADO" }).populate('origem').populate('destino').populate('empresa').populate('cliente').then((dados, tipo) => {
+        var title = {
+            tipoDeGuia: "Cancleadas",
+            qtd: 0,
+            total: 0,
+            baixar: 'disabled',
+            periodo: dados[0].periodo
+        }
+        title.qtd = dados.length
+
+        for (let i = 0; i < dados.length; i++) {
+            dados[i]["date_entrada"] = moment(dados[i].dateEntrada).format('DD/MM/YYYY')
+            dados[i]["venc_exib"] = moment(dados[i].vencimento).format('DD/MM/YYYY')
+            dados[i]["valor_exib"] = dados[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+            dados[i]["statusBaixa"] = "Canceladas"
+            title.total += dados[i].valor
+        }
+        title.total = title.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+
+        res.render('guiasDeCargas/listar_guias', { dados, title })
+    }).catch((err) => {
+        req.flash('error_msg', "Erro ao Buscar Guias, ERRO: " + err)
         res.redirect('/periodos')
     })
 })

@@ -30,7 +30,23 @@ const Comissao = new Schema({
         type: Number,
         required: true
     },
+    totalValidas: {
+        type: Number,
+        required: true
+    },
+    totalCancelado: {
+        type: Number,
+        required: true
+    },
     qtdVendas: {
+        type: Number,
+        required: true
+    },
+    qtdValidos: {
+        type: Number,
+        required: true
+    },
+    qtdCancelado: {
         type: Number,
         required: true
     },

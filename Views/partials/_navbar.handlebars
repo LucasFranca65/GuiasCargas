@@ -17,15 +17,14 @@
           <ul class="dropdown-menu">
             <li><a class="dropdown-item" href="/guias">Cadastrar Guia de Excesso</a></li>
             {{#if user.eAdmin}}
-            <!--<li><a class="dropdown-item" href="/consultas/buscar_guias">Buscador Guias</a></li>-->
             <li><a class="dropdown-item" href="/guias/guias_cadastradas">Guias Cadastradas</a></li>
             <li><a class="dropdown-item" href="/consultas/por_entrega">Buscar status de entrega</a></li>
             <li><a class="dropdown-item" href="/consultas/por_agencia">Buscar status de pagamento</a></li>
             {{else}}
-            <!--<li><a class="dropdown-item" href="/consultas/buscar_guias">Buscador Guias</a></li>-->
+            <li><a class="dropdown-item" href="/consultas/por_entrega">Buscar status de entrega</a></li>
+            <li><a class="dropdown-item" href="/consultas/por_agencia">Buscar status de pagamento</a></li>
             <li><a class="dropdown-item" href="/guias/minhas_guias/remetente">Guias como Remetente</a></li>
-            <li><a class="dropdown-item" href="/guias/minhas_guias/destinatario">Guias com Destinatario</a></li>
-            <li><a class="dropdown-item" href="/consultas/por_agencia">Buscar por Agencia status de pagamento</a></li>
+            <li><a class="dropdown-item" href="/guias/minhas_guias/destinatario">Guias como Destinatario</a></li>
             {{/if}}
             {{#if agencia.emitecte}}<li><a class="dropdown-item" href="/ctes">Cadastrar CTE</a></li>{{else}}{{/if}}
 

@@ -1,0 +1,104 @@
+.grafico {
+    background-color: black;
+}
+
+.grafico-barras {
+    background-color: whitesmoke;
+    width: 100%;
+    height: 400px;
+    padding: 5px;
+}
+
+.grafico-barras .colunas {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+}
+
+.grafico-barras .colunas .escala-y {
+    width: 90px;
+    display: flex;
+    flex-direction: column;
+}
+
+.grafico-barras .colunas .escala-y .divisao {
+    height: calc((100% - 80px)/6);
+    display: flex;
+    padding-right: 2px;
+
+}
+
+.grafico-barras .colunas .area-grafico {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.grafico-barras .colunas .area-grafico .area-barras {
+    flex-grow: 1;
+    border-left: 2px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    position: relative;
+
+}
+
+.grafico-barras .colunas .area-grafico .escala-x {
+    height: 80px;
+    display: flex;
+
+}
+
+.grafico-barras .colunas .area-grafico .escala-x .divisao {
+    width: calc(100%/12);
+    text-align: center;
+}
+
+.grafico-barras .colunas .area-grafico .area-barras .meses_barra {
+
+    width: calc(100%/12);
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+
+}
+
+.grafico-barras .colunas .area-grafico .area-barras .resumo {
+    display: none;
+    width: 30%;
+    height: 50px;
+    position: absolute;
+    border: 1px solid #CCC;
+    text-align: center;
+    left: 50%;
+    top: 5px;
+    border-radius: 10px;
+    background-color: #ffff;
+    box-shadow: 0 3px 10px 5px rgba(0, 0, 0, .07);
+}
+
+.grafico-barras .colunas .area-grafico .area-barras .meses_barra .barra {
+    width: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin: 0 2px;
+
+}
+
+.grafico-barras .colunas .area-grafico .area-barras .meses_barra .barra.gren {
+
+    background-color: green;
+
+}
+
+.grafico-barras .colunas .area-grafico .area-barras .meses_barra .barra.blue {
+
+    background-color: blue;
+
+}
+
+.grafico-barras .colunas .area-grafico .area-barras .meses_barra .barra.red {
+
+    background-color: red;
+
+}

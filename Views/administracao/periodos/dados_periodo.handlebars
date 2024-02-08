@@ -5,10 +5,8 @@
     <small>Final: {{periodo.final}}</small><br>
     <small>Total Vendas: {{periodo.vendasT}}</small><br>
     <small>Total Comissão: {{periodo.comissaoT}}</small><br>
-    <hr>
+    <br>
     <table class="table">
-        <hr>
-
         <thead class="table-dark">
             <tr>
                 <th scope="col">Status</th>
@@ -18,25 +16,41 @@
         </thead>
         <tbody>
             <tr>
-                <td>Pago</td>
+                <td><a href="/periodos/dadosPeriododeControle/listar/1/{{periodo._id}}">Guias
+                        Pagas</a></td>
                 <td>{{resumo.pagasQtd}}</td>
                 <td>{{resumo.pagasValor}}</td>
             </tr>
             <tr>
-                <td>Pendentes</td>
+                <td><a href="/periodos/dadosPeriododeControle/listar/2/{{periodo._id}}">Guias
+                        Pendentes</a>
+                </td>
                 <td>{{resumo.pendentesQtd}}</td>
                 <td>{{resumo.pendentesValor}}</td>
             </tr>
             <tr>
-                <td>Vencidas</td>
+                <td><a href="/periodos/dadosPeriododeControle/listar/3/{{periodo._id}}">Guias
+                        Vencidas</a>
+                </td>
                 <td>{{resumo.vencidasQtd}}</td>
                 <td>{{resumo.vencidasValor}}</td>
             </tr>
             <tr>
-                <td>Canceladas</td>
+                <td><a href="/periodos/dadosPeriododeControle/listar/4/{{periodo._id}}">Guias
+                        Canceladas</a>
+                </td>
                 <td>{{resumo.canceladasQtd}}</td>
                 <td>{{resumo.canceladasValor}}</td>
+            </tr>
+            <tr>
+                <td>Total</td>
+                <td>{{resumo.qtdTotal}}</td>
+                <td>{{resumo.total}}</td>
             </tr>
         </tbody>
     </table>
 </div>
+
+<button onclick="window.print()" class="btn btn-outline-success btn-sm ms-2">Imprimir</button><a
+    href="/comissao/cargas/detalhado/{{periodo._id}}"><button
+        class="btn btn-secondary btn-sm ms-2">Retornar</button></a>

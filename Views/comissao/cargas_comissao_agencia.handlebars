@@ -1,0 +1,67 @@
+{{#each error}}
+<div class="alert alert-danger">{{text}}</div>
+{{else}}
+{{/each}}
+<!--
+    const newComissao = {
+                        periodo: periodo.nome,
+                        agencia: agencia.cidade,
+                        empresa: periodo.empresa,
+                        valor: comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+                        totalVendas: total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+                        qtdVendas: guias.length,
+                        totalValidas: totalValidas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+                        totalCancelado: totalCancel.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+                        qtdValidos: guiasValidas.length,
+                        qtdCancelado: guiasCancel.length
+                    }
+-->
+<h5 class="mt-4">Comissão detalhada da agencia {{newComissao.agencia}}</h5>
+
+<div class=" p-3">
+    <table class="table table-bordered shadow mt-4">
+        <tbody>
+            <tr>
+                <td>Periodo</td>
+                <td>{{newComissao.periodo}}</td>
+            </tr>
+            <tr>
+                <td>Empresa</td>
+                <td>{{newComissao.empresa}}</td>
+            </tr>
+            <tr>
+                <td>Valor Comissão</td>
+                <td>{{newComissao.valor}}</td>
+            </tr>
+            <tr>
+                <td>Total Vendas</td>
+                <td>{{newComissao.totalVendas}}</td>
+            </tr>
+            <tr>
+                <td>Qtd Vendas</td>
+                <td>{{newComissao.qtdVendas}}</td>
+            </tr>
+            <tr>
+                <td>Total Vendas Validas</td>
+                <td>{{newComissao.totalValidas}}</td>
+            </tr>
+            <tr>
+                <td>Qtd Vendas Validas</td>
+                <td>{{newComissao.qtdValidos}}</td>
+            </tr>
+            <tr>
+                <td>Total Cancelados</td>
+                <td>{{newComissao.totalCancelado}}</td>
+            </tr>
+            <tr>
+                <td>Qtd Cancelados</td>
+                <td>{{newComissao.qtdCancelado}}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+<hr>
+
+<button class="btn btn-outline-success btn-sm" onclick="window.print()">Imprimir</button> <a
+    href="/comissao/cargas"><button class="btn btn-outline-secondary ms-2 btn-sm">Retornar</button></a>

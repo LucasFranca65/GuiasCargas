@@ -24,9 +24,9 @@ function confirmAdd(event, form) {
     }
 }
 
-function confirmReprint(event, form) {
+function confirmAction(event, form) {
     event.preventDefault()
-    var decision = confirm("Confirmar reimpressão ?")
+    var decision = confirm("Confirmar Ação ?")
     if (decision) {
         form.submit()
     }

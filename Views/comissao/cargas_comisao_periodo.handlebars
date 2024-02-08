@@ -4,35 +4,43 @@
 {{/each}}
 
 <div class="table-responsive-xl">
-    <form action="/comissao/excluir" method="post">
-        <table class="table">
-            <hr>
-            <p style="font-weight: bold;">Comissões Calculadas</p>
+    <h5>Comissões Calculadas por Agencia</h5>
+    <a href="/periodos/dadosPeriododeControle/{{periodo._id}}"><small>Resumo {{periodo.nome}}</small></a><br>
+    <small>Total Vendido:{{periodo.totalVendasExib}}</small><br>
+    <small>Total Comissão: {{periodo.totalComissExib}}</small>
+    <form action="/comissao/cargas/excluir_calculos" onsubmit="confirmDell(event, this)">
+        <input type="hidden" name="periodo" value="{{periodo.id}}">
+        <table class="table table-bordered shadow mt-4">
             <thead class="table-dark">
                 <tr>
                     <th scope="col">Agencia</th>
-                    <th scope="col">Periodo</th>
                     <th scope="col">Empresa</th>
-                    <th scope="col">Valor Comissão</th>
-                    <th scope="col">Total Vendido</th>
-                    <th scope="col">Quantidade</th>
+                    <th scope="col" colspan="2">Total Vendido</th>
+                    <th scope="col" colspan="2">Guias Validas</th>
+                    <th scope="col" colspan="2">Guias Cancelado</th>
+                    <th scope="col">Comissão</th>
+
                 </tr>
             </thead>
             {{#each comissoes}}
             <tbody>
                 <tr>
-                    <td>{{agencia.cidade}}</td>
-                    <td><a href="/periodos/dadosPeriododeControle/{{periodo._id}}">{{periodo.nome}}</a></td>
+                    <td><a href="/comissao/cargas/detalhadoAgencia/{{_id}}">{{agencia.cidade}}</a></td>
                     <td>{{empresa.empresa}}</td>
-                    <td>{{valorExib}}</td>
-                    <td>{{totalExib}}</td>
                     <td>{{qtdVendas}}</td>
+                    <td>{{totalExib}}</td>
+                    <td>{{qtdValidos}}</td>
+                    <td>{{totalValidExib}}</td>
+                    <td>{{qtdCancelado}}</td>
+                    <td>{{totalCancelExib}}</td>
+                    <td>{{valorExib}}</td>
                 </tr>
             </tbody>
             {{else}}
             {{/each}}
         </table>
-        <button class="btn btn-outline-danger btn-sm" type="submit">Excluir</button>
+        <button class="btn btn-outline-danger btn-sm" type="submit">Excluir Calculos</button>
+        <a role="button" class="ms-2 btn btn-sm btn-secondary" onclick="window.print()">Imprimir</a>
     </form>
 </div>
-</div>
+</div><br><br>

@@ -26,106 +26,20 @@ router.get('/detalhado_do_periodo', lOgado, (req, res) => {
             periodos[i]['inicial'] = moment(periodos[i].dateInit).format('DD/MM/YYYY')
             periodos[i]['final'] = moment(periodos[i].dateFin).format('DD/MM/YYYY')
         }
-        res.render('consultasRelatorios/guias_cargas/detalhadoPeriodo', { periodos })
+        const abertos = periodos.filter(p => p.status == "Aberto")
+        const fechados = periodos.filter(p => p.status == "Fechado")
+        var title = {
+            qtd: periodos.length,
+            qtdAbertos: abertos.length,
+            qtdFechados: fechados.length,
+        }
+        res.render('consultasRelatorios/guias_cargas/detalhadoPeriodo', { periodos, title })
     }).catch((err) => {
         req.flash('error_msg', "Erro ao buscar periodos agencias ERRO:", err)
         res.redirect('/error')
     })
 })
 
-router.get('/buscar_guias', lOgado, (req, res) => {
-    Agencia.find().sort({ cidade: 1 }).then((agencias) => {
-        Empresa.find().sort({ cidade: 1 }).then((empresas) => {
-            Cliente.find().sort({ name_client: 1 }).then((clientes) => {
-                res.render('consultasRelatorios/guias_cargas/buscar_guias', { agencias, clientes, empresas })
-            }).catch((err) => {
-                req.flash('error_msg', "Erro interno ao carregar agencias ERRO:", err)
-                res.redirect('/error')
-            })
-        }).catch((err) => {
-            req.flash('error_msg', "Erro interno ao carregar agencias ERRO:", err)
-            res.redirect('/error')
-        })
-
-    }).catch((err) => {
-        req.flash('error_msg', "Erro interno ao carregar agencias ERRO:", err)
-        res.redirect('/error')
-    })
-
-})
-
-router.get('/buscar_guias/pesquisar', lOgado, (req, res) => {
-    let error = []
-    var { agencia, cliente, empresa, statusPag, statusEntre, dateMin, dateMax } = req.query
-
-    dateMax = moment(dateMax).format()
-    dateMin = moment(dateMin).format()
-    //console.log('agencia= '+agencia +', dateMin= '+ dateMin+', dateMax= '+dateMax+'limit ='+limit+'Offset='+offset)
-
-    if (dateMax < dateMin) {
-        error.push({ texto: "A data inicial não pode ser menor que a final" })
-    }
-    if (agencia == "selecione") {
-        error.push({ texto: "Selecione uma agencia" })
-    }
-    if (error.length > 0) {
-        Agencia.find().sort({ cidade: 1 }).then((agencias) => {
-            res.render('consultasRelatorios/guias_cargas/porAgencia', { agencias, error })
-        }).catch((err) => {
-            req.flash('error_msg', "Erro interno ao carregar agencias", err)
-            res.redirect('/consultas/por_agencia')
-        })
-    } else {
-        Agencia.find().sort({ cidade: 1 }).then((agencias) => {
-            Empresa.find().sort({ cidade: 1 }).then((empresas) => {
-                Cliente.find().sort({ name_client: 1 }).then((clientes) => {
-                    var query = { dateEntrada: { $gte: dateMin, $lte: dateMax }, origem: agencia, cliente: cliente, empresa: empresa, baixaPag: statusPag, baixaEntr: statusEntre }
-                    GuiaCarga.find(query).populate('origem').populate('destino').populate('empresa').populate('cliente').sort({ numero: 1 }).then((dados) => {
-
-                        if (dados.length < 1) {
-                            req.flash('error_msg', "Não foi encontrado guias para o periodo Informado")
-                            res.redirect('/consultas/por_agencia')
-                        } else {
-                            var i = 0
-                            while (i < dados.length) {
-                                dados[i]["date_entrada"] = moment(dados[i].dateEntrada).format('DD/MM/YYYY')
-                                dados[i]["venc_exib"] = moment(dados[i].vencimento).format('DD/MM/YYYY')
-                                dados[i]["valor_exib"] = dados[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-                                //dados[i]["n"] = (i + 1) + offset
-                                if (dados[i].baixaPag == true || dados[i].baixaPag == "true") {
-                                    dados[i]["statusBaixa"] = "PAGO"
-                                } else {
-                                    if (moment(dados[i].vencimento).format("YYYY-MM-DD") < moment(new Date()).format("YYYY-MM-DD")) {
-                                        dados[i]["statusBaixa"] = "VENCIDO"
-                                    } else {
-                                        dados[i]["statusBaixa"] = "PENDENTE"
-                                    }
-                                }
-                                i++
-                            }
-                            res.render('consultasRelatorios/guias_cargas/porAgencia', { dados, agencias })
-                        }
-
-                    }).catch((err) => {
-                        req.flash('error_msg', "Não foi encontrado guias para os parametros no periodo informado", err)
-                        res.redirect('/consultas/por_agencia')
-                    })
-                }).catch((err) => {
-                    req.flash('error_msg', "Erro interno ao carregar agencias ERRO:", err)
-                    res.redirect('/painel')
-                })
-            }).catch((err) => {
-                req.flash('error_msg', "Erro interno ao carregar agencias ERRO:", err)
-                res.redirect('/painel')
-            })
-
-        }).catch((err) => {
-            req.flash('error_msg', "Erro interno ao carregar agencias ERRO:", err)
-            res.redirect('/painel')
-        })
-
-    }
-})
 
 router.get('/por_empresa', lOgado, (req, res) => {
     Empresa.find().then((empresas) => {
@@ -328,7 +242,7 @@ router.get('/por_usuario/pesquisar', lOgado, (req, res) => {
     }
 })
 
-//BUSCA POR AGENCIA
+//BUSCA POR AGENCIA  /por_entrega
 router.get('/por_agencia', lOgado, (req, res) => {
     let next = "disabled", prev = "disabled"
     Agencia.find().sort({ cidade: 1 }).then((agencias) => {
@@ -487,6 +401,184 @@ router.get('/por_agencia/pesquisar', lOgado, (req, res) => {
 
     }
 })
+
+//BUSCAR POR STATUS DE ENTREGA
+router.get('/por_entrega', lOgado, (req, res) => {
+    let next = "disabled", prev = "disabled"
+    Agencia.find().sort({ cidade: 1 }).then((agencias) => {
+        res.render('consultasRelatorios/guias_cargas/porEntrega', { agencias, next, prev })
+    }).catch((err) => {
+        req.flash('error_msg', "Erro interno ao carregar agencias ERRO:", err)
+        res.redirect('/error')
+    })
+})
+
+router.get('/por_entrega/pesquisar', lOgado, (req, res) => {
+    let error = []
+    var { agencia, dateMin, dateMax, status } = req.query
+
+    dateMax = moment(dateMax).format()
+    dateMin = moment(dateMin).format()
+    //console.log('agencia= '+agencia +', dateMin= '+ dateMin+', dateMax= '+dateMax+'limit ='+limit+'Offset='+offset)
+
+    if (dateMax < dateMin) {
+        error.push({ texto: "A data inicial não pode ser menor que a final" })
+    }
+    if (agencia == "selecione") {
+        error.push({ texto: "Selecione uma agencia" })
+    }
+    if (error.length > 0) {
+        Agencia.find().sort({ cidade: 1 }).then((agencias) => {
+            res.render('consultasRelatorios/guias_cargas/porAgencia', { agencias, error })
+        }).catch((err) => {
+            req.flash('error_msg', "Erro interno ao carregar agencias", err)
+            res.redirect('/consultas/por_entrega')
+        })
+    } else {
+        if (agencia == "1") {
+            Agencia.find().sort({ cidade: 1 }).then((agencias) => {
+                //console.log(status)
+                var query
+                if (status == 1 || status == "1") {
+                    query = { dateEntrada: { $gte: dateMin, $lte: dateMax } }
+                } else if (status == 2 || status == "2") {
+                    query = { dateEntrada: { $gte: dateMin, $lte: dateMax }, baixaEntr: true }
+                } else if (status == 3 || status == "3") {
+                    query = { dateEntrada: { $gte: dateMin, $lte: dateMax }, baixaEntr: false }
+                } else {
+                    query = { dateEntrada: { $gte: dateMin, $lte: dateMax }, condPag: "CANCELADO" }
+                }
+                //console.log(query)
+                GuiaCarga.find(query).populate('origem').populate('destino').populate('empresa').populate('cliente').sort({ numero: 1 }).then((dados) => {
+                    if (dados.length < 1) {
+                        req.flash('error_msg', "Não foi encontrado guias para o periodo Informado")
+                        res.redirect('/consultas/por_entrega')
+                    } else {
+                        var i = 0
+                        var total_vendas = 0
+                        while (i < dados.length) {
+                            dados[i]["date_entrada"] = moment(dados[i].dateEntrada).format('DD/MM/YYYY')
+                            dados[i]["venc_exib"] = moment(dados[i].vencimento).format('DD/MM/YYYY')
+                            dados[i]["valor_exib"] = dados[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                            //dados[i]["n"] = (i + 1) + offset
+                            if (dados[i].baixaPag == true || dados[i].baixaPag == "true" && !dados[i].condPag == "CANCELADO") {
+                                dados[i]["statusBaixa"] = "PAGO"
+                            } else if (dados[i].condPag == "CANCELADO") {
+                                dados[i]["statusBaixa"] = "CANCELADO"
+                            } else {
+                                if (moment(dados[i].vencimento).format("YYYY-MM-DD") < moment(new Date()).format("YYYY-MM-DD")) {
+                                    dados[i]["statusBaixa"] = "VENCIDO"
+                                } else {
+                                    dados[i]["statusBaixa"] = "PENDENTE"
+                                }
+                            }
+                            total_vendas += dados[i].valor
+                            i++
+                        }
+                        title = {
+                            totalVendasExib: total_vendas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+                            qtd_vendas: dados.length,
+                            agencia: "TODAS",
+                            dateMin, dateMax, status
+                        }
+
+                        res.render('consultasRelatorios/guias_cargas/porEntrega', { dados, agencias, title })
+                    }
+                }).catch((err) => {
+                    req.flash('error_msg', "Não foi encontrado guias para os parametros no periodo informado", err)
+                    res.redirect('/consultas/por_entrega')
+                })
+            }).catch((err) => {
+                req.flash('error_msg', "Erro interno ao carregar agencias" + err)
+                res.redirect('/painel')
+            })
+        } else {
+            Agencia.find().sort({ cidade: 1 }).then((agencias) => {
+                //console.log(status)
+                var query
+                if (status == 1 || status == "1") {
+                    query = { dateEntrada: { $gte: dateMin, $lte: dateMax }, origem: agencia }
+                } else if (status == 2 || status == "2") {
+                    query = { dateEntrada: { $gte: dateMin, $lte: dateMax }, origem: agencia, baixaPag: true }
+                } else if (status == 3 || status == "3") {
+                    query = { dateEntrada: { $gte: dateMin, $lte: dateMax }, origem: agencia, baixaPag: false, vencimento: { $gt: moment(new Date()).format() } }
+                } else if (status == 4 || status == "4") {
+                    query = { dateEntrada: { $gte: dateMin, $lte: dateMax }, origem: agencia, baixaPag: false, vencimento: { $lte: moment(new Date()).format() } }
+                } else {
+                    query = { dateEntrada: { $gte: dateMin, $lte: dateMax }, origem: agencia, condPag: "CANCELADO" }
+                }
+                //console.log(query)
+                GuiaCarga.find(query).populate('origem').populate('destino').populate('empresa').populate('cliente').sort({ numero: 1 }).then((dados) => {
+                    Agencia.findById(agencia).then((agencia) => {
+                        if (dados.length < 1) {
+                            req.flash('error_msg', "Não foi encontrado guias para o periodo Informado")
+                            res.redirect('/consultas/por_entrega')
+                        } else {
+                            var i = 0
+                            var total_vendas = 0
+                            while (i < dados.length) {
+                                dados[i]["date_entrada"] = moment(dados[i].dateEntrada).format('DD/MM/YYYY')
+                                dados[i]["venc_exib"] = moment(dados[i].vencimento).format('DD/MM/YYYY')
+                                dados[i]["valor_exib"] = dados[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                                //dados[i]["n"] = (i + 1) + offset
+                                if (dados[i].baixaPag == true || dados[i].baixaPag == "true") {
+                                    dados[i]["statusBaixa"] = "PAGO"
+                                } else {
+                                    if (moment(dados[i].vencimento).format("YYYY-MM-DD") < moment(new Date()).format("YYYY-MM-DD")) {
+                                        dados[i]["statusBaixa"] = "VENCIDO"
+                                    } else {
+                                        dados[i]["statusBaixa"] = "PENDENTE"
+                                    }
+                                }
+                                total_vendas += dados[i].valor
+                                i++
+                            }
+                            title = {
+                                totalVendasExib: total_vendas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+                                qtd_vendas: dados.length,
+                                agencia: agencia.cidade,
+                                dateMin, dateMax, status
+                            }
+
+                            res.render('consultasRelatorios/guias_cargas/porEntrega', { dados, agencias, title, agencia })
+                        }
+                    }).catch((err) => {
+                        req.flash('error_msg', "Não foi encontrado guias para os parametros no periodo informado", err)
+                        res.redirect('/consultas/por_entrega')
+                    })
+                }).catch((err) => {
+                    req.flash('error_msg', "Não foi encontrado guias para os parametros no periodo informado", err)
+                    res.redirect('/consultas/por_entrega')
+                })
+            }).catch((err) => {
+                req.flash('error_msg', "Erro interno ao carregar agencias" + err)
+                res.redirect('/consultas/por_entrega')
+            })
+        }
+
+    }
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //BUSCA POR CLIENTE
 router.get('/por_cliente', lOgado, (req, res) => {

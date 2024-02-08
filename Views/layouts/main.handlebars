@@ -18,7 +18,7 @@
 <body style="background-color: aliceblue;">
     {{>_navbar}}
 
-    <div class=" container-fluid mt-2">
+    <div class=" container-fluid mt-2" style="flex-grow: 1;">
         {{>_msg}}
         {{#if error}}
         <div class="alert alert-danger mt-4">{{error}}</div>
@@ -26,6 +26,7 @@
         {{/if}}
         {{{body}}}
     </div>
+    <!--{{>_footer}}-->
 
 </body>
 <script src='http://code.jquery.com/jquery-2.1.3.min.js'></script>
