@@ -1,0 +1,41 @@
+<div style="width: 47%;max-height: 450px;">
+    <canvas id="myChart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const ctx = document.getElementById('myChart');
+    let valores = []
+    let lbl
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Vendidos', 'Cancelados', 'Pagos', 'Pendentes', 'Vencidos'],
+            datasets: [{
+                label: lbl,
+                data: valores,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    const endpoint = "http://localhost:1056/graficos/grafico_valores"
+    fetch(endpoint).then(res => res.json()).then(res => {
+        valores[0] = res.vendidos
+        valores[1] = res.cancelados
+        valores[2] = res.pagos
+        valores[3] = res.pendentes
+        valores[4] = res.vencidos
+        lbl = res.periodo
+    }).catch(erro => {
+        console.log("Erro encontrado: ", erro)
+    })
+</script>

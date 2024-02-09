@@ -70,6 +70,119 @@ exportBtn.addEventListener('click', () => {
     exportBtn.setAttribute('download', 'table.csv')
 })
 
+// Graficos
+
+const ctx = document.getElementById('grafico');
+const ctx2 = document.getElementById('grafico2');
+
+let valores = []
+let lbl = "Quantidade"
+
+let grafico1 = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: ['Vendidos', 'Cancelados', 'Pagos', 'Pendentes', 'Vencidos'],
+        datasets: [{
+            label: lbl,
+            data: valores,
+            backgroundColor: [
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 205, 86, 0.2)',
+                'rgba(255, 159, 64, 0.2)',
+
+
+            ],
+            borderColor: [
+                'rgb(75, 192, 192)',
+                'rgb(255, 99, 132)',
+                'rgb(54, 162, 235)',
+                'rgb(255, 205, 86)',
+                'rgb(255, 159, 64)',
+
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+let valores2 = []
+let lbl2 = "Valores"
+let grafico2 = new Chart(ctx2, {
+    type: 'bar',
+    data: {
+        labels: ['Vendidos', 'Cancelados', 'Pagos', 'Pendentes', 'Vencidos'],
+        datasets: [{
+            label: lbl2,
+            data: valores2,
+            backgroundColor: [
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 205, 86, 0.2)',
+                'rgba(255, 159, 64, 0.2)',
+
+
+            ],
+            borderColor: [
+                'rgb(75, 192, 192)',
+                'rgb(255, 99, 132)',
+                'rgb(54, 162, 235)',
+                'rgb(255, 205, 86)',
+                'rgb(255, 159, 64)',
+
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+
+const obterDados = () => {
+    const endpoint = "http://localhost:1056/graficos/grafico_vendas"
+    fetch(endpoint).then(res => res.json()).then(res => {
+        valores[0] = res.vendidos
+        valores[1] = res.cancelados
+        valores[2] = res.pagos
+        valores[3] = res.pendentes
+        valores[4] = res.vencidos
+        lbl = res.periodo
+        grafico1.update()
+    }).catch(erro => {
+        console.log("Erro encontrado: ", erro)
+    })
+
+    const endpoint2 = "http://localhost:1056/graficos/grafico_valores"
+    fetch(endpoint2).then(res => res.json()).then(res => {
+        valores2[0] = res.vendidos
+        valores2[1] = res.canceladoss
+        valores2[2] = res.pagos
+        valores2[3] = res.pendentes
+        valores2[4] = res.vencidos
+        lbl2 = res.periodo
+        grafico2.update()
+    }).catch(erro => {
+        console.log("Erro encontrado: ", erro)
+    })
+}
+
+const interval = setInterval(obterDados, 3000)
+
 
 /*const btn_imp = document.getElementById('btn_imp')
 

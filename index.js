@@ -25,6 +25,7 @@ const talao = require('./Routes/rotasTaloes')
 const comissao = require('./Routes/rotasComissao')
 const periodo = require('./Routes/rotasPeriodos')
 const ctes = require('./Routes/rotasCtes')
+const graficos = require('./Routes/rotasGraficos')
 
 //Configurações
 
@@ -92,6 +93,7 @@ app.use('/comissao', comissao)
 app.use('/periodos', periodo)
 app.use('/arrecadacao', arrecadacao)
 app.use('/ctes', ctes)
+app.use('/graficos', graficos)
 
 app.get('/error', (req, res) => {
     res.render('404')
