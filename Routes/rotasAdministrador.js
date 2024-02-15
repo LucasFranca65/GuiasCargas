@@ -6,17 +6,17 @@ const { eAdmin, lOgado } = require('../helpers/eAdmin')
 const moment = require('moment')
 
 //Models
-require('../Models/User')
+require('../models/User')
 const User = mongoose.model('users')
-require('../Models/GuiaCarga')
+require('../models/GuiaCarga')
 const GuiaCarga = mongoose.model('guiascargas')
-require('../Models/Agencia')
+require('../models/Agencia')
 const Agencia = mongoose.model('agencias')
-require('../Models/Empresa')
+require('../models/Empresa')
 const Empresa = mongoose.model('empresas')
-require('../Models/PContas')
+require('../models/PContas')
 const PContas = mongoose.model('pContas')
-require('../Models/Cliente')
+require('../models/Cliente')
 const Cliente = mongoose.model('clientes')
 
 //Rotas de Administração de Usuarios

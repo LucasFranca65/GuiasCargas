@@ -6,15 +6,15 @@ const flash = require('connect-flash')
 const { lOgado, eAdmin } = require('../helpers/eAdmin')
 
 //Mongoose Models
-require('../Models/System')
+require('../models/System')
 const System = mongoose.model('systens')
-require('../Models/Agencia')
+require('../models/Agencia')
 const Agencia = mongoose.model('agencias')
-require('../Models/Talao')
+require('../models/Talao')
 const Talao = mongoose.model('taloes')
-require('../Models/GuiaCarga')
+require('../models/GuiaCarga')
 const GuiaCarga = mongoose.model('guiascargas')
-require('../Models/Periodo')
+require('../models/Periodo')
 const Periodo = mongoose.model('periodos')
 
 //Painel principal das guias

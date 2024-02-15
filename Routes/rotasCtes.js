@@ -6,17 +6,17 @@ const flash = require('connect-flash')
 const { lOgado } = require('../helpers/eAdmin')
 
 //Models
-require('../Models/Agencia')
+require('../models/Agencia')
 const Agencia = mongoose.model('agencias')
-require('../Models/Periodo')
+require('../models/Periodo')
 const Periodo = mongoose.model('periodos')
-require('../Models/Empresa')
+require('../models/Empresa')
 const Empresa = mongoose.model('empresas')
-require('../Models/Talao')
+require('../models/Talao')
 const Talao = mongoose.model('taloes')
-require('../Models/Cliente')
+require('../models/Cliente')
 const Cliente = mongoose.model('clientes')
-require('../Models/Cte')
+require('../models/Cte')
 const Cte = mongoose.model('ctes')
 
 router.get('/', lOgado, (req, res) => {

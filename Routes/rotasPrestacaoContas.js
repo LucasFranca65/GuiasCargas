@@ -24,15 +24,15 @@ function checkValueFloat(valor) {
 }
 
 //Models
-require('../Models/PContas')
+require('../models/PContas')
 const PContas = mongoose.model('pContas')
-require('../Models/Agencia')
+require('../models/Agencia')
 const Agencia = mongoose.model('agencias')
-require('../Models/Periodo')
+require('../models/Periodo')
 const Periodo = mongoose.model('periodos')
-require('../Models/Empresa')
+require('../models/Empresa')
 const Empresa = mongoose.model('empresas')
-require('../Models/Talao')
+require('../models/Talao')
 const Talao = mongoose.model('taloes')
 
 router.get('/', lOgado, (req, res) => {

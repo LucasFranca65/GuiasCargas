@@ -4,7 +4,7 @@ const passport = require('passport')
 const { lOgado } = require('../helpers/eAdmin')
 const { serializeUser } = require('passport')
 const { default: mongoose } = require('mongoose')
-require('../Models/User')
+require('../models/User')
 const Usuario = mongoose.model('users')
 
 router.post('/reset_pass/reset', lOgado, (req, res) => {

@@ -14,18 +14,19 @@ const PORT = 1056
 //Configuração de autenticação
 require('./config/alth')(passport)
 //Grupos de Rotas
-const admin = require('./Routes/rotasAdministrador')
-const guias = require('./Routes/rotasGruias')
-const arrecadacao = require('./Routes/rotasPrestacaoContas')
-const validation = require('./Routes/validation')
-const painel = require('./Routes/rotasPainel')
-const consultas = require('./Routes/rotasConsultas')
-const users = require('./Routes/rotasUsuarios')
-const talao = require('./Routes/rotasTaloes')
-const comissao = require('./Routes/rotasComissao')
-const periodo = require('./Routes/rotasPeriodos')
-const ctes = require('./Routes/rotasCtes')
-const graficos = require('./Routes/rotasGraficos')
+const admin = require('./routes/rotasAdministrador')
+const guias = require('./routes/rotasGruias')
+const arrecadacao = require('./routes/rotasPrestacaoContas')
+const validation = require('./routes/validation')
+const painel = require('./routes/rotasPainel')
+const consultas = require('./routes/rotasConsultas')
+const users = require('./routes/rotasUsuarios')
+const talao = require('./routes/rotasTaloes')
+const comissao = require('./routes/rotasComissao')
+const periodo = require('./routes/rotasPeriodos')
+const ctes = require('./routes/rotasCtes')
+const graficos = require('./routes/rotasGraficos')
+const agencias = require('./routes/rotasAgente')
 
 //Configurações
 
@@ -79,7 +80,7 @@ app.engine('handlebars', handlebars.engine({
 app.set('view engine', 'handlebars')
 
 //Public Arquivos estaticos
-app.use(express.static(path.join(__dirname, 'Public')))
+app.use(express.static(path.join(__dirname, 'public')))
 
 //Rotas
 app.use('/administracao', admin)
@@ -94,6 +95,7 @@ app.use('/periodos', periodo)
 app.use('/arrecadacao', arrecadacao)
 app.use('/ctes', ctes)
 app.use('/graficos', graficos)
+app.use('/agencias', agencias)
 
 app.get('/error', (req, res) => {
     res.render('404')

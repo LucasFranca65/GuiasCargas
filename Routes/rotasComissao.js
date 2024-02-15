@@ -7,15 +7,15 @@ const moment = require('moment')
 
 //Models
 
-require('../Models/Agencia')
+require('../models/Agencia')
 const Agencia = mongoose.model('agencias')
-require('../Models/Periodo')
+require('../models/Periodo')
 const Periodo = mongoose.model('periodos')
-require('../Models/BalancoEnc')
+require('../models/BalancoEnc')
 const BalancoEnc = mongoose.model('balancoEnc')
-require('../Models/Comissao')
+require('../models/Comissao')
 const Comissao = mongoose.model('comissoes')
-require('../Models/GuiaCarga')
+require('../models/GuiaCarga')
 const GuiaCarga = mongoose.model('guiascargas')
 
 
@@ -534,6 +534,12 @@ router.post('/cargas/excluir', eAdmin, (req, res) => {
         res.redirect('/comissao')
     }
 })
+
+
+
+
+
+
 
 //Seguro
 router.get('/seguro', (req, res) => {

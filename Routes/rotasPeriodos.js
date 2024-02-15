@@ -6,11 +6,11 @@ const flash = require('connect-flash')
 const { lOgado, eAdmin } = require('../helpers/eAdmin')
 
 //Mongoose Models
-require('../Models/Empresa')
+require('../models/Empresa')
 const Empresa = mongoose.model('empresas')
-require('../Models/Periodo')
+require('../models/Periodo')
 const Periodo = mongoose.model('periodos')
-require('../Models/GuiaCarga')
+require('../models/GuiaCarga')
 const GuiaCarga = mongoose.model('guiascargas')
 
 
