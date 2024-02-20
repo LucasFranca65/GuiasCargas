@@ -1,12 +1,23 @@
 {{>_topNavbar}}
+<div class="d-flex flex-column mb-3" style="align-items: center;">
+    <div>
+        <h5>Movimentação do mês atual</h5>
+    </div>
+    <div>
+        {{>_graficoAgencia}}
+
+    </div>
+
+</div>
+<br><br>
+<!--
+<h5 class="ms-4">Controles de Execessos</h5>
+
 
 <div class=" card mb-3 mt-2 shadow">
-    <!-- Div Coluna 1-->
-    <div class="card-header">
-        <h5>Controles de Execessos</h5>
-    </div>
-    <div class="card-body d-flex justify-content-between " style="overflow-y: scroll; max-height: 450px">
-        <div class="p-2 card-body">
+    
+    <div class="card-body d-flex justify-content-between ">
+        <div class="p-2 card-body" style="overflow-y: scroll; max-height: 450px">
             <h6>Enviados com pendencia de Entrega</h6>
             <table class="table table-bordered ">
                 <thead class="table-secondary">
@@ -32,7 +43,7 @@
             </table>
         </div>
 
-        <div class="p-2 card-body">
+        <div class="p-2 card-body" style="overflow-y: scroll; max-height: 450px">
             <h6>Recebidos ou a Caminho com pendencia de Entrega</h6>
             <div class="table-responsive-xl fs-6">
                 <table class="table table-bordered">
@@ -41,6 +52,7 @@
                             <th scope="col">Número</th>
                             <th scope="col">Origem</th>
                             <th scope="col">Cliente</th>
+                            <th scope="col">Data Envio</th>
                             <th scope="col">Status Entrega</th>
                         </tr>
                     </thead>
@@ -63,7 +75,9 @@
     </div>
 </div>
 
-<div class="card shadow" style="overflow-y: scroll; max-height: 450px">
+-->
+
+<div class="card shadow" style="overflow-y: scroll; height: 450px">
     <div class="card-header">
         <h5>Guias "A COBRAR" com pagamento pendente</h5>
     </div>

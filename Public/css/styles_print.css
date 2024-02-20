@@ -5,7 +5,10 @@ hr,
 section,
 footer,
 button,
-.btn {
+.btn,
+.alert,
+canvas,
+#graficos {
     display: none;
 }
 

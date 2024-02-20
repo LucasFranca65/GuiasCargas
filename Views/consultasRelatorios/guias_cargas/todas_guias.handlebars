@@ -4,7 +4,7 @@
 {{/each}}
 
 <form action="/administracao/guias/excluir" method="post">
-    <div class="table-responsive-xl fs-6 mt-4">
+    <div class="table-responsive-xl fs-6 mt-5">
         <table class="table table-bordered">
             <thead class="table-dark ">
                 <tr class="fs-6">
@@ -14,10 +14,10 @@
                     <th scope="col">Cliente</th>
                     <th scope="col">Empresa</th>
                     <th scope="col">Entrada</th>
-                    <th scope="col">Pagamento</th>
+                    <th scope="col">Vencimento</th>
                     <th scope="col">Valor</th>
-                    <th scope="col">Status </th>
-                    <th scope="col">Baixa </th>
+                    <th scope="col">Cond. Pag.</th>
+                    <th scope="col">Sts. Pag. </th>
                     <th scope="col">#</th>
                 </tr>
             </thead>
@@ -28,11 +28,11 @@
                     <td>{{origem.cidade}}</td>
                     <td>{{destino.cidade}}</td>
                     <td>{{cliente.name_client}}</td>
-                    <td>{{empresa.nome}}</td>
+                    <td>{{empresa.empresa}}</td>
                     <td>{{date_entrada}}</td>
-                    <td>{{date_pagamento}}</td>
+                    <td>{{date_vencimento}}</td>
                     <td>{{valor_exib}}</td>
-                    <td>{{statusPag}}</td>
+                    <td>{{condPag}}</td>
                     <td>{{statusBaixa}}</td>
                     <td><input id="ckbox" type="checkbox" name="id" value="{{_id}}"></td>
                 </tr>
@@ -45,12 +45,12 @@
         <ul class="pagination justify-content-center">
             <li class="page-item {{prev}}">
                 <a class="page-link "
-                    href="/guias/guias_cadastradas?offset={{prevUrl.ofst}}&page={{prevUrl.pag}}">Anterior</a>
+                    href="/consultas/guias_cadastradas?offset={{prevUrl.ofst}}&page={{prevUrl.pag}}">Anterior</a>
             </li>
             <li class="page-item"><a class="page-link">-- {{page}} --</a></li>
             <li class="page-item {{next}}">
                 <a class="page-link "
-                    href="/guias/guias_cadastradas/?offset={{nextUrl.ofst}}&page={{nextUrl.pag}}">Proximo</a>
+                    href="/consultas/guias_cadastradas/?offset={{nextUrl.ofst}}&page={{nextUrl.pag}}">Proximo</a>
             </li>
         </ul>
     </nav>

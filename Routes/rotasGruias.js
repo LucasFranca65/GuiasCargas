@@ -268,81 +268,6 @@ router.get('/minhas_guias/destinatario', lOgado, (req, res) => {
 
 })
 
-router.get('/guias_cadastradas', lOgado, (req, res) => {
-    GuiaCarga.count().then((qtd) => {
-        console.log(qtd)
-        var { offset, page } = req.query
-        const limit = 10
-        if (!offset) {
-            offset = 0
-        }
-        if (offset < 0) {
-            offset = 0
-        }
-        else {
-            offset = parseInt(offset)
-        }
-        if (!page) {
-            page = 1
-        }
-        if (page < 1) {
-            page = 1
-        } else {
-            page = parseInt(page)
-        }
-
-        GuiaCarga.find().limit(limit).skip(offset).populate('cliente').populate('destino').populate('origem').sort({ numero: 1 }).then((dados) => {
-            var next = ""
-            var prev = ""
-
-            if (page == 1) {
-                prev = "disabled"
-            }
-            if (limit > dados.length || offset + limit >= qtd) {
-                next = "disabled"
-            }
-            var nextUrl = {
-                ofst: offset + limit,
-                pag: page + 1,
-            }
-            var prevUrl = {
-                ofst: offset - limit,
-                pag: page - 1
-            }
-
-            if (dados.length < 1) {
-                req.flash('error_msg', "Não há mais guias cadastradas")
-                res.redirect('/guias/guias_cadastradas')
-            } else {
-                var i = 0
-                while (i < dados.length) {
-                    dados[i]["date_entrada"] = moment(dados[i].dateEntrada).format('DD/MM/YYYY')
-                    dados[i]["date_pagamento"] = moment(dados[i].datePagamento).format('DD/MM/YYYY')
-                    dados[i]["valor_exib"] = dados[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-                    dados[i]["n"] = (i + 1) + offset
-                    if (dados[i].baixaPag == true && dados[i].statusPag == "CANCELADO") {
-                        dados[i]["statusBaixa"] = "CANCELADO"
-                    }
-                    if (dados[i].baixaPag == true) {
-                        dados[i]["statusBaixa"] = "PAGO"
-                    }
-                    else {
-                        dados[i]["statusBaixa"] = "PENDENTE"
-                    }
-                    i++
-                }
-                res.render('guiasDeCargas/todas_guias', { dados, nextUrl, prevUrl, page, prev, next })
-            }
-
-        }).catch((err) => {
-            req.flash('error_msg', "Não foi encontrado guias para os parametros no periodo informado", err)
-            res.redirect('/painel')
-        })
-    }).catch((err) => {
-        req.flash('error_msg', "Impossivel contar guias", err)
-        res.redirect('/painel')
-    })
-})
 //Rota de adição de guia
 router.post('/adicionar', lOgado, (req, res) => {
     const { numero, origem, destino, client, empresa, dateEntrada, vencimento, valor, condPag, baixa, n_fatura } = req.body
@@ -1035,7 +960,7 @@ router.get('/baixar_em_lote', lOgado, (req, res) => {
             if (i + 1 == ids.length) {
                 req.flash('success_msg', "" + success)
                 req.flash('error_msg', "" + error)
-                res.redirect("/consultas/por_agencia/pesquisar?agencia=" + agencia + "&status=" + status + "&dateMin=" + dateMin + "&dateMax=" + dateMax)
+                res.redirect("/consultas/por_agencia_por_pagamento/pesquisar?agencia=" + agencia + "&status=" + status + "&dateMin=" + dateMin + "&dateMax=" + dateMax)
             }
         }
     } else {
@@ -1047,7 +972,7 @@ router.get('/baixar_em_lote', lOgado, (req, res) => {
             guia.baixaPag = true
             guia.save().then(() => {
                 req.flash('success_msg', "Guia " + guia.numero + " baixada com sucesso !")
-                res.redirect("/consultas/por_agencia/pesquisar?agencia=" + agencia + "&status=" + status + "&dateMin=" + dateMin + "&dateMax=" + dateMax)
+                res.redirect("/consultas/por_agencia_por_pagamento/pesquisar?agencia=" + agencia + "&status=" + status + "&dateMin=" + dateMin + "&dateMax=" + dateMax)
             }).catch((err) => {
                 req.flash('error_msg', "Erro ao Buscar a guia" + err)
                 res.redirect('/guias/selectEdit/' + ident)

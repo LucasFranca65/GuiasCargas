@@ -1,6 +1,6 @@
 <div id="graficos" class="d-flex justify-content-center" style="width: 98%;max-height: 450px;">
-    <canvas style="max-width: 49%;" class="p-2" id="graficoValores"></canvas>
-    <canvas style="max-width: 49%;" class="p-2" id="graficoQtd"></canvas>
+    <canvas class="p-2" id="graficoValores"></canvas>
+    <canvas class="p-2" id="graficoQtd"></canvas>
 
 </div>
 
@@ -10,38 +10,30 @@
     const ctx = document.getElementById('graficoValores');
     const ctx2 = document.getElementById('graficoQtd');
 
-    const total = document.getElementById('valorTotal').value
+    const total = document.getElementById('total').value
     const qtdTotal = document.getElementById('qtdTotal').value
-
-    const pago = document.getElementById('valorPago').value
-    const qtdPago = document.getElementById('qtdPago').value
-
-    const cancel = document.getElementById('valorCancel').value
+    const cancel = document.getElementById('cancel').value
     const qtdCancel = document.getElementById('qtdCancel').value
 
-    const venci = document.getElementById('valorVencido').value
-    const qtdVenci = document.getElementById('qtdVenciados').value
+    const valid = document.getElementById('valid').value
+    const qtdValid = document.getElementById('qtdValid').value
 
-    const pend = document.getElementById('valorPendente').value
-    const qtdPend = document.getElementById('qtdPendente').value
-
-
-    let valores = [total, pago, cancel, pend, venci]
-    let qtd = [qtdTotal, qtdPago, qtdCancel, qtdPend, qtdVenci]
+    const comiss = document.getElementById('comiss').value
+    let valores = [total, valid, cancel, comiss]
+    let qtd = [qtdTotal, qtdValid, qtdCancel]
     let grafico1 = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['Total', 'Pagos', 'Canceladas', 'Pendente', 'Vencidos'],
+            labels: ['Total', 'Validas', 'Canceladas', 'comissao'],
             datasets: [{
                 label: "Valor R$",
                 data: valores,
                 borderWidth: 1,
                 backgroundColor: [
-                    'rgb(102, 205, 86)',
-                    'rgb(54, 162, 235)',
                     'rgb(255, 99, 132)',
+                    'rgb(54, 162, 235)',
                     'rgb(255, 205, 86)',
-                    'rgb(255,75, 56)'
+                    'rgb(228, 245, 87)'
                 ],
                 hoverOffset: 4
             }]
@@ -58,17 +50,15 @@
     let grafico2 = new Chart(ctx2, {
         type: 'bar',
         data: {
-            labels: ['Total', 'Pagos', 'Canceladas', 'Pendente', 'Vencidos'],
+            labels: ['Total', 'Validas', 'Canceladas'],
             datasets: [{
                 label: "Quantidade",
                 data: qtd,
                 borderWidth: 1,
                 backgroundColor: [
-                    'rgb(102, 205, 86)',
-                    'rgb(54, 162, 235)',
                     'rgb(255, 99, 132)',
-                    'rgb(255, 205, 86)',
-                    'rgb(255,75, 56)'
+                    'rgb(54, 162, 235)',
+                    'rgb(255, 205, 86)'
                 ],
                 hoverOffset: 4
             }]

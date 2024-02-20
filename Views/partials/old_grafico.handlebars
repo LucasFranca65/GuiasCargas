@@ -1,6 +1,6 @@
 <div class="mt-4" style="width: 98%;max-height: 450px; display: flex">
-    <canvas id="grafico" style="width: 48%;"></canvas>
-    <canvas id="grafico2" style="width: 48%;"></canvas>
+    <canvas id="grafico"></canvas>
+    <canvas id="grafico2"></canvas>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -49,7 +49,7 @@
     });
 
     let valores2 = []
-    let lbl2 = "Valor R$"
+    let lbl2 = "Valores"
     let grafico2 = new Chart(ctx2, {
         type: 'bar',
         data: {
@@ -88,7 +88,7 @@
 
 
     const obterDados = () => {
-        const endpoint = "http://10.10.10.215:1056/graficos/grafico_vendas_agencia"
+        const endpoint = "http://10.10.10.215:1056/graficos/grafico_vendas"
         fetch(endpoint).then(res => res.json()).then(res => {
             valores[0] = res.vendidos
             valores[1] = res.cancelados
@@ -101,7 +101,7 @@
             console.log("Erro encontrado: ", erro)
         })
 
-        const endpoint2 = "http://10.10.10.215:1056/graficos/grafico_valores_agencia"
+        const endpoint2 = "http://10.10.10.215:1056/graficos/grafico_valores"
         fetch(endpoint2).then(res => res.json()).then(res => {
             valores2[0] = res.vendidos
             valores2[1] = res.canceladoss

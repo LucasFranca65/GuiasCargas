@@ -1,115 +1,89 @@
-{{>_grafico}}
-<div class="d-flex justify-content-between mb-3 mt-2">
-    <!-- Div Coluna 1-->
-    <div class="card shadow" style="width: 51%;">
-        <div class="card-header">
-            <h4>Guias "A COBRAR" com pagamento pendente</h4>
-            <small>Quantidade: </small><small id="qtd_guiasAc">{{qtd_guiasAc}}</small>
-        </div>
-        <div class="p-2 card-body table-responsive" style="overflow-y: scroll; max-height: 400px;overflow-x: scroll;">
-            <table class="table ">
-                <thead>
-                    <tr>
-                        <th scope="col">Número</th>
-                        <th scope="col">Origem</th>
-                        <th scope="col">Destino</th>
-                        <th scope="col">Venc</th>
-                        <th scope="col">Valor</th>
-                        <th scope="col">Sts Pag</th>
-                        <th scope="col">Cliente</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{#each guiasAc}}
-                    <tr>
-                        <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
-                        <td>{{origem.cidade}}</td>
-                        <td>{{destino.cidade}}</td>
-                        <td>{{date_vencimento}}</td>
-                        <td>{{valorExib}}</td>
-                        <td>{{statusBaixa}}</td>
-                        <td><a href="/consultas/guias_do_cliente?cliente={{cliente._id}}">{{cliente.name_client}}</a>
-                        </td>
+{{#if periodo}}
+<input type="hidden" id="qtdTotal" value="{{graficos.qtdTotal}}">
+<input type="hidden" id="valorTotal" value="{{graficos.valorTotal}}">
+<input type="hidden" id="qtdCancel" value="{{graficos.qtdCancel}}">
+<input type="hidden" id="valorCancel" value="{{graficos.valorCancel}}">
+<input type="hidden" id="qtdPago" value="{{graficos.qtdPago}}">
+<input type="hidden" id="valorPago" value="{{graficos.valorPago}}">
+<input type="hidden" id="qtdVenciados" value="{{graficos.qtdVenciados}}">
+<input type="hidden" id="valorVencido" value="{{graficos.valorVencido}}">
+<input type="hidden" id="qtdPendente" value="{{graficos.qtdPendente}}">
+<input type="hidden" id="valorPendente" value="{{graficos.valorPendente}}">
 
-                    </tr>
-                    {{else}}
-                    {{/each}}
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <!-- Div Coluna 2-->
-    <div class="card shadow" style="width: 48%;">
-        <div class="card-header">
-            <h4>Guias com Entrega Pendente</h4>
-            <small>Quantidade: {{qtd_guiasPe}}</small>
-        </div>
-        <div class="p-2 card-body table-responsive" style="overflow-y: scroll; max-height: 400px;">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">Número</th>
-                        <th scope="col">Origem</th>
-                        <th scope="col">Destino</th>
-                        <th scope="col">Cliente</th>
-                        <th scope="col">Status Entrega</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{#each guiasPe}}
-                    <tr>
-                        <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
-                        <td>{{origem.cidade}}</td>
-                        <td>{{destino.cidade}}</td>
-                        <td><a href="/consultas/guias_do_cliente?cliente={{cliente._id}}">{{cliente.name_client}}</a>
-                        </td>
-
-                        <td>{{entrega}}</td>
-                    </tr>
-                    {{else}}
-                    {{/each}}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<div class="card shadow">
-    <div class="card-header">
-        <h4>Guias com pagamento pendente</h4>
-        <small>Quantidade: {{qtd_guiasPp}}</small>
-    </div>
-    <div class="p-2 card-body" style="overflow-y: scroll; max-height: 400px;">
-        <table class="table ">
-            <thead>
-                <tr>
-                    <th scope="col">Número</th>
-                    <th scope="col">Cliente</th>
-                    <th scope="col">Origem</th>
-                    <th scope="col">Destino</th>
-                    <th scope="col">Venc</th>
-                    <th scope="col">Valor</th>
-                    <th scope="col">Cond Pag</th>
-                    <th scope="col">Sts Pag</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{#each guiasPp}}
-                <tr>
-                    <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
-                    <td><a href="/consultas/guias_do_cliente?cliente={{cliente._id}}">{{cliente.name_client}}</a></td>
-                    <td>{{origem.cidade}}</td>
-                    <td>{{destino.cidade}}</td>
-                    <td>{{date_vencimento}}</td>
-                    <td>{{valorExib}}</td>
-                    <td>{{condPag}}</td>
-                    <td>{{statusBaixa}}</td>
-                </tr>
+<div class="d-flex justify-content-center mt-2">
+    <div class="p-4 mt-2" style="width: 60%;">
+        <h5>Selecione uma Empresa</h5>
+        <form action="/painel/administrador">
+            <select class="form-select" name="empresa" id="">
+                <option value="0">Selecione</option>
+                {{#each empresas}}
+                <option value="{{_id}}">{{empresa}}</option>
                 {{else}}
                 {{/each}}
-            </tbody>
-        </table>
+            </select>
+            <button type="submit" class="mt-2 btn btn-sm btn-outline-success">Selecionar</button>
+        </form>
     </div>
 </div>
 
-<br><br><br>
+
+<div class="d-flex justify-content-center mt-4">
+    <h5>{{periodo.nome}}</h5>
+</div>
+
+{{>_grafico}}
+
+<h5>Guias com Pagamento Pendente </h5>
+<p>Quantidade: {{graficos.qtdPendente}}</p>
+<p>Total: {{graficos.pendenteExib}}</p>
+<div class="table-responsive" style="overflow-y: scroll; max-height: 360px; max-width: 98%;">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Número</th>
+                <th scope="col">Origem</th>
+                <th scope="col">Destino</th>
+                <th scope="col">Cliente</th>
+                <th scope="col">Valor</th>
+                <th scope="col">Vencimento</th>
+                <th scope="col">Cond Pag.</th>
+                <th scope="col">Status Pag</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each guiasPp}}
+            <tr>
+                <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
+                <td>{{origem.cidade}}</td>
+                <td>{{destino.cidade}}</td>
+                <td><a href="/consultas/guias_do_cliente?cliente={{cliente._id}}">{{cliente.name_client}}</a></td>
+                <td>{{valorExib}}</td>
+                <td>{{date_vencimento}}</td>
+                <td>{{condPag}}</td>
+                <td>{{statusBaixa}}</td>
+            </tr>
+            {{else}}
+            {{/each}}
+        </tbody>
+    </table>
+</div>
+<br><br>
+
+{{else}}
+<div class="d-flex justify-content-center mt-4">
+    <div class="p-4 mt-2" style="width: 60%;">
+        <h5>Selecione uma Empresa</h5>
+        <form action="/painel/administrador/empresa">
+            <select class="form-select" name="empresa" id="">
+                <option value="0">Selecione</option>
+                {{#each empresas}}
+                <option value="{{_id}}">{{empresa}}</option>
+                {{else}}
+                {{/each}}
+            </select>
+            <button type="submit" class="mt-2 btn btn-sm btn-outline-success">Selecionar</button>
+        </form>
+    </div>
+</div>
+
+{{/if}}

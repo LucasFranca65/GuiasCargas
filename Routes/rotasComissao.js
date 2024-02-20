@@ -248,6 +248,7 @@ router.get('/cargas', lOgado, (req, res) => {
 
 router.get('/cargas/calcular', eAdmin, (req, res) => {
     const { periodoBusca, agenciaBusca } = req.query
+
     var erros = []
     var success = []
     if (agenciaBusca == '1' || agenciaBusca == 1) {
@@ -316,8 +317,8 @@ router.get('/cargas/calcular', eAdmin, (req, res) => {
             res.redirect('/comissao/cargas')
         })
     } else {
-        Periodo.findById(periodoBusca).then((periodo) => {
-            Agencia.find().then((agencia) => {
+        Periodo.findById(periodoBusca).populate('empresa').then((periodo) => {
+            Agencia.findById(agenciaBusca).then((agencia) => {
                 GuiaCarga.find({ origem: agenciaBusca, periodo: periodoBusca }).then((guias) => {
                     const guiasValidas = guias.filter(g => g.condPag != "CANCELADO")
                     var guiasCancel = guias.filter(g => g.condPag == "CANCELADO")
@@ -333,20 +334,25 @@ router.get('/cargas/calcular', eAdmin, (req, res) => {
                     for (let k = 0; k < guiasCancel.length; k++) {
                         totalCancel += parseFloat(guiasCancel[k].valor)
                     }
-                    var comissao = parseFloat((totalValidas * parseFloat(agencia.indiceComissao)) / 100)
+                    var comissao = (totalValidas * agencia.indiceComissao) / 100
+                    //console.log(comissao)
                     const newComissao = {
                         periodo: periodo.nome,
                         agencia: agencia.cidade,
-                        empresa: periodo.empresa,
+                        empresa: periodo.empresa.empresa,
                         valor: comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
                         totalVendas: total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
                         qtdVendas: guias.length,
                         totalValidas: totalValidas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
                         totalCancelado: totalCancel.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
                         qtdValidos: guiasValidas.length,
-                        qtdCancelado: guiasCancel.length
+                        qtdCancelado: guiasCancel.length,
+                        total: total,
+                        cancel: totalCancel,
+                        valid: totalValidas,
+                        comiss: comissao
                     }
-                    res.render('comissao/cargas/cargas_comissao_agencia', { newComissao: newComissao })
+                    res.render('comissao/cargas_comissao_agencia', { newComissao, agencia, periodo })
                 }).catch((err) => {
                     req.flash('error_msg', "Erro ao buscar Guias do periodo, Err" + err)
                     res.redirect('/comissao/cargas')
@@ -426,7 +432,11 @@ router.get('/cargas/detalhadoAgencia/:id', lOgado, (req, res) => {
             totalValidas: comissao.totalValidas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
             totalCancelado: comissao.totalCancelado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
             qtdValidos: comissao.qtdValidos,
-            qtdCancelado: comissao.qtdCancelado
+            qtdCancelado: comissao.qtdCancelado,
+            total: comissao.totalVendas,
+            cancel: comissao.totalCancelado,
+            valid: comissao.totalValidas,
+            comiss: comissao.valor
         }
         res.render('comissao/cargas_comissao_agencia', { newComissao: newComissao })
 

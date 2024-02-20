@@ -2,19 +2,33 @@
 <div class="alert alert-danger">{{text}}</div>
 {{else}}
 {{/each}}
+<input type="hidden" id="total" value="{{newComissao.total}}">
+<input type="hidden" id="qtdTotal" value="{{newComissao.qtdVendas}}">
+
+<input type="hidden" id="cancel" value="{{newComissao.cancel}}">
+<input type="hidden" id="qtdCancel" value="{{newComissao.qtdCancelado}}">
+
+<input type="hidden" id="valid" value="{{newComissao.valid}}">
+<input type="hidden" id="qtdValid" value="{{newComissao.qtdValidos}}">
+
+<input type="hidden" id="comiss" value="{{newComissao.comiss}}">
+
+
+
 <!--
-    const newComissao = {
-                        periodo: periodo.nome,
-                        agencia: agencia.cidade,
-                        empresa: periodo.empresa,
-                        valor: comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-                        totalVendas: total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-                        qtdVendas: guias.length,
-                        totalValidas: totalValidas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-                        totalCancelado: totalCancel.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-                        qtdValidos: guiasValidas.length,
-                        qtdCancelado: guiasCancel.length
-                    }
+    const total = document.getElementById('total').value
+    const cancel = document.getElementById('cancel').value
+    const valid = document.getElementById('valid').value
+    const comiss = document.getElementById('comiss').value    
+
+    const total = document.getElementById('total').value
+    const qtdTotal = document.getElementById('qtdTotal').value
+    const cancel = document.getElementById('cancel').value
+    const qtdCancel = document.getElementById('qtdCancel').value
+
+    const valid = document.getElementById('valid').value
+    const qtdValid = document.getElementById('qtdValid').value
+
 -->
 <h5 class="mt-4">Comissão detalhada da agencia {{newComissao.agencia}}</h5>
 
@@ -61,7 +75,13 @@
         </tbody>
     </table>
 </div>
-<hr>
+
+{{>_graficoComiss}}
+
+<br>
+
 
 <button class="btn btn-outline-success btn-sm" onclick="window.print()">Imprimir</button> <a
     href="/comissao/cargas"><button class="btn btn-outline-secondary ms-2 btn-sm">Retornar</button></a>
+
+<br><br>
