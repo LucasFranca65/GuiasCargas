@@ -36,7 +36,7 @@ router.get('/users', eAdmin, (req, res) => {
 })
 
 router.post('/users/add_user', eAdmin, (req, res) => {
-    const { nome, login, agencia, senha1, senha2, eAdmin, perfil } = req.body
+    const { nome, login, agencia, senha1, senha2, perfil } = req.body
 
     var error = []
     //  Validação de usuario
@@ -83,22 +83,21 @@ router.post('/users/add_user', eAdmin, (req, res) => {
         })
 
     } else {
-        //  Verificando se usuario é Administrador 
-        if (eAdmin == "true" || eAdmin == true) { //Se campo é admin estiver marcado ele grava usuario como administrador
-            //verifica se o usuario já existe
-            User.findOne({ login: login }).then((users) => {
-                if (users) {
-                    req.flash('error_msg', "Já existe um usuario com esse login")
-                    res.redirect('/administracao/users')
-                } else {
-
+        User.findOne({ login: login }).then((usuario) => {
+            if (usuario) {
+                req.flash('error_msg', "Já existe um usuario com esse login")
+                res.redirect('/administracao/users')
+            } else {
+                if (perfil == "ADMINISTRADOR") {
                     const novoUsuario = new User({
                         nome: nome,
                         login: login,
-                        perfil: "ADMINISTRADOR",
+                        perfil: perfil,
                         senha: senha1,
                         agencia: agencia,
-                        eAdmin: true
+                        eAdmin: true,
+                        eControle: true,
+                        eDigitador: true
                     })
                     bcrypt.genSalt(10, (erro, salt) => {
                         bcrypt.hash(novoUsuario.senha, salt, (erro, hash) => {
@@ -116,55 +115,89 @@ router.post('/users/add_user', eAdmin, (req, res) => {
                             })
                         })
                     })
-                }
-            }).catch((err) => {
-                req.flash('error_msg', "Erro Interno", err)
-                res.redirect('/administracao/users')
-            })
-
-        } else { //Se campo é admin não estiver marcado ele grava como usuario comun
-            if (perfil == 'selecione') {
-                req.flash('error_msg', "Selecione um perfil para o usuario")
-                res.redirect('/administracao/users')
-            } else {
-                User.findOne({ login: login }).then((users) => {
-                    if (users) {
-                        req.flash('error_msg', "Já existe um usuario com esse login")
-                        res.redirect('/administracao/users')
-                    } else {
-
-                        const novoUsuario = new User({
-                            nome: nome,
-                            login: login,
-                            perfil: perfil,
-                            senha: senha1,
-                            agencia: agencia
-                        })
-                        bcrypt.genSalt(10, (erro, salt) => {
-                            bcrypt.hash(novoUsuario.senha, salt, (erro, hash) => {
-                                if (erro) {
-                                    req.flash('error_msg', "Houve um erro ao salvar usuario")
-                                    res.redirect('/administracao/users')
-                                }
-                                novoUsuario.senha = hash
-                                novoUsuario.save().then(() => {
-                                    req.flash('success_msg', "Usuario Cadastrado com sucesso")
-                                    res.redirect('/administracao/users')
-                                }).catch((err) => {
-                                    req.flash('error_msg', "Erro ao criar usuario")
-                                    res.redirect('/administracao/users')
-                                })
+                } else if (perfil == "FINANCEIRO" || "ARRECADACAO") {
+                    const novoUsuario = new User({
+                        nome: nome,
+                        login: login,
+                        perfil: perfil,
+                        senha: senha1,
+                        agencia: agencia,
+                        eControle: true,
+                        eDigitador: true
+                    })
+                    bcrypt.genSalt(10, (erro, salt) => {
+                        bcrypt.hash(novoUsuario.senha, salt, (erro, hash) => {
+                            if (erro) {
+                                req.flash('error_msg', "Houve um erro ao salvar usuario")
+                                res.redirect('/administracao/users')
+                            }
+                            novoUsuario.senha = hash
+                            novoUsuario.save().then(() => {
+                                req.flash('success_msg', "Usuario Cadastrado com sucesso")
+                                res.redirect('/administracao/users')
+                            }).catch((err) => {
+                                req.flash('error_msg', "Erro ao criar usuario")
+                                res.redirect('/administracao/users')
                             })
                         })
-                    }
-                }).catch((err) => {
-                    req.flash('error_msg', "Erro Interno", err)
-                    res.redirect('/administracao/users')
+                    })
+                } else if (perfil == "DIGITADOR") {
+                    const novoUsuario = new User({
+                        nome: nome,
+                        login: login,
+                        perfil: perfil,
+                        senha: senha1,
+                        agencia: agencia,
+                        eDigitador: true
+                    })
+                    bcrypt.genSalt(10, (erro, salt) => {
+                        bcrypt.hash(novoUsuario.senha, salt, (erro, hash) => {
+                            if (erro) {
+                                req.flash('error_msg', "Houve um erro ao salvar usuario")
+                                res.redirect('/administracao/users')
+                            }
+                            novoUsuario.senha = hash
+                            novoUsuario.save().then(() => {
+                                req.flash('success_msg', "Usuario Cadastrado com sucesso")
+                                res.redirect('/administracao/users')
+                            }).catch((err) => {
+                                req.flash('error_msg', "Erro ao criar usuario")
+                                res.redirect('/administracao/users')
+                            })
+                        })
+                    })
+                } else {
+                    const novoUsuario = new User({
+                        nome: nome,
+                        login: login,
+                        perfil: perfil,
+                        senha: senha1,
+                        agencia: agencia
+                    })
 
-                })
+                    bcrypt.genSalt(10, (erro, salt) => {
+                        bcrypt.hash(novoUsuario.senha, salt, (erro, hash) => {
+                            if (erro) {
+                                req.flash('error_msg', "Houve um erro ao salvar usuario")
+                                res.redirect('/administracao/users')
+                            }
+                            novoUsuario.senha = hash
+                            novoUsuario.save().then(() => {
+                                req.flash('success_msg', "Usuario Cadastrado com sucesso")
+                                res.redirect('/administracao/users')
+                            }).catch((err) => {
+                                req.flash('error_msg', "Erro ao criar usuario")
+                                res.redirect('/administracao/users')
+                            })
+                        })
+                    })
+                }
             }
+        }).catch((err) => {
+            req.flash('error_msg', "Erro Interno", err)
+            res.redirect('/administracao/users')
 
-        }
+        })
     }
 
 })

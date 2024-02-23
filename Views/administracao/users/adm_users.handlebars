@@ -10,7 +10,6 @@
             <p style="font-weight: bold;">Cadastrar novo Usuario</p>
             <thead class="table-dark">
                 <tr>
-                    <th scope="col">Adm</th>
                     <th scope="col">Nome</th>
                     <th scope="col">Login</th>
                     <th scope="col">Perfil</th>
@@ -21,9 +20,6 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>
-                        <input type="checkbox" name="eAdmin" value="true">
-                    </td>
                     <td>
                         <input class="form-control" type="text" name="nome">
                     </td>
@@ -36,9 +32,10 @@
                             <option value="AGENTE">AGENTE</option>
                             <option value="ARRECADACAO">ARRECADACAO</option>
                             <option value="FINANCEIRO">FINANCEIRO</option>
-                            <option value="GARAGEM">GARAGEM</option>
+                            <option value="DIGITADOR">DIGITADOR</option>
+                            <option value="ADMINISTRADOR">ADMINISTRADOR</option>
+
                         </select>
-                        <small>Selecione apenas se não for administrador</small>
                     </td>
                     <td>
                         <select class="form-select" name="agencia">
@@ -48,6 +45,7 @@
                             {{else}}
                             {{/each}}
                         </select>
+                        <small>Selecione apenas para perfil de agentes</small>
                     </td>
                     <td>
                         <input class="form-control" type="password" name="senha1">

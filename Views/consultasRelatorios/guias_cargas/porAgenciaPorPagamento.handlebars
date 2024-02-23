@@ -20,10 +20,14 @@
           <select name="agencia" class="form-select" id="floatingSelect2" aria-label="agencia" required>
             <option value="selecione">---Selecione---</option>
             <option value="1">Todas</option>
+            {{#if origem}}
+            <option value="{{origem._id}}">{{origem.cidade}} - {{origem.numero}}</option>
+            {{else}}
             {{#each agencias}}
-            <option value="{{_id}}">{{numero}} - {{cidade}}</option>
+            <option value="{{_id}}">{{cidade}} - {{numero}}</option>
             {{else}}
             {{/each}}
+            {{/if}}
           </select>
         </td>
         <td>

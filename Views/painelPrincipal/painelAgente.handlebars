@@ -1,115 +1,124 @@
-{{>_topNavbar}}
-<div class="d-flex flex-column mb-3" style="align-items: center;">
-    <div>
-        <h5>Movimentação do mês atual</h5>
-    </div>
-    <div>
-        {{>_graficoAgencia}}
+{{#if periodo}}
+<input type="hidden" id="qtdTotal" value="{{graficos.qtdTotal}}">
+<input type="hidden" id="valorTotal" value="{{graficos.valorTotal}}">
+<input type="hidden" id="qtdCancel" value="{{graficos.qtdCancel}}">
+<input type="hidden" id="valorCancel" value="{{graficos.valorCancel}}">
+<input type="hidden" id="qtdPago" value="{{graficos.qtdPago}}">
+<input type="hidden" id="valorPago" value="{{graficos.valorPago}}">
+<input type="hidden" id="qtdVenciados" value="{{graficos.qtdVenciados}}">
+<input type="hidden" id="valorVencido" value="{{graficos.valorVencido}}">
+<input type="hidden" id="qtdPendente" value="{{graficos.qtdPendente}}">
+<input type="hidden" id="valorPendente" value="{{graficos.valorPendente}}">
 
+<div class="d-flex justify-content-center mt-2">
+    <div class="p-4 mt-2" style="width: 60%;">
+        <h5>Selecione uma Empresa</h5>
+        <form action="/agencias">
+            <select class="form-select" name="empresa" id="">
+                {{#each empresas}}
+                <option value="{{_id}}">{{empresa}}</option>
+                {{else}}
+                {{/each}}
+            </select>
+            <button type="submit" class="mt-2 btn btn-sm btn-outline-success">Selecionar</button>
+        </form>
     </div>
+</div>
+
+
+<div class="d-flex justify-content-center mt-4">
+    <h5>{{periodo.nome}} - {{agencia.cidade}}</h5>
 
 </div>
+
+{{>_grafico}}
 <br><br>
-<!--
-<h5 class="ms-4">Controles de Execessos</h5>
 
-
-<div class=" card mb-3 mt-2 shadow">
-    
-    <div class="card-body d-flex justify-content-between ">
-        <div class="p-2 card-body" style="overflow-y: scroll; max-height: 450px">
-            <h6>Enviados com pendencia de Entrega</h6>
-            <table class="table table-bordered ">
-                <thead class="table-secondary">
-                    <tr class="fs-6 fst-normal">
+<div class="d-flex justify-content-around shadow"
+    style="background-color: rgb(199, 199, 199,.2); border-radius: 5px; border-style: solid; border-width: medium;border-color: rgb(187, 186, 186);">
+    <div style="width: 49%;">
+        <div id="title" class="mt-4">
+            <h5>Pagamento Pendente </h5>
+            <p>Quantidade: {{graficos.qtdPendente}}</p>
+            <p>Total: {{graficos.pendenteExib}}</p>
+        </div>
+        <div class="table-responsive" style="overflow-y: scroll; max-height: 360px;">
+            <table class="table">
+                <thead>
+                    <tr>
                         <th scope="col">Número</th>
                         <th scope="col">Destino</th>
                         <th scope="col">Cliente</th>
-                        <th scope="col">Status Entrega</th>
+                        <th scope="col">Valor</th>
+                        <th scope="col">Vencimento</th>
+                        <th scope="col">Cond Pag.</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {{#each guiasRem}}
-                    <tr class="fs-6 fst-normal">
+                    {{#each guiasPp}}
+                    <tr>
                         <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
                         <td>{{destino.cidade}}</td>
                         <td><a href="/consultas/guias_do_cliente?cliente={{cliente._id}}">{{cliente.name_client}}</a>
                         </td>
-                        <td>{{entrega}}</td>
+                        <td>{{valorExib}}</td>
+                        <td>{{date_vencimento}}</td>
+                        <td>{{condPag}}</td>
                     </tr>
                     {{else}}
                     {{/each}}
                 </tbody>
             </table>
         </div>
-
-        <div class="p-2 card-body" style="overflow-y: scroll; max-height: 450px">
-            <h6>Recebidos ou a Caminho com pendencia de Entrega</h6>
-            <div class="table-responsive-xl fs-6">
-                <table class="table table-bordered">
-                    <thead class="table-secondary">
-                        <tr>
-                            <th scope="col">Número</th>
-                            <th scope="col">Origem</th>
-                            <th scope="col">Cliente</th>
-                            <th scope="col">Data Envio</th>
-                            <th scope="col">Status Entrega</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {{#each guiasDest}}
-                        <tr>
-                            <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
-                            <td>{{origem.cidade}}</td>
-                            <td><a
-                                    href="/consultas/guias_do_cliente?cliente={{cliente._id}}">{{cliente.name_client}}</a>
-                            </td>
-                            <td>{{entrega}}</td>
-                        </tr>
-                        {{else}}
-                        {{/each}}
-                    </tbody>
-                </table>
-            </div>
+        <br>
+    </div>
+    <div style="width: 49%;">
+        <div id="title" class="mt-4">
+            <h5>Entrega Pendente </h5>
+            <p>Quantidade: {{graficos.pendenteEntrega}}</p>
+            <p> - </p>
+        </div>
+        <div class="table-responsive" style="overflow-y: scroll; max-height: 360px;">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Número</th>
+                        <th scope="col">Origem</th>
+                        <th scope="col">Cliente</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each guiasPe}}
+                    <tr>
+                        <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
+                        <td>{{origem.cidade}}</td>
+                        <td><a href="/consultas/guias_do_cliente?cliente={{cliente._id}}">{{cliente.name_client}}</a>
+                        </td>
+                    </tr>
+                    {{else}}
+                    {{/each}}
+                </tbody>
+            </table>
         </div>
     </div>
+
+
 </div>
 
--->
-
-<div class="card shadow" style="overflow-y: scroll; height: 450px">
-    <div class="card-header">
-        <h5>Guias "A COBRAR" com pagamento pendente</h5>
-    </div>
-    <div class="p-2 card-body">
-        <table class="table ">
-            <thead>
-                <tr class="fs-6 fst-normal">
-                    <th scope="col">Número</th>
-                    <th scope="col">Origem</th>
-                    <th scope="col">Vencimento</th>
-                    <th scope="col">Valor</th>
-                    <th scope="col">Cliente</th>
-                    <th scope="col">Cond Pag</th>
-                    <th scope="col">Sts Pagamento</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{#each guiasAc}}
-                <tr class="fs-6 fst-normal">
-                    <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
-                    <td>{{origem.cidade}}</td>
-                    <td>{{date_vencimento}}</td>
-                    <td>{{valorExib}}</td>
-                    <td><a href="/consultas/guias_do_cliente?cliente={{cliente._id}}">{{cliente.name_client}}</a>
-                    </td>
-                    <td>{{condPag}}</td>
-                    <td>{{statusBaixa}}</td>
-                </tr>
+{{else}}
+<div class="d-flex justify-content-center mt-4">
+    <div class="p-4 mt-2" style="width: 60%;">
+        <h5>Selecione uma Empresa</h5>
+        <form action="/agencias">
+            <select class="form-select" name="empresa" id="">
+                {{#each empresas}}
+                <option value="{{_id}}">{{empresa}}</option>
                 {{else}}
                 {{/each}}
-            </tbody>
-        </table>
+            </select>
+            <button type="submit" class="mt-2 btn btn-sm btn-outline-success">Selecionar</button>
+        </form>
     </div>
 </div>
-<br><br>
+
+{{/if}}

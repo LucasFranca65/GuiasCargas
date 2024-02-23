@@ -4,6 +4,7 @@ const mongoose = require('mongoose')
 const moment = require('moment')
 const flash = require('connect-flash')
 const { lOgado } = require('../helpers/eAdmin')
+const e = require('connect-flash')
 require('../models/Empresa')
 const Empresa = mongoose.model('empresas')
 require('../models/GuiaCarga')
@@ -17,69 +18,170 @@ const Periodo = mongoose.model('periodos')
 router.get('/', lOgado, (req, res) => {
     const usuario = req.user
     Agencia.findById(usuario.agencia).then((agencia) => {
-        GuiaCarga.find({ baixaEntr: false, origem: usuario.agencia }).sort({ numero: 1 }).populate('origem').populate('destino').populate('empresa').populate('cliente').then((guiasRem) => {
-            for (let i = 0; i < guiasRem.length; i++) {
-                guiasRem[i]["date_entrada"] = moment(guiasRem[i].dateEntrada).format('DD/MM/YYYY')
-                guiasRem[i]["date_vencimento"] = moment(guiasRem[i].vencimento).format('DD/MM/YYYY')
-                guiasRem[i]["valorExib"] = guiasRem[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-                if (guiasRem[i].baixa == true || guiasRem[i].baixa == "true") {
-                    guiasRem[i]["statusBaixa"] = "PAGO"
-                } else {
-                    if (moment(guiasRem[i].vencimento).format("YYYY-MM-DD") < moment(new Date()).format("YYYY-MM-DD")) {
-                        guiasRem[i]["statusBaixa"] = "VENCIDO"
+        const dataAtual = moment('01/15/2024', 'MM/DD/YYYY', true).format()
+        const { empresa } = req.query
+        if (!empresa) {
+            Empresa.find().then(empresas => {
+                Periodo.findOne({ dateInit: { $lte: dataAtual }, dateFin: { $gte: dataAtual } }).populate('empresa').then(periodo => {
+                    if (!periodo) {
+                        var error = [{ texto: "Erro ao Buscar periodos" }]
+                        res.render('painelPrincipal/painelAgente', { error, empresas })
                     } else {
-                        guiasRem[i]["statusBaixa"] = "PENDENTE"
-                    }
-                }
-            }
-
-            GuiaCarga.find({ baixaEntr: false, destino: usuario.agencia }).sort({ numero: 1 }).populate('origem').populate('destino').populate('empresa').populate('cliente').then((guiasDest) => {
-                for (let i = 0; i < guiasDest.length; i++) {
-                    guiasDest[i]["date_entrada"] = moment(guiasDest[i].dateEntrada).format('DD/MM/YYYY')
-                    guiasDest[i]["date_vencimento"] = moment(guiasDest[i].vencimento).format('DD/MM/YYYY')
-                    guiasDest[i]["valorExib"] = guiasDest[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-                    if (guiasDest[i].baixa == true || guiasDest[i].baixa == "true") {
-                        guiasDest[i]["statusBaixa"] = "PAGO"
-                    } else {
-                        if (moment(guiasDest[i].vencimento).format("YYYY-MM-DD") < moment(new Date()).format("YYYY-MM-DD")) {
-                            guiasDest[i]["statusBaixa"] = "VENCIDO"
-                        } else {
-                            guiasDest[i]["statusBaixa"] = "PENDENTE"
-                        }
-                    }
-                }
-                GuiaCarga.find({ baixa: false, condPag: "A COBRAR", destino: usuario.agencia }).populate('origem').populate('destino').populate('empresa').populate('cliente').then((guiasAc) => {
-                    for (let i = 0; i < guiasAc.length; i++) {
-                        guiasAc[i]["date_entrada"] = moment(guiasAc[i].dateEntrada).format('DD/MM/YYYY')
-                        guiasAc[i]["date_vencimento"] = moment(guiasAc[i].vencimento).format('DD/MM/YYYY')
-                        guiasAc[i]["valorExib"] = guiasAc[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-                        if (guiasAc[i].baixa == true || guiasAc[i].baixa == "true") {
-                            guiasAc[i]["statusBaixa"] = "PAGO"
-                        } else {
-                            if (moment(guiasAc[i].vencimento).format("YYYY-MM-DD") < moment(new Date()).format("YYYY-MM-DD")) {
-                                guiasAc[i]["statusBaixa"] = "VENCIDO"
-                            } else {
-                                guiasAc[i]["statusBaixa"] = "PENDENTE"
+                        GuiaCarga.find({ $and: [{ periodo: periodo._id }, { $or: [{ origem: usuario.agencia }, { destino: usuario.agencia }] }] }).sort({ vencimento: 1 }).populate('origem').populate('destino').populate('cliente').then((guias) => {
+                            var graficos = {
+                                qtdTotal: 0,
+                                valorTotal: 0,
+                                qtdCancel: 0,
+                                valorCancel: 0,
+                                qtdPago: 0,
+                                valorPago: 0,
+                                qtdVenciados: 0,
+                                valorVencido: 0,
+                                qtdPendente: 0,
+                                valorPendente: 0,
+                                pendenteExib: "",
+                                pendenteEntrega: 0
                             }
-                        }
+
+                            var guiasPp = guias.filter(g => g.baixaPag == false && String(g.origem._id) == String(agencia._id) && moment(g.vencimento).format('MM-DD-YYYY') <= moment(new Date()).format('MM-DD-YYYY'))
+                            var guiasPe = guias.filter(g => g.baixaEntr == false && String(g.destino._id) == String(agencia._id))
+                            graficos.pendenteEntrega = guiasPe.length
+                            graficos.qtdPendente = guiasPp.length
+                            for (let i = 0; i < guiasPp.length; i++) {
+                                graficos.valorPendente += guiasPp[i].valor
+                                guiasPp[i]["date_entrada"] = moment(guiasPp[i].dateEntrada).format('DD/MM/YYYY')
+                                guiasPp[i]["date_vencimento"] = moment(guiasPp[i].vencimento).format('DD/MM/YYYY')
+                                guiasPp[i]["valorExib"] = guiasPp[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+
+                                if (moment(guiasPp[i].vencimento).format("YYYY-MM-DD") >= moment(dataAtual).format("YYYY-MM-DD")) {
+                                    guiasPp[i]["statusBaixa"] = "PENDENTE"
+                                } else {
+                                    guiasPp[i]["statusBaixa"] = "VENCIDO"
+                                }
+
+                            }
+                            graficos.pendenteExib = graficos.valorPendente.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+
+                            var guiasCancel = guias.filter(g => g.condPag == "CANCELADO" && String(g.origem._id) == String(agencia._id))
+                            graficos.qtdCancel = guiasCancel.length
+                            for (let i = 0; i < guiasCancel.length; i++) {
+                                graficos.valorCancel += guiasCancel[i].valor
+                            }
+
+                            var guiasPagas = guias.filter(g => g.baixaPag == true && g.condPag != "CANCELADO" && String(g.origem._id) == String(agencia._id))
+                            graficos.qtdPago = guiasPagas.length
+                            for (let i = 0; i < guiasPagas.length; i++) {
+                                graficos.valorPago += guiasPagas[i].valor
+                            }
+
+                            var guiasVencidas = guias.filter(g => moment(g.vencimento).format('MM-DD-YYYY') <= moment(new Date()).format('MM-DD-YYYY') && g.baixaPag == false && String(g.origem._id) == String(agencia._id))
+                            graficos.qtdVenciados = guiasVencidas.length
+                            for (let i = 0; i < guiasVencidas.length; i++) {
+                                graficos.valorVencido += guiasVencidas[i].valor
+                            }
+                            var total = guias.filter(g => String(g.origem._id) == String(agencia._id))
+                            graficos.qtdTotal = total.length
+                            for (let i = 0; i < total.length; i++) {
+                                graficos.valorTotal += total[i].valor
+                            }
+                            res.render('painelPrincipal/painelAgente', { guiasPp, guiasPe, periodo, graficos, empresas, agencia })
+                        }).catch((err) => {
+                            req.flash('error_msg', "Painel principal, busca de guias ERRO: " + err)
+                            res.redirect('/error')
+                        })
                     }
-                    res.render('painelPrincipal/painelAgente', { guiasRem, guiasAc, guiasDest, agencia })
+
                 }).catch((err) => {
-                    req.flash('error_msg', "Erro ao Buscar guias pendentes " + err)
+                    req.flash('error_msg', "Painel principal, busca de periodo ERRO: " + err)
                     res.redirect('/error')
                 })
             }).catch((err) => {
-                req.flash('error_msg', "Erro ao Buscar guias " + err)
+                req.flash('error_msg', "Painel principal, busca de empresa ERRO: " + err)
                 res.redirect('/error')
             })
+        } else {
+            Empresa.find().then(empresas => {
+                Periodo.findOne({ dateInit: { $lte: dataAtual }, dateFin: { $gte: dataAtual }, empresa: empresa }).populate('empresa').then(periodo => {
+                    if (!periodo) {
 
-        }).catch((err) => {
-            req.flash('error_msg', "Erro ao Buscar guias " + err)
-            res.redirect('/error')
-        })
-    }).catch((err) => {
-        req.flash('error_msg', "Erro ao Buscar agencias " + err)
-        res.redirect('/error')
+                        req.flash('error_msg', "Não existe dados referentes a data atual para a empresa selecionalda!")
+                        res.redirect('/agencias')
+
+                    } else {
+                        GuiaCarga.find({ periodo: periodo._id, $or: [{ origem: agencia._id }, { destino: agencia._id }] }).sort({ vencimento: 1 }).populate('origem').populate('destino').populate('cliente').then((guias) => {
+                            var graficos = {
+                                qtdTotal: 0,
+                                valorTotal: 0,
+                                qtdCancel: 0,
+                                valorCancel: 0,
+                                qtdPago: 0,
+                                valorPago: 0,
+                                qtdVenciados: 0,
+                                valorVencido: 0,
+                                qtdPendente: 0,
+                                valorPendente: 0,
+                                pendenteExib: ""
+                            }
+                            const guiasPp = guias.filter(g => g.baixaPag == false && String(g.origem._id) == String(agencia._id) && moment(g.vencimento).format('MM-DD-YYYY') <= moment(new Date()).format('MM-DD-YYYY'))
+                            const guiasPe = guias.filter(g => g.baixaEntr == false && String(g.destino._id) == String(agencia._id))
+
+                            graficos.qtdPendente = guiasPp.length
+                            for (let i = 0; i < guiasPp.length; i++) {
+                                graficos.valorPendente += guiasPp[i].valor
+                                guiasPp[i]["date_entrada"] = moment(guiasPp[i].dateEntrada).format('DD/MM/YYYY')
+                                guiasPp[i]["date_vencimento"] = moment(guiasPp[i].vencimento).format('DD/MM/YYYY')
+                                guiasPp[i]["valorExib"] = guiasPp[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+
+                                if (moment(guiasPp[i].vencimento).format("YYYY-MM-DD") >= moment(dataAtual).format("YYYY-MM-DD")) {
+                                    guiasPp[i]["statusBaixa"] = "PENDENTE"
+                                } else {
+                                    guiasPp[i]["statusBaixa"] = "VENCIDO"
+                                }
+
+                            }
+                            graficos.pendenteExib = graficos.valorPendente.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+
+                            const guiasCancel = guias.filter(g => g.condPag == "CANCELADO" && String(g.origem._id) == String(agencia._id))
+                            graficos.qtdCancel = guiasCancel.length
+                            for (let i = 0; i < guiasCancel.length; i++) {
+                                graficos.valorCancel += guiasCancel[i].valor
+                            }
+
+                            const guiasPagas = guias.filter(g => g.baixaPag == true && g.condPag != "CANCELADO" && String(g.origem._id) == String(agencia._id))
+                            graficos.qtdPago = guiasPagas.length
+                            for (let i = 0; i < guiasPagas.length; i++) {
+                                graficos.valorPago += guiasPagas[i].valor
+                            }
+
+                            const guiasVencidas = guias.filter(g => moment(g.vencimento).format('MM-DD-YYYY') <= moment(new Date()).format('MM-DD-YYYY') && String(g.origem._id) == String(agencia._id))
+                            graficos.qtdVenciados = guiasVencidas.length
+                            for (let i = 0; i < guiasVencidas.length; i++) {
+                                graficos.valorVencido += guiasVencidas[i].valor
+                            }
+
+                            var total = guias.filter(g => String(g.origem._id) == String(agencia._id))
+                            graficos.qtdTotal = total.length
+                            for (let i = 0; i < total.length; i++) {
+                                graficos.valorTotal += total[i].valor
+                            }
+
+                            res.render('painelPrincipal/painelAgente', { guiasPp, guiasPe, periodo, graficos, empresas, agencia })
+                        }).catch((err) => {
+                            req.flash('error_msg', "Painel principal, busca de guias ERRO: " + err)
+                            res.redirect('/error')
+                        })
+                    }
+
+                }).catch((err) => {
+                    req.flash('error_msg', "Painel principal, busca de periodo ERRO: " + err)
+                    res.redirect('/error')
+                })
+            }).catch((err) => {
+                req.flash('error_msg', "Painel principal, busca de empresa ERRO: " + err)
+                res.redirect('/error')
+            })
+        }
+
     })
 })
 

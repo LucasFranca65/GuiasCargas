@@ -4,7 +4,7 @@
 {{/each}}
 
 <form action="/consultas/por_entrega/pesquisar" method="get">
-  <h3>Buscar por status de pagamento</h3>
+  <h3>Buscar por status de Entrega</h3>
   <div class="table-responsive-xl  ">
     <table class="table shadow p-2">
       <thead class="table-secondary">
@@ -19,11 +19,14 @@
         <td>
           <select name="agencia" class="form-select" id="floatingSelect2" aria-label="agencia" required>
             <option value="selecione">---Selecione---</option>
-            <option value="1">Todas</option>
+            {{#if origem}}
+            <option value="{{origem._id}}">{{origem.cidade}} - {{origem.numero}}</option>
+            {{else}}
             {{#each agencias}}
             <option value="{{_id}}">{{cidade}} - {{numero}}</option>
             {{else}}
             {{/each}}
+            {{/if}}
           </select>
         </td>
         <td>

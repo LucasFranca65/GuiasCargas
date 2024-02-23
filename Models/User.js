@@ -31,6 +31,14 @@ const User = new Schema({
     eAdmin: {
         type: Boolean,
         default: false
+    },
+    eControle: {
+        type: Boolean,
+        default: false
+    },
+    eDigitador: {
+        type: Boolean,
+        default: false
     }
 
 })
