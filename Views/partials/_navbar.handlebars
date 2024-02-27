@@ -25,7 +25,6 @@
             <li><a class="dropdown-item" href="/guias/minhas_guias/destinatario">Guias como Destinatario</a></li>
           </ul>
         </li>
-
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             Controle
@@ -42,8 +41,6 @@
             {{/if}}
           </ul>
         </li>
-
-
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             Relatorios
@@ -56,6 +53,17 @@
             <li><a class="dropdown-item" href="/consultas/hitorico_de_comissao">Historico de comissão</a></li>
           </ul>
         </li>
+        {{else}}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Controle
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="/administracao/clientes">Clientes Cadastrados</a></li>
+            <li><a class="dropdown-item" href="/talao">Meus Talões</a></li>
+          </ul>
+        </li>
+        {{/if}}
 
         {{#if user.eAdmin}}
         <li class="nav-item dropdown">
@@ -69,8 +77,6 @@
             <li><a class="dropdown-item" href="#">Log dos Usuarios</a></li>
           </ul>
         </li>
-        {{else}}
-        {{/if}}
         {{else}}
         {{/if}}
         <li class="nav-item">
@@ -87,7 +93,7 @@
           </ul>
         </li>
       </ul>
-      {{#if eDigitador}}
+      {{#if user.eDigitador}}
       <form class="d-flex" role="search" action="/guias/buscar" method="post">
         <input name="numero" class="form-control me-2" type="search" placeholder="Nº Guia/P.Contas "
           aria-label="Conhecimento">

@@ -28,7 +28,7 @@
 
 
 <div class="d-flex justify-content-center mt-4">
-    <h5>{{periodo.nome}}</h5>
+    <h5>{{periodo.empresa.empresa}} - {{graficos.dataHoje}}</h5>
 </div>
 
 {{>_grafico}}
@@ -70,20 +70,17 @@
 <br><br>
 
 {{else}}
+{{#each error}}
+<div class="alert alert-danger">{{texto}}</div>
+{{else}}
+{{/each}}
 <div class="d-flex justify-content-center mt-4">
-    <div class="p-4 mt-2" style="width: 60%;">
-        <h5>Selecione uma Empresa</h5>
-        <form action="/painel/garagem">
-            <select class="form-select" name="empresa" id="">
-                <option value="0">Selecione</option>
-                {{#each empresas}}
-                <option value="{{_id}}">{{empresa}}</option>
-                {{else}}
-                {{/each}}
-            </select>
-            <button type="submit" class="mt-2 btn btn-sm btn-outline-success">Selecionar</button>
-        </form>
+    <div>
+        <h5>Não existe Periodo cadastrado, referente a data atual</h5>
+        <p>Casdastre e abra um novo periodo para digitação referentes ao mês atual</p>
+        <a href="/periodos">
+            <p>Cadastrar Periodo</p> <a href="/painel">Retornar a Pagina Inicial</a>
+        </a>
     </div>
 </div>
-
 {{/if}}

@@ -80,10 +80,12 @@ const GuiaCarga = new Schema({
         required: true
     },
     recebedor: {
-        type: String
+        type: String,
+        default: "ENTREGA AUTOMATICA"
     },
     cpfRecebedor: {
-        type: String
+        type: String,
+        default: "00000000000"
     },
     user_conf_entr: {
         type: Schema.Types.ObjectId,
@@ -101,14 +103,16 @@ const GuiaCarga = new Schema({
     ],
     entrega: {
         type: String,
-        default: "NA ORIGEM PARA ENVIO"
+        //default: "NA ORIGEM PARA ENVIO"
+        default: "ENTREGE AO DESTINATARIO"
     },
     baixaEntr: {
         type: Boolean,
-        default: false
+        default: true
     },
     dateEntrega: {
-        type: Date
+        type: Date,
+        default: new Date()
     },
     user: {
         type: Schema.Types.ObjectId,

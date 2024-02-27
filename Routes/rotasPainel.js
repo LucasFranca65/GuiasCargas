@@ -352,10 +352,8 @@ router.get('/garagem', lOgado, (req, res) => {
         Empresa.find().then(empresas => {
             Periodo.findOne({ dateInit: { $lte: dataAtual }, dateFin: { $gte: dataAtual } }).populate('empresa').then(periodo => {
                 if (!periodo) {
-
-                    req.flash('error_msg', "Não existe dados referentes a data atual para a empresa selecionalda!")
-                    res.redirect('/painel/garagem')
-
+                    var error = [{ texto: "Não existe perido criado para o mês atual" }];
+                    res.render('painelPrincipal/painelGaragem', { error })
                 } else {
                     GuiaCarga.find({ periodo: periodo._id }).sort({ vencimento: 1 }).populate('origem').populate('destino').populate('cliente').then((guias) => {
                         const graficos = {
@@ -369,7 +367,8 @@ router.get('/garagem', lOgado, (req, res) => {
                             valorVencido: 0,
                             qtdPendente: 0,
                             valorPendente: 0,
-                            pendenteExib: ""
+                            pendenteExib: "",
+                            dataHoje: moment(dataAtual).format('DD/MM/YYYY')
                         }
                         const guiasPp = guias.filter(g => g.baixaPag == false)
                         graficos.qtdPendente = guiasPp.length
@@ -430,9 +429,8 @@ router.get('/garagem', lOgado, (req, res) => {
         Empresa.find().then(empresas => {
             Periodo.findOne({ dateInit: { $lte: dataAtual }, dateFin: { $gte: dataAtual }, empresa: empresa }).populate('empresa').then(periodo => {
                 if (!periodo) {
-                    req.flash('error_msg', "Não existe dados referentes a data atual para a empresa selecionalda!")
-                    res.redirect('/painel/garagem')
-
+                    var error = [{ texto: "Não existe perido criado para o mês atual" }];
+                    res.render('painelPrincipal/painelGaragem', { error })
                 } else {
                     GuiaCarga.find({ periodo: periodo._id }).sort({ vencimento: 1 }).populate('origem').populate('destino').populate('cliente').then((guias) => {
                         const graficos = {
