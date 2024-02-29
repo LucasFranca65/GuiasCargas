@@ -1,0 +1,67 @@
+{{#if historico}}
+<div>
+    <h5>{{agc.cidade}}</h5>
+    <small>Indice Comissão {{agc.indiceComissao}}%</small>
+
+</div>
+<div class="table-responsive-xl fs-6 mt-4 shadow" id="content">
+    <div>
+        <table class="table table-bordered shadow">
+            <thead class="table-secondary">
+                <tr>
+                    <th scope="col">Empresa</th>
+                    <th scope="col">Mes</th>
+                    <th scope="col">Ano</th>
+                    <th scope="col" colspan="2">Validas</th>
+                    <th scope="col" colspan="2">Canceladas</th>
+                    <th scope="col">Comissao</th>
+                </tr>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                    <th scope="col">QTD</th>
+                    <th scope="col">Valor</th>
+                    <th scope="col">QTD</th>
+                    <th scope="col">Valor</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            {{#each historico}}
+            <tbody>
+                <tr>
+                    <td>{{empresa.empresa}}</td>
+                    <td>{{mes}}</td>
+                    <td>{{ano}}</td>
+                    <td>{{qtdValidos}}</td>
+                    <td>{{validos_exib}}</td>
+                    <td>{{qtdCancelado}}</td>
+                    <td>{{cancelados_exib}}</td>
+                    <td>{{valor_exib}}</td>
+                </tr>
+            </tbody>
+            {{else}}
+            {{/each}}
+        </table>
+    </div>
+</div>
+<a href="/consultas/hitorico_de_comissao" role="button" class="btn btn-sm btn-outline-secondary">Retornar</a> <button
+    class="btn btn-outline-secondary btn-sm" onclick="window.print()">Imprimir</button>
+{{else}}
+<div class="d-flex justify-content-center mt-2" style="height: 10px;">
+    <form action="/consultas/hitorico_de_comissao" method="get">
+        <label for="ano">Ano Base:</label>
+        <input type="number" name="ano" id="ano" class="form-control">
+        <label for="agencia">Agencia</label>
+        <select name="agencia" class="form-select" id="">
+            {{#each agencias}}
+            <option value="{{_id}}">{{cidade}}</option>
+            {{else}}
+            {{/each}}
+        </select>
+        <button type="submit" class="mt-2 btn-sm">Buscar</button>
+    </form>
+</div>
+{{/if}}
+
+<br><br>

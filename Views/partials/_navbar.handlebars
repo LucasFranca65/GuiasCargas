@@ -21,8 +21,7 @@
             <li><a class="dropdown-item" href="/ctes">Cadastrar CTE</a></li>-->
             <li><a class="dropdown-item" href="/consultas/por_entrega">Buscar status de entrega</a></li>
             <li><a class="dropdown-item" href="/consultas/por_agencia_por_pagamento">Buscar status de pagamento</a></li>
-            <li><a class="dropdown-item" href="/guias/minhas_guias/remetente">Guias como Remetente</a></li>
-            <li><a class="dropdown-item" href="/guias/minhas_guias/destinatario">Guias como Destinatario</a></li>
+
           </ul>
         </li>
         <li class="nav-item dropdown">
@@ -54,6 +53,15 @@
           </ul>
         </li>
         {{else}}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Movimentação
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="/guias/minhas_guias/remetente">Guias como Remetente</a></li>
+            <li><a class="dropdown-item" href="/guias/minhas_guias/destinatario">Guias como Destinatario</a></li>
+          </ul>
+        </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             Controle

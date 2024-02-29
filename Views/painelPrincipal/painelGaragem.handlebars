@@ -1,3 +1,9 @@
+{{#each success}}
+<div class="alert alert-success">{{text}}</div>
+{{else}}
+{{/each}}
+
+
 {{#if periodo}}
 <input type="hidden" id="qtdTotal" value="{{graficos.qtdTotal}}">
 <input type="hidden" id="valorTotal" value="{{graficos.valorTotal}}">
@@ -11,9 +17,9 @@
 <input type="hidden" id="valorPendente" value="{{graficos.valorPendente}}">
 
 <div class="d-flex justify-content-center mt-2">
-    <div class="p-4 mt-2" style="width: 60%;">
+    <div class="p-4 mt-2" style="width: 50%;">
         <h5>Selecione uma Empresa</h5>
-        <form action="/painel/garagem">
+        <form action="/painel" method="get">
             <select class="form-select" name="empresa" id="">
                 <option value="0">Selecione</option>
                 {{#each empresas}}
@@ -28,7 +34,7 @@
 
 
 <div class="d-flex justify-content-center mt-4">
-    <h5>{{periodo.empresa.empresa}} - {{graficos.dataHoje}}</h5>
+    <h5>{{titulo.empresa}} {{titulo.mes}}-{{titulo.ano}}</h5>
 </div>
 
 {{>_grafico}}
@@ -70,8 +76,9 @@
 <br><br>
 
 {{else}}
-{{#each error}}
-<div class="alert alert-danger">{{texto}}</div>
+
+{{#each erros}}
+<div class="alert alert-danger">{{text}}</div>
 {{else}}
 {{/each}}
 <div class="d-flex justify-content-center mt-4">
@@ -79,8 +86,9 @@
         <h5>Não existe Periodo cadastrado, referente a data atual</h5>
         <p>Casdastre e abra um novo periodo para digitação referentes ao mês atual</p>
         <a href="/periodos">
-            <p>Cadastrar Periodo</p> <a href="/painel">Retornar a Pagina Inicial</a>
+            <p>Cadastrar Periodo</p>
         </a>
     </div>
 </div>
+
 {{/if}}

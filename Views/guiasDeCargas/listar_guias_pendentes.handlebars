@@ -1,0 +1,52 @@
+<h4>Agencia {{agencia.cidade}}</h4>
+<h5>Guias Pendentes</h5>
+<small>Quantidade: {{title.qtd}}</small><br>
+<small>Total: {{title.totalExib}}</small><br>
+
+
+<form action="/guias/baixar_em_lote/periodo" method="get" onsubmit="confirmBaixa(event, this)">
+    <div class="table-responsive-xl fs-6 mt-4">
+        <div style="overflow-y: scroll;max-height: 500px;">
+            <table class="table table-bordered">
+                <thead class="table-dark ">
+                    <tr class="fs-6">
+                        <th scope="col">Conh.</th>
+                        <th scope="col">Origem</th>
+                        <th scope="col">Destino</th>
+                        <th scope="col">Cliente</th>
+                        <th scope="col">Empresa</th>
+                        <th scope="col">Entrada</th>
+                        <th scope="col">Vencimento</th>
+                        <th scope="col">Valor</th>
+                        <th scope="col">Status </th>
+                        <th scope="col">Condição </th>
+                        <th scope="col">#</th>
+                    </tr>
+                </thead>
+                {{#each dados}}
+                <tbody>
+                    <tr class="fs-6 fst-normal">
+                        <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
+                        <td>{{origem.cidade}}</td>
+                        <td>{{destino.cidade}}</td>
+                        <td>{{cliente.name_client}}</td>
+                        <td>{{empresa.empresa}}</td>
+                        <td>{{date_entrada}}</td>
+                        <td>{{date_vencimento}}</td>
+                        <td>{{valor_exib}}</td>
+                        <td>{{statusBaixa}}</td>
+                        <td>{{condPag}}</td>
+                        <td><input id="ckbox" type="checkbox" name="ids" value="{{_id}}"></td>
+
+                    </tr>
+                </tbody>
+                {{else}}
+                {{/each}}
+            </table>
+            <input type="hidden" name="periodo" value="{{title.periodo}}">
+        </div>
+    </div>
+    <button type="submit" class="btn btn-outline-success btn-sm mt-2" {{title.baixar}}>Baixar Selecionadas</button> <a
+        role="button" href="/painel" class="btn btn-outline-primary btn-sm mt-2">Retornar</a>
+</form>
+<br>

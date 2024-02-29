@@ -18,107 +18,44 @@ require('../models/Cliente')
 const Cliente = mongoose.model('clientes')
 require('../models/Periodo')
 const Periodo = mongoose.model('periodos')
+require('../models/Comissao')
+const Comissao = mongoose.model('comissoes')
 //BUSCA POR EMPRESA 
 
 router.get('/detalhado_do_periodo', lOgado, (req, res) => {
-    Periodo.find().then((periodos) => {
-        for (let i = 0; i < periodos.length; i++) {
-            periodos[i]['inicial'] = moment(periodos[i].dateInit).format('DD/MM/YYYY')
-            periodos[i]['final'] = moment(periodos[i].dateFin).format('DD/MM/YYYY')
-        }
-        const abertos = periodos.filter(p => p.status == "Aberto")
-        const fechados = periodos.filter(p => p.status == "Fechado")
-        var title = {
-            qtd: periodos.length,
-            qtdAbertos: abertos.length,
-            qtdFechados: fechados.length,
-        }
-        res.render('consultasRelatorios/guias_cargas/detalhadoPeriodo', { periodos, title })
-    }).catch((err) => {
-        req.flash('error_msg', "Erro ao buscar periodos agencias ERRO:", err)
-        res.redirect('/error')
-    })
+
+    const usuario = req.user
+    if (usuario.perfil == "AGENTE") {
+        req.flash('error_msg', "Rota não auorizada para o usuario")
+        res.redirect('/agencias')
+    } else {
+        Periodo.find().then((periodos) => {
+            for (let i = 0; i < periodos.length; i++) {
+                periodos[i]['inicial'] = moment(periodos[i].dateInit).format('DD/MM/YYYY')
+                periodos[i]['final'] = moment(periodos[i].dateFin).format('DD/MM/YYYY')
+            }
+            const abertos = periodos.filter(p => p.status == "Aberto")
+            const fechados = periodos.filter(p => p.status == "Fechado")
+            var title = {
+                qtd: periodos.length,
+                qtdAbertos: abertos.length,
+                qtdFechados: fechados.length,
+            }
+            res.render('consultasRelatorios/guias_cargas/detalhadoPeriodo', { periodos, title })
+        }).catch((err) => {
+            req.flash('error_msg', "Erro ao buscar periodos agencias ERRO:", err)
+            res.redirect('/error')
+        })
+    }
+
+
 })
 
 router.get('/guias_cadastradas', lOgado, (req, res) => {
     const usuario = req.user
     if (usuario.perfil == "AGENTE") {
-        GuiaCarga.count({ origem: usuario.agencia }).then((qtd) => {
-
-            var { offset, page } = req.query
-            const limit = 20
-            if (!offset) {
-                offset = 0
-            }
-            if (offset < 0) {
-                offset = 0
-            }
-            else {
-                offset = parseInt(offset)
-            }
-            if (!page) {
-                page = 1
-            }
-            if (page < 1) {
-                page = 1
-            } else {
-                page = parseInt(page)
-            }
-
-            GuiaCarga.find({ origem: usuario.agencia }).limit(limit).skip(offset).populate('cliente').populate('destino').populate('origem').populate('empresa').sort({ numero: 1 }).then((dados) => {
-                var next = ""
-                var prev = ""
-
-                if (page == 1) {
-                    prev = "disabled"
-                }
-                if (limit > dados.length || offset + limit >= qtd) {
-                    next = "disabled"
-                }
-                var nextUrl = {
-                    ofst: offset + limit,
-                    pag: page + 1,
-                }
-                var prevUrl = {
-                    ofst: offset - limit,
-                    pag: page - 1
-                }
-
-                if (dados.length < 1) {
-                    req.flash('error_msg', "Não há mais guias cadastradas")
-                    res.redirect('/guias/guias_cadastradas')
-                } else {
-                    var i = 0
-                    while (i < dados.length) {
-                        dados[i]["date_entrada"] = moment(dados[i].dateEntrada).format('DD/MM/YYYY')
-                        dados[i]["date_vencimento"] = moment(dados[i].vencimento).format('DD/MM/YYYY')
-                        dados[i]["valor_exib"] = dados[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-                        dados[i]["n"] = (i + 1) + offset
-                        if (dados[i].baixaPag == true && dados[i].statusPag == "CANCELADO") {
-                            dados[i]["statusBaixa"] = "CANCELADO"
-                        }
-                        else if (dados[i].baixaPag == true && dados[i].statusPag != "CANCELADO") {
-                            dados[i]["statusBaixa"] = "PAGO"
-                        }
-                        else if (dados[i].baixaPag == false && moment(dados[i].vencimento).format("MM-DD-YYYY") >= moment(new Date()).format("MM-DD-YYYY")) {
-                            dados[i]["statusBaixa"] = "PENDENTE"
-                        }
-                        else if (dados[i].baixaPag == false && moment(dados[i].vencimento).format("MM-DD-YYYY") < moment(new Date()).format("MM-DD-YYYY")) {
-                            dados[i]["statusBaixa"] = "VENCIDO"
-                        }
-                        i++
-                    }
-                    res.render('consultasRelatorios/guias_cargas/todas_guias', { dados, nextUrl, prevUrl, page, prev, next })
-                }
-
-            }).catch((err) => {
-                req.flash('error_msg', "Não foi encontrado guias para os parametros no periodo informado", err)
-                res.redirect('/painel')
-            })
-        }).catch((err) => {
-            req.flash('error_msg', "Impossivel contar guias", err)
-            res.redirect('/painel')
-        })
+        req.flash('error_msg', "Rota não auorizada para o usuario")
+        res.redirect('/agencias')
     } else {
         GuiaCarga.count().then((qtd) => {
 
@@ -200,116 +137,167 @@ router.get('/guias_cadastradas', lOgado, (req, res) => {
 })
 
 router.get('/por_empresa', lOgado, (req, res) => {
-    Empresa.find().then((empresas) => {
-        let next = "disabled", prev = "disabled"
-        res.render('consultasRelatorios/guias_cargas/porEmpresa', { next, prev, empresas })
-    }).catch((err) => {
-        req.flash('error_msg', "Erro ao Buscar empresas")
-        res.redirect('/consultas/por_empresa')
-    })
-
-})
-
-router.get('/por_empresa/pesquisar', lOgado, (req, res) => {
-    var { empresa, dateMin, dateMax, offset, page } = req.query
-    //console.log(empresa, dateMin,dateMax, offset, page)
-    dateMax = moment(dateMax).format()
-    dateMin = moment(dateMin).format()
-    const limit = 30
-    if (!offset) {
-        offset = 0
-    }
-    if (offset < 0) {
-        offset = 0
-    }
-    else {
-        offset = parseInt(offset)
-    }
-    if (!page) {
-        page = 1
-    }
-    if (page < 1) {
-        page = 1
-    } else {
-        page = parseInt(page)
-    }
-    if (dateMax < dateMin) {
-        req.flash('error_msg', "A data inicial não pode ser menor que a final")
-        res.redirect('/consulta/por_empresa')
+    const usuario = req.user
+    if (usuario.perfil == "AGENTE") {
+        req.flash('error_msg', "Rota não auorizada para o usuario")
+        res.redirect('/agencias')
     } else {
         Empresa.find().then((empresas) => {
-            let query = { dateEntrada: { $gte: dateMin, $lt: dateMax }, empresa: empresa }
-            GuiaCarga.find(query).populate('origem').populate('destino').populate('empresa').populate('cliente').limit(limit).skip(offset).sort({ dateEntrada: 1 }).then((dados) => {
-                if (dados.length == 0) {
-                    req.flash('error_msg', "Não foi encontrado guias para o periodo Informado")
-                    res.redirect('/consultas/por_empresa')
-                } else {
-                    var next, prev
-                    if (page == 1) {
-                        prev = "disabled"
-                    }
-                    if (dados.length <= limit) {
-                        next = "disabled"
-                    }
-                    var nextUrl = {
-                        emp: empresa,
-                        dmin: moment(dateMin).format('YYYY-MM-DD'),
-                        dmax: moment(dateMax).format('YYYY-MM-DD'),
-                        ofst: offset + limit,
-                        pag: page + 1,
-                    }
-                    var prevUrl = {
-                        emp: empresa,
-                        dmin: moment(dateMin).format('YYYY-MM-DD'),
-                        dmax: moment(dateMax).format('YYYY-MM-DD'),
-                        ofst: offset - limit,
-                        pag: page - 1
-                    }
-
-                    var i = 0
-                    while (i < dados.length) {
-                        dados[i]["date_entrada"] = moment(dados[i].dateEntrada).format('DD/MM/YYYY')
-                        dados[i]["date_pagamento"] = moment(dados[i].datePagamento).format('DD/MM/YYYY')
-                        dados[i]["date_vencimento"] = moment(dados[i].vencimento).format('DD/MM/YYYY')
-
-                        dados[i]["valor_exib"] = dados[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-
-                        if (dados[i].baixa == true) {
-                            dados[i]["statusBaixa"] = "BAIXADO"
-                        }
-                        if (dados[i].statusPag = "CANCELADO") {
-                            dados[i]["statusBaixa"] = "CANCELADO"
-                        }
-                        else {
-                            dados[i]["statusBaixa"] = "PENDENTE"
-                        }
-                        i++
-                    }
-                    res.render('consultasRelatorios/guias_cargas/porEmpresa', { dados, nextUrl, prevUrl, page, prev, next, empresas })
-                }
-
-            }).catch((err) => {
-                req.flash('error_msg', "Não foi encontrado guias para os parametros no periodo informado")
-                res.redirect('/consultas/por_empresa')
-            })
+            let next = "disabled", prev = "disabled"
+            res.render('consultasRelatorios/guias_cargas/porEmpresa', { next, prev, empresas })
         }).catch((err) => {
             req.flash('error_msg', "Erro ao Buscar empresas")
             res.redirect('/consultas/por_empresa')
         })
+    }
 
+})
+
+router.get('/hitorico_de_comissao', lOgado, (req, res) => {
+    const usuario = req.user
+    if (usuario.perfil == "AGENTE") {
+        req.flash('error_msg', "Rota não auorizada para o usuario")
+        res.redirect('/agencias')
+    } else {
+        Agencia.find().sort({ cidade: 1 }).then(agencias => {
+            const { ano, agencia } = req.query
+
+            if (!ano || !agencia) {
+                res.render('consultasRelatorios/guias_cargas/historico_comissao', { agencias })
+            } else {
+                Agencia.findById(agencia).then((agc) => {
+                    Comissao.find({ ano: ano, agencia: agencia }).populate('empresa').sort({ mes: 1 }).then((historico) => {
+                        for (let i = 0; i < historico.length; i++) {
+
+                            historico[i]["valor_exib"] = historico[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                            historico[i]["validos_exib"] = historico[i].totalValidas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                            historico[i]["cancelados_exib"] = historico[i].totalCancelado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+
+                        }
+                        res.render('consultasRelatorios/guias_cargas/historico_comissao', { historico, agc })
+
+                    })
+                })
+            }
+        })
 
     }
 })
 
+router.get('/por_empresa/pesquisar', lOgado, (req, res) => {
+
+    const usuario = req.user
+    if (usuario.perfil == "AGENTE") {
+        req.flash('error_msg', "Rota não auorizada para o usuario")
+        res.redirect('/agencias')
+    } else {
+
+        var { empresa, dateMin, dateMax, offset, page } = req.query
+        //console.log(empresa, dateMin,dateMax, offset, page)
+        dateMax = moment(dateMax).format()
+        dateMin = moment(dateMin).format()
+        const limit = 30
+        if (!offset) {
+            offset = 0
+        }
+        if (offset < 0) {
+            offset = 0
+        }
+        else {
+            offset = parseInt(offset)
+        }
+        if (!page) {
+            page = 1
+        }
+        if (page < 1) {
+            page = 1
+        } else {
+            page = parseInt(page)
+        }
+        if (dateMax < dateMin) {
+            req.flash('error_msg', "A data inicial não pode ser menor que a final")
+            res.redirect('/consulta/por_empresa')
+        } else {
+            Empresa.find().then((empresas) => {
+                let query = { dateEntrada: { $gte: dateMin, $lt: dateMax }, empresa: empresa }
+                GuiaCarga.find(query).populate('origem').populate('destino').populate('empresa').populate('cliente').limit(limit).skip(offset).sort({ dateEntrada: 1 }).then((dados) => {
+                    if (dados.length == 0) {
+                        req.flash('error_msg', "Não foi encontrado guias para o periodo Informado")
+                        res.redirect('/consultas/por_empresa')
+                    } else {
+                        var next, prev
+                        if (page == 1) {
+                            prev = "disabled"
+                        }
+                        if (dados.length <= limit) {
+                            next = "disabled"
+                        }
+                        var nextUrl = {
+                            emp: empresa,
+                            dmin: moment(dateMin).format('YYYY-MM-DD'),
+                            dmax: moment(dateMax).format('YYYY-MM-DD'),
+                            ofst: offset + limit,
+                            pag: page + 1,
+                        }
+                        var prevUrl = {
+                            emp: empresa,
+                            dmin: moment(dateMin).format('YYYY-MM-DD'),
+                            dmax: moment(dateMax).format('YYYY-MM-DD'),
+                            ofst: offset - limit,
+                            pag: page - 1
+                        }
+
+                        var i = 0
+                        while (i < dados.length) {
+                            dados[i]["date_entrada"] = moment(dados[i].dateEntrada).format('DD/MM/YYYY')
+                            dados[i]["date_pagamento"] = moment(dados[i].datePagamento).format('DD/MM/YYYY')
+                            dados[i]["date_vencimento"] = moment(dados[i].vencimento).format('DD/MM/YYYY')
+
+                            dados[i]["valor_exib"] = dados[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+
+                            if (dados[i].baixa == true) {
+                                dados[i]["statusBaixa"] = "BAIXADO"
+                            }
+                            if (dados[i].statusPag = "CANCELADO") {
+                                dados[i]["statusBaixa"] = "CANCELADO"
+                            }
+                            else {
+                                dados[i]["statusBaixa"] = "PENDENTE"
+                            }
+                            i++
+                        }
+                        res.render('consultasRelatorios/guias_cargas/porEmpresa', { dados, nextUrl, prevUrl, page, prev, next, empresas })
+                    }
+
+                }).catch((err) => {
+                    req.flash('error_msg', "Não foi encontrado guias para os parametros no periodo informado")
+                    res.redirect('/consultas/por_empresa')
+                })
+            }).catch((err) => {
+                req.flash('error_msg', "Erro ao Buscar empresas")
+                res.redirect('/consultas/por_empresa')
+            })
+
+
+        }
+    }
+})
+
 //BUSCA POR USUARIO
-router.get('/por_usuario', lOgado, (req, res) => {
-    let next = "disabled", prev = "disabled"
-    User.find().then((users) => {
-        res.render('consultasRelatorios/porUsuario', { users, next, prev })
-    }).catch((err) => {
-        req.flash('error_msg', "Erro interno ao carregar usuarios")
-        res.redirect('/painel')
-    })
+/*router.get('/por_usuario', lOgado, (req, res) => {
+    const usuario = req.user
+    if (usuario.perfil == "AGENTE") {
+        req.flash('error_msg', "Rota não auorizada para o usuario")
+        res.redirect('/agencias')
+    } else {
+        let next = "disabled", prev = "disabled"
+        User.find().then((users) => {
+            res.render('consultasRelatorios/porUsuario', { users, next, prev })
+        }).catch((err) => {
+            req.flash('error_msg', "Erro interno ao carregar usuarios")
+            res.redirect('/painel')
+        })
+    }
 
 })
 
@@ -398,7 +386,7 @@ router.get('/por_usuario/pesquisar', lOgado, (req, res) => {
             res.redirect('/consultas/por_usuario')
         })
     }
-})
+})*/
 
 //BUSCA POR AGENCIA  /por_entrega
 router.get('/por_agencia_por_pagamento', lOgado, (req, res) => {
@@ -1059,5 +1047,6 @@ router.get('/comissao', lOgado, (req, res) => {
     res.render('consultasRelatorios/comissao')
 
 })
+
 
 module.exports = router

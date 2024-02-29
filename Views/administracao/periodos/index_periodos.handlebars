@@ -1,3 +1,12 @@
+{{#each sucessos}}
+<div class="alert alert-success">{{texto}}</div>
+{{else}}
+{{/each}}
+{{#each erros}}
+<div class="alert alert-danger">{{texto}}</div>
+{{else}}
+{{/each}}
+
 <div class="table-responsive-xl">
 
     <form action="/periodos/adicionar" method="post">
@@ -18,31 +27,31 @@
             <tbody>
                 <tr>
                     <td>
-                        <div class="form-floating">
-                            <select name="empresa" class="form-select" id="floatingSelect2" aria-label="Agencia Destino"
-                                required>
-                                <option value="selecione">---Selecione---</option>
-                                {{#each empresas}}
-                                <option value="{{_id}}">{{empresa}}</option>
-                                {{else}}
-                                {{/each}}
-                            </select>
-                            <label for="floatingSelect">Empresa</label>
-                        </div>
+
+                        <select name="empresa" class="form-select" id="floatingSelect2" aria-label="Agencia Destino"
+                            required>
+                            <option value="selecione">---Selecione---</option>
+                            {{#each empresas}}
+                            <option value="{{_id}}">{{empresa}}</option>
+                            {{else}}
+                            {{/each}}
+                        </select>
+
+
                     </td>
                     <td>
-                        <div class="form-floating mb-3">
-                            <input type="number" class="form-control" name="mes" min="01" max="12" placeholder="00"
-                                required>
-                            <label for="floatingInput">Mês</label>
-                        </div>
+
+                        <input type="number" class="form-control" name="mes" min="01" max="12" placeholder="00"
+                            required>
+
+
                     </td>
                     <td>
-                        <div class="form-floating mb-3">
-                            <input type="number" class="form-control" min="2000" max="2999" name="ano"
-                                placeholder="0000" required>
-                            <label for="floatingInput">Ano</label>
-                        </div>
+
+                        <input type="number" class="form-control" min="2000" max="2999" name="ano" placeholder="0000"
+                            required>
+
+
                     </td>
                 </tr>
             </tbody>

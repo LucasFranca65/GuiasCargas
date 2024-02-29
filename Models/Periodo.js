@@ -37,8 +37,16 @@ const Periodo = new Schema({
     },
     status: {
         type: String,
-        default: "Aberto"
-    }
+        default: "ABERTO"
+    },
+    mes: {
+        type: String,
+        required: true
+    },
+    ano: {
+        type: String,
+        required: true
+    },
 
 })
 

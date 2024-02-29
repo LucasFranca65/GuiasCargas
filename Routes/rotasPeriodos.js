@@ -18,8 +18,8 @@ const GuiaCarga = mongoose.model('guiascargas')
 //Falta fazer Paginação 
 router.get('/', eAdmin, (req, res) => {
     Empresa.find().then((empresas) => {
-        Periodo.find({ status: "Fechado" }).populate('empresa').limit(5).sort({ _id: -1 }).then((periodosFechados) => {
-            Periodo.find({ status: "Aberto" }).populate('empresa').limit(5).sort({ _id: -1 }).then((periodosAbertos) => {
+        Periodo.find({ status: "FECHADO" }).populate('empresa').limit(5).sort({ _id: -1 }).then((periodosFechados) => {
+            Periodo.find({ status: "ABERTO" }).populate('empresa').limit(5).sort({ _id: -1 }).then((periodosAbertos) => {
                 if (periodosFechados.length > 0) {
                     for (let i = 0; i < periodosFechados.length; i++) {
                         periodosFechados[i]["dateExibInit"] = moment(periodosFechados[i].dateInit).format('DD/MM/YYYY')
@@ -49,57 +49,96 @@ router.get('/', eAdmin, (req, res) => {
 })
 
 router.post('/adicionar', eAdmin, (req, res) => {
-
-    if (req.body.empresa == "selecione") {
-        req.flash('error_msg', "Selecione uma empresa mês e ano para gerar um periodo de controle")
-        res.redirect('/administracao/controle')
+    const { empresa, mes, ano } = req.body
+    var erros = []
+    if (empresa == "selecione") {
+        erros.push({ texto: "Selecione uma empresa mês e ano para gerar um periodo de controle" })
     }
-    Empresa.findOne({ _id: req.body.empresa }).then((empresa) => {
-        var strEmp = empresa.empresa.replace(/\s/g, '')
-        const reference = (strEmp + "-" + req.body.mes + "-" + req.body.ano)
-        Periodo.findOne({ nome: reference }).then((periodo) => {
-            if (periodo) {
-                req.flash('error_msg', "Já existe um periodo criado para esses dados")
-                res.redirect('/administracao/controle')
-            } else {
-                var uDia = 31
-                if (req.body.mes == 2) {
-                    if ((req.body.ano % 4) > 0) {
-                        uDia = 28
-                    } else {
-                        uDia = 29
+    if (mes.length != 2) {
+        erros.push({ texto: "o campo mes deve conter 2 digitos" })
+    }
+    if (ano.length != 4) {
+        erros.push({ texto: "o campo ano deve conter 4 digitos" })
+    }
+    if (erros.length > 0) {
+        Empresa.find().then((empresas) => {
+            Periodo.find({ status: "FECHADO" }).populate('empresa').limit(5).sort({ _id: -1 }).then((periodosFechados) => {
+                Periodo.find({ status: "ABERTO" }).populate('empresa').limit(5).sort({ _id: -1 }).then((periodosAbertos) => {
+                    if (periodosFechados.length > 0) {
+                        for (let i = 0; i < periodosFechados.length; i++) {
+                            periodosFechados[i]["dateExibInit"] = moment(periodosFechados[i].dateInit).format('DD/MM/YYYY')
+                            periodosFechados[i]["dateExibFin"] = moment(periodosFechados[i].dateFin).format('DD/MM/YYYY')
+                        }
                     }
-                }
-                if (req.body.mes == 4 || req.body.mes == 6 || req.body.mes == 9 || req.body.mes == 11) {
-                    uDia = 30
-                }
+                    if (periodosAbertos.length > 0) {
+                        for (let i = 0; i < periodosAbertos.length; i++) {
+                            periodosAbertos[i]["dateExibInit"] = moment(periodosAbertos[i].dateInit).format('DD/MM/YYYY')
+                            periodosAbertos[i]["dateExibFin"] = moment(periodosAbertos[i].dateFin).format('DD/MM/YYYY')
 
-            }
-
-            const newPeriodo = {
-                nome: reference,
-                empresa: req.body.empresa,
-                dateInit: moment(req.body.ano + '-' + req.body.mes + '-01').format(),
-                dateFin: moment(req.body.ano + '-' + req.body.mes + '-' + uDia).format()
-
-            }
-
-            new Periodo(newPeriodo).save().then(() => {
-                console.log("Periodo " + reference + " Criado com sucesso")
-                req.flash('success_msg', "Periodo " + reference + " Criado com sucesso")
-                res.redirect('/periodos')
+                        }
+                    }
+                    res.render('administracao/periodos/index_periodos', { empresas, periodosAbertos, periodosFechados, erros })
+                }).catch((err) => {
+                    req.flash('error_msg', "Erro ao Buscar  periodos Abertos para digitação, ERRO: " + err)
+                    res.redirect('/painel')
+                })
             }).catch((err) => {
-                req.flash('error_msg', "Erro ao criar periodo " + err)
+                req.flash('error_msg', "Erro ao Buscar  periodos encerrados para digitação, ERRO: " + err)
+                res.redirect('/painel')
+            })
+        }).catch((err) => {
+            req.flash('error_msg', "erro ao buscar empresas, ERRO: " + err)
+            res.redirect('/painel')
+        })
+    } else {
+        Empresa.findOne({ _id: empresa }).then((empresa) => {
+            var strEmp = empresa.empresa.replace(/\s/g, '')
+            const reference = (strEmp + "-" + mes + "-" + ano)
+            Periodo.findOne({ nome: reference }).then((periodo) => {
+                if (periodo) {
+                    req.flash('error_msg', "Já existe um periodo criado para esses dados")
+                    res.redirect('/administracao/controle')
+                } else {
+                    var uDia = 31
+                    if (mes == 2) {
+                        if ((ano % 4) > 0) {
+                            uDia = 28
+                        } else {
+                            uDia = 29
+                        }
+                    }
+                    if (mes == 4 || mes == 6 || mes == 9 || mes == 11) {
+                        uDia = 30
+                    }
+
+                }
+
+                const newPeriodo = {
+                    nome: reference,
+                    empresa: empresa,
+                    dateInit: moment(mes + '-01' + ano + " 00:00:00", 'MM-DD-YYYY HH:mm:ss', true).format(),
+                    dateFin: moment(mes + '-' + uDia + '-' + ano + " 23:59:59", 'MM-DD-YYYY HH:mm:ss', true).format(),
+                    mes,
+                    ano
+                }
+
+                new Periodo(newPeriodo).save().then(() => {
+                    console.log("Periodo " + reference + " Criado com sucesso")
+                    req.flash('success_msg', "Periodo " + reference + " Criado com sucesso")
+                    res.redirect('/periodos')
+                }).catch((err) => {
+                    req.flash('error_msg', "Erro ao criar periodo " + err)
+                    res.redirect('/periodos')
+                })
+            }).catch((err) => {
+                req.flash('error_msg', "Erro ao Buscar periodo " + err)
                 res.redirect('/periodos')
             })
         }).catch((err) => {
-            req.flash('error_msg', "Erro ao Buscar periodo " + err)
+            req.flash('error_msg', "Erro ao Buscar empresa " + err)
             res.redirect('/periodos')
         })
-    }).catch((err) => {
-        req.flash('error_msg', "Erro ao Buscar empresa " + err)
-        res.redirect('/periodos')
-    })
+    }
 
 })
 
@@ -310,95 +349,149 @@ router.get('/listarGuiasCanceladas/:id', lOgado, (req, res) => {
 
 router.post('/encerrar', eAdmin, (req, res) => {
     const ident = req.body.ident
-    console.log(ident)
-    if (Array.isArray(ident) == true) {
-        for (let i = 0; i < ident.length; i++) {
-            Periodo.findOne({ _id: ident[i] }).then((periodo) => {
-                if (!periodo) {
-                    console.log("Não Foi Encontrado o " + periodo.nome)
-                } else {
-                    periodo.status = "Fechado"
+    if (!ident) {
+        req.flash('error_msg', "Selecione um periodo para encerramento")
+        res.redirect('/periodos')
+    } else {
+
+        if (Array.isArray(ident)) {
+            var erros = []
+            var sucessos = []
+            ident.forEach(id => {
+                Periodo.findById(id).then((periodo) => {
+                    periodo.status = 'FECHADO'
                     periodo.save().then(() => {
-                        console.log("Periodo " + periodo.nome + " Editado com sucesso")
+                        sucessos.push({ texto: "Periodo " + periodo.nome + " Fechado com sucesso" })
                     }).catch((err) => {
-                        console.log("Erro ao Salvar Encerramento do periodo " + periodo.nome + ", ERRO: " + err)
+                        erros.push(erros.push({ texto: "Erro ao Salvar Encerramento do periodo " + periodo.nome + ", ERRO: " + err }))
+                    })
+                }).catch((err) => {
+                    erros.push(erros.push({ texto: "Erro ao buscar periodo para encerramento, ERRO: " + err }))
+                })
+            });
+
+            Empresa.find().then((empresas) => {
+                Periodo.find().populate('empresa').sort({ _id: -1 }).then((periodos) => {
+                    const periodosAbertos = periodos.filter(p => p.status == "ABERTO")
+                    const periodosFechados = periodos.filter(p => p.status == "FECHADO")
+                    if (periodosFechados.length > 0) {
+                        for (let i = 0; i < periodosFechados.length; i++) {
+                            periodosFechados[i]["dateExibInit"] = moment(periodosFechados[i].dateInit).format('DD/MM/YYYY')
+                            periodosFechados[i]["dateExibFin"] = moment(periodosFechados[i].dateFin).format('DD/MM/YYYY')
+                        }
+                    }
+                    if (periodosAbertos.length > 0) {
+                        for (let i = 0; i < periodosAbertos.length; i++) {
+                            periodosAbertos[i]["dateExibInit"] = moment(periodosAbertos[i].dateInit).format('DD/MM/YYYY')
+                            periodosAbertos[i]["dateExibFin"] = moment(periodosAbertos[i].dateFin).format('DD/MM/YYYY')
+                        }
+                    }
+                    res.render('administracao/periodos/index_periodos', { empresas, periodosAbertos, periodosFechados, erros, sucessos })
+
+                }).catch((err) => {
+                    req.flash('error_msg', "Erro ao Buscar  periodos encerrados para digitação, ERRO: " + err)
+                    res.redirect('/painel')
+                })
+            }).catch((err) => {
+                req.flash('error_msg', "erro ao buscar empresas, ERRO: " + err)
+                res.redirect('/painel')
+            })
+
+        } else {
+            Periodo.findById(ident).then((periodo) => {
+                if (!periodo) {
+                    req.flash('error_msg', "Periodo não encontrado ")
+                    res.redirect('/periodos')
+                } else {
+                    periodo.status = "FECHADO"
+                    periodo.save().then(() => {
+                        req.flash('success_msg', 'Periodo Selecionado Fechado com sucesso')
+                        res.redirect('/periodos')
+                    }).catch((err) => {
+                        req.flash('error_msg', "Erro ao Salvar Encerramento do periodo, ERRO: " + err)
                         res.redirect('/periodos')
                     })
                 }
+
             }).catch((err) => {
-                req.flash('error_msg', "Erro ao Buscar Periodos, ERRO: " + err)
+                req.flash('error_msg', "Erro ao Salvar Encerramento do periodo, ERRO: " + err)
                 res.redirect('/periodos')
             })
         }
-        req.flash('success_msg', 'Periodos Selecionados Encerrados com sucesso')
-        res.redirect('/periodos')
-
-    } else {
-        Periodo.findOne({ _id: ident }).then((periodo) => {
-            if (!periodo) {
-                req.flash('error_msg', "Não foi encontrado Periodo referente ao paramentro ")
-                res.redirect('/periodos')
-            } else {
-                periodo.status = "Fechado"
-                periodo.save().then(() => {
-                    req.flash('success_msg', 'Periodo Selecionado Encerrado com sucesso')
-                    res.redirect('/periodos')
-                }).catch((err) => {
-                    req.flash('error_msg', "Erro ao Salvar Encerramento do periodo, ERRO: " + err)
-                    res.redirect('/periodos')
-                })
-            }
-        }).catch((err) => {
-            req.flash('error_msg', "Erro ao Buscar Periodos, ERRO: " + err)
-            res.redirect('/periodos')
-        })
     }
 })
 
 router.post('/reabrir', eAdmin, (req, res) => {
     const ident = req.body.ident
-    console.log(ident)
-    if (Array.isArray(ident) == true) {
-        for (let i = 0; i < ident.length; i++) {
-            Periodo.findOne({ _id: ident[i] }).then((periodo) => {
-                if (!periodo) {
-                    console.log("Não Foi Encontrado o " + periodo.nome)
-                } else {
-                    periodo.status = "Aberto"
+    if (!ident) {
+        req.flash('error_msg', "Selecione um periodo para reabertura")
+        res.redirect('/periodos')
+    } else {
+
+        if (Array.isArray(ident)) {
+            var erros = []
+            var sucessos = []
+            ident.forEach(id => {
+                Periodo.findById(id).then((periodo) => {
+                    periodo.status = 'ABERTO'
                     periodo.save().then(() => {
-                        console.log("Periodo " + periodo.nome + " Editado com sucesso")
+                        sucessos.push({ texto: "Periodo " + periodo.nome + " Reaberto com sucesso" })
                     }).catch((err) => {
-                        console.log("Erro ao tentar Reabrir o periodo " + periodo.nome + ", ERRO: " + err)
+                        erros.push(erros.push({ texto: "Erro ao Salvar reabertura do periodo " + periodo.nome + ", ERRO: " + err }))
+                    })
+                }).catch((err) => {
+                    erros.push({ texto: "Erro ao buscar periodo para reabertura, ERRO: " + err })
+                })
+            });
+            Empresa.find().then((empresas) => {
+                Periodo.find().populate('empresa').sort({ _id: -1 }).then((periodos) => {
+                    const periodosAbertos = periodos.filter(p => p.status == "ABERTO")
+                    const periodosFechados = periodos.filter(p => p.status == "FECHADO")
+                    if (periodosFechados.length > 0) {
+                        for (let i = 0; i < periodosFechados.length; i++) {
+                            periodosFechados[i]["dateExibInit"] = moment(periodosFechados[i].dateInit).format('DD/MM/YYYY')
+                            periodosFechados[i]["dateExibFin"] = moment(periodosFechados[i].dateFin).format('DD/MM/YYYY')
+                        }
+                    }
+                    if (periodosAbertos.length > 0) {
+                        for (let i = 0; i < periodosAbertos.length; i++) {
+                            periodosAbertos[i]["dateExibInit"] = moment(periodosAbertos[i].dateInit).format('DD/MM/YYYY')
+                            periodosAbertos[i]["dateExibFin"] = moment(periodosAbertos[i].dateFin).format('DD/MM/YYYY')
+                        }
+                    }
+                    res.render('administracao/periodos/index_periodos', { empresas, periodosAbertos, periodosFechados, erros, sucessos })
+
+
+                }).catch((err) => {
+                    req.flash('error_msg', "Erro ao Buscar  periodos para digitação, ERRO: " + err)
+                    res.redirect('/painel')
+                })
+            }).catch((err) => {
+                req.flash('error_msg', "erro ao buscar empresas, ERRO: " + err)
+                res.redirect('/painel')
+            })
+        } else {
+            Periodo.findById(ident).then((periodo) => {
+                if (!periodo) {
+                    req.flash('error_msg', "Periodo não encontrado ")
+                    res.redirect('/periodos')
+                } else {
+                    periodo.status = "ABERTO"
+                    periodo.save().then(() => {
+                        req.flash('success_msg', 'Periodo Selecionado reaberto com sucesso')
+                        res.redirect('/periodos')
+                    }).catch((err) => {
+                        req.flash('error_msg', "Erro ao Salvar reabertura do periodo, ERRO: " + err)
                         res.redirect('/periodos')
                     })
                 }
+
             }).catch((err) => {
-                req.flash('error_msg', "Erro ao Buscar Periodos, ERRO: " + err)
+                req.flash('error_msg', "Erro ao Salvar reabertura do periodo, ERRO: " + err)
                 res.redirect('/periodos')
             })
         }
-        req.flash('success_msg', 'Periodos Selecionados Reabertos com sucesso')
-        res.redirect('/periodos')
 
-    } else {
-        Periodo.findOne({ _id: ident }).then((periodo) => {
-            if (!periodo) {
-                req.flash('error_msg', "Não foi encontrado Periodo referente ao paramentro ")
-                res.redirect('/periodos')
-            } else {
-                periodo.status = "Aberto"
-                periodo.save().then(() => {
-                    req.flash('success_msg', 'Periodo Selecionado Reaberto com sucesso')
-                    res.redirect('/periodos')
-                }).catch((err) => {
-                    req.flash('error_msg', "Erro ao Salvar Encerramento do periodo, ERRO: " + err)
-                    res.redirect('/periodos')
-                })
-            }
-        }).catch((err) => {
-            req.flash('error_msg', "Erro ao Buscar Periodos, ERRO: " + err)
-            res.redirect('/periodos')
-        })
     }
 })
 

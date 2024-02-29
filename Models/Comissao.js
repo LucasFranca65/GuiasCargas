@@ -13,6 +13,14 @@ const Comissao = new Schema({
         ref: "agencias",
         required: true
     },
+    mes: {
+        type: String,
+        required: true
+    },
+    ano: {
+        type: String,
+        required: true
+    },
     empresa: {
         type: Schema.Types.ObjectId,
         ref: "empresas",

@@ -21,6 +21,7 @@ const Cliente = mongoose.model('clientes')
 
 router.get('/', lOgado, (req, res) => {
     let usuario = req.user
+    var error = []
     Agencia.findById(usuario.agencia).then((agencia) => {
         if (agencia.cidade == "Geral") {
             Empresa.find().then((empresas) => {
@@ -45,21 +46,21 @@ router.get('/', lOgado, (req, res) => {
                             }
                             res.render('guiasDeCargas/index_guias', { guias, agencias, empresas, clientes })
                         }).catch((err) => {
-                            console.log("erros ao caregar clientes, ERRO: ", err)
-                            res.render('guiasDeCargas/index_guias')
+                            req.flash('error_msg', "Erro interno 000005 ERRO: " + err)
+                            res.redirect('/error')
                         })
                     }).catch((err) => {
-                        console.log("erros ao caregar guias, ERRO: ", err)
-                        res.render('guiasDeCargas/index_guias')
+                        req.flash('error_msg', "Erro interno 000004 ERRO: " + err)
+                        res.redirect('/error')
                     })
 
                 }).catch((err) => {
-                    console.log("erros ao caregar guias, ERRO: ", err)
-                    res.render('guiasDeCargas/index_guias')
+                    req.flash('error_msg', "Erro interno 000003 ERRO: " + err)
+                    res.redirect('/error')
                 })
             }).catch((err) => {
-                console.log("erros ao caregar guias, ERRO: ", err)
-                res.render('guiasDeCargas/index_guias')
+                req.flash('error_msg', "Erro interno 000002 ERRO: " + err)
+                res.redirect('/error')
             })
         } else {
             const origem = {
@@ -86,23 +87,26 @@ router.get('/', lOgado, (req, res) => {
                             }
                             res.render('guiasDeCargas/index_guias', { guias, agencias, empresas, clientes, origem })
                         }).catch((err) => {
-                            console.log("erros ao caregar clientes, ERRO: ", err)
-                            res.render('guiasDeCargas/index_guias')
+                            req.flash('error_msg', "Erro interno 000012 ERRO: " + err)
+                            res.redirect('/error')
                         })
                     }).catch((err) => {
-                        console.log("erros ao caregar guias, ERRO: ", err)
-                        res.render('guiasDeCargas/index_guias')
+                        req.flash('error_msg', "Erro interno 000013 ERRO: " + err)
+                        res.redirect('/error')
                     })
 
                 }).catch((err) => {
-                    console.log("erros ao caregar guias, ERRO: ", err)
-                    res.render('guiasDeCargas/index_guias')
+                    req.flash('error_msg', "Erro interno 000014 ERRO: " + err)
+                    res.redirect('/error')
                 })
             }).catch((err) => {
-                console.log("erros ao caregar guias, ERRO: ", err)
-                res.render('guiasDeCargas/index_guias')
+                req.flash('error_msg', "Erro interno 000015 ERRO: " + err)
+                res.redirect('/error')
             })
         }
+    }).catch((err) => {
+        req.flash('error_msg', "Erro interno 000001 ERRO: " + err)
+        res.redirect('/error')
     })
 })
 
@@ -154,7 +158,7 @@ router.get('/minhas_guias/remetente', lOgado, (req, res) => {
 
             if (dados.length < 1) {
                 req.flash('error_msg', "Não há mais guias cadastradas para a agencia")
-                res.redirect('/painel')
+                res.redirect('/error')
             } else {
                 var i = 0
                 while (i < dados.length) {
@@ -173,16 +177,16 @@ router.get('/minhas_guias/remetente', lOgado, (req, res) => {
                     }
                     i++
                 }
-                res.render('guiasDeCargas/minhas_guias', { dados, agencia, nextUrl, prevUrl, page, prev, next })
+                res.render('guiasDeCargas/minhas_guias_rem', { dados, agencia, nextUrl, prevUrl, page, prev, next })
             }
 
         }).catch((err) => {
             req.flash('error_msg', "Não foi encontrado guias para os parametros no periodo informado", err)
-            res.redirect('/painel')
+            res.redirect('/error')
         })
     }).catch((err) => {
         req.flash('error_msg', "Erro interno ao carregar agencias" + err)
-        res.redirect('/painel')
+        res.redirect('/error')
     })
 
 })
@@ -235,7 +239,7 @@ router.get('/minhas_guias/destinatario', lOgado, (req, res) => {
 
             if (dados.length < 1) {
                 req.flash('error_msg', "Não há mais guias cadastradas para a agencia")
-                res.redirect('/painel')
+                res.redirect('/error')
             } else {
                 var i = 0
                 while (i < dados.length) {
@@ -254,18 +258,54 @@ router.get('/minhas_guias/destinatario', lOgado, (req, res) => {
                     }
                     i++
                 }
-                res.render('guiasDeCargas/minhas_guias', { dados, agencia, nextUrl, prevUrl, page, prev, next })
+                res.render('guiasDeCargas/minhas_guias_dest', { dados, agencia, nextUrl, prevUrl, page, prev, next })
             }
 
         }).catch((err) => {
             req.flash('error_msg', "Não foi encontrado guias para os parametros no periodo informado", err)
-            res.redirect('/painel')
+            res.redirect('/error')
         })
     }).catch((err) => {
         req.flash('error_msg', "Erro interno ao carregar agencias" + err)
-        res.redirect('/painel')
+        res.redirect('/error')
     })
 
+})
+
+router.get('/pendencias_da_agencia/:id', lOgado, (req, res) => {
+    const id = req.params.id
+    GuiaCarga.find({ origem: id, baixaPag: false }).populate('origem').populate('destino').populate('cliente').populate('empresa').then((dados) => {
+        const agencia = dados[0].origem
+        var title = {
+            qtd: dados.length,
+            total: 0,
+            totalExib: ""
+        }
+        for (let i = 0; i < dados.length; i++) {
+            dados[i]["date_entrada"] = moment(dados[i].dateEntrada).format('DD/MM/YYYY')
+            dados[i]["date_vencimento"] = moment(dados[i].vencimento).format('DD/MM/YYYY')
+            dados[i]["valor_exib"] = dados[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+            if (dados[i].baixaPag == true && condPag != 'CANCELADO') {
+                dados[i]["statusBaixa"] = "BAIXADO"
+            }
+            else if (dados[i].baixaPag == true && dados[i].statusPag == "CANCELADO") {
+                dados[i]["statusBaixa"] = "CANCELADO"
+            }
+            else if (dados[i].vencimento >= moment(new Date()).format()) {
+                dados[i]["statusBaixa"] = "PENDENTE"
+            } else {
+                dados[i]["statusBaixa"] = "VENCIDO"
+            }
+
+            title.total += dados[i].valor
+
+        }
+        title.totalExib = title.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+        res.render('guiasDeCargas/listar_guias_pendentes', { dados, agencia, title })
+    }).catch((err) => {
+        req.flash('error_msg', "Erro ao tentar buscar Guias, ERROR " + err)
+        res.redirect('/error')
+    })
 })
 
 //Rota de adição de guia
@@ -298,6 +338,7 @@ router.post('/adicionar', lOgado, (req, res) => {
         erro.push({ text: "Selecione uma forma de pagamento" })
     }
     if (erro.length > 0) {
+        var error = []
         Empresa.find().then((empresas) => {
             Agencia.find().sort({ cidade: 1 }).then((agencias) => {
                 GuiaCarga.find().populate('empresa').populate('origem').populate('destino').populate('cliente').limit(10).sort({ date: 1 }).then((guias) => {
@@ -318,21 +359,21 @@ router.post('/adicionar', lOgado, (req, res) => {
                         }
                         res.render('guiasDeCargas/index_guias', { guias, agencias, empresas, clientes, erro })
                     }).catch((err) => {
-                        console.log("erros ao caregar clientes, ERRO: ", err)
-                        res.render('guiasDeCargas/index_guias')
+                        req.flash('error_msg', "Erro interno 000010 ao tentar buscar clientes ERRO: " + err)
+                        res.redirect('/guias')
                     })
                 }).catch((err) => {
-                    console.log("erros ao caregar guias, ERRO: ", err)
-                    res.render('guiasDeCargas/index_guias')
+                    req.flash('error_msg', "Erro interno 000009 ao tentar buscar guias ERRO: " + err)
+                    res.redirect('/guias')
                 })
 
             }).catch((err) => {
-                console.log("erros ao caregar guias, ERRO: ", err)
-                res.render('guiasDeCargas/index_guias')
+                req.flash('error_msg', "Erro interno 000008 ao tentar buscar agencia ERRO: " + err)
+                res.redirect('/guias')
             })
         }).catch((err) => {
-            console.log("erros ao caregar guias, ERRO: ", err)
-            res.render('guiasDeCargas/index_guias')
+            req.flash('error_msg', "Erro interno 000007 ao tentar buscar empresas ERRO: " + err)
+            res.redirect('/guias')
         })
     } else {
         Cliente.findById(client).then((client) => {
@@ -494,9 +535,6 @@ router.post('/adicionar', lOgado, (req, res) => {
                                     res.redirect('/guias')
                                 })
                             }
-
-
-
                         }).catch((err) => {
                             req.flash('error_msg', "Erro ao tentar buscar Talão, ERRO: " + err)
                             res.redirect('/guias')
@@ -866,6 +904,7 @@ router.post('/editar', lOgado, (req, res) => {
         erro.push({ text: "Data de Pagamento iinformada é invalida" })
     }
     if (erro.length > 0) {
+
         Empresa.find().then((empresas) => {
             Agencia.find().sort({ cidade: 1 }).then((agencias) => {
                 GuiaCarga.find().populate('empresa').populate('origem').populate('destino').populate('cliente').limit(10).sort({ date: 1 }).then((guias) => {
@@ -886,21 +925,21 @@ router.post('/editar', lOgado, (req, res) => {
                         }
                         res.render('guiasDeCargas/index_guias', { guias, agencias, empresas, clientes, erro })
                     }).catch((err) => {
-                        console.log("erros ao caregar clientes, ERRO: ", err)
-                        res.render('guiasDeCargas/index_guias')
+                        req.flash('error_msg', "erros ao caregar clientes, ERRO: ", err)
+                        res.redirect('/guias')
                     })
                 }).catch((err) => {
-                    console.log("erros ao caregar guias, ERRO: ", err)
-                    res.render('guiasDeCargas/index_guias')
+                    req.flash('error_msg', "erros ao caregar guias, ERRO: ", err)
+                    res.redirect('/guias')
                 })
 
             }).catch((err) => {
-                console.log("erros ao caregar guias, ERRO: ", err)
-                res.render('guiasDeCargas/index_guias')
+                req.flash('error_msg', "erros ao caregar guias, ERRO: ", err)
+                res.redirect('/guias')
             })
         }).catch((err) => {
-            console.log("erros ao caregar guias, ERRO: ", err)
-            res.render('guiasDeCargas/index_guias')
+            req.flash('error_msg', "erros ao caregar guias, ERRO: ", err)
+            res.redirect('/guias')
         })
     } else {
         if (condPag == "CANCELADO") {
