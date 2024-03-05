@@ -5,7 +5,7 @@
 
 <div class="table-responsive-xl">
 
-    <form action="/administracao/agencias/add_agencia" method="post">
+    <form action="/administracao/agencias/add_agencia" method="post" onsubmit="confirmAdd(event, this)">
         <table class="table">
             <p style="font-weight: bold;">Cadastrar nova Agencia</p>
             <thead class="table-dark">
@@ -45,7 +45,7 @@
 </div>
 
 <div class="table-responsive-xl">
-    <form action="/administracao/agencias/excluir" method="post">
+    <form action="/administracao/agencias/excluir" method="post" onsubmit="confirmDell(event, this)">
         <table class="table">
             <hr>
             <p style="font-weight: bold;">Agencias Cadastradas</p>

@@ -2,7 +2,7 @@ const express = require('express')
 const { default: mongoose, model, mongo } = require('mongoose')
 const router = express.Router()
 const moment = require('moment')
-const { lOgado } = require('../helpers/eAdmin')
+const { eAdmin, lOgado, eDigitador, eControle } = require('../helpers/eAdmin')
 const { route } = require('./rotasAdministrador')
 const pdf = require('html-pdf')
 //Mongoose Models
@@ -22,7 +22,9 @@ require('../models/Comissao')
 const Comissao = mongoose.model('comissoes')
 //BUSCA POR EMPRESA 
 
-router.get('/detalhado_do_periodo', lOgado, (req, res) => {
+
+
+router.get('/detalhado_do_periodo', eDigitador, (req, res) => {
 
     const usuario = req.user
     if (usuario.perfil == "AGENTE") {
@@ -51,7 +53,7 @@ router.get('/detalhado_do_periodo', lOgado, (req, res) => {
 
 })
 
-router.get('/guias_cadastradas', lOgado, (req, res) => {
+router.get('/guias_cadastradas', eDigitador, (req, res) => {
     const usuario = req.user
     if (usuario.perfil == "AGENTE") {
         req.flash('error_msg', "Rota não auorizada para o usuario")
@@ -136,7 +138,7 @@ router.get('/guias_cadastradas', lOgado, (req, res) => {
     }
 })
 
-router.get('/por_empresa', lOgado, (req, res) => {
+router.get('/por_empresa', eDigitador, (req, res) => {
     const usuario = req.user
     if (usuario.perfil == "AGENTE") {
         req.flash('error_msg', "Rota não auorizada para o usuario")
@@ -153,7 +155,7 @@ router.get('/por_empresa', lOgado, (req, res) => {
 
 })
 
-router.get('/hitorico_de_comissao', lOgado, (req, res) => {
+router.get('/hitorico_de_comissao', eDigitador, (req, res) => {
     const usuario = req.user
     if (usuario.perfil == "AGENTE") {
         req.flash('error_msg', "Rota não auorizada para o usuario")
@@ -184,7 +186,7 @@ router.get('/hitorico_de_comissao', lOgado, (req, res) => {
     }
 })
 
-router.get('/por_empresa/pesquisar', lOgado, (req, res) => {
+router.get('/por_empresa/pesquisar', eDigitador, (req, res) => {
 
     const usuario = req.user
     if (usuario.perfil == "AGENTE") {
@@ -389,18 +391,18 @@ router.get('/por_usuario/pesquisar', lOgado, (req, res) => {
 })*/
 
 //BUSCA POR AGENCIA  /por_entrega
-router.get('/por_agencia_por_pagamento', lOgado, (req, res) => {
+router.get('/por_agencia_por_pagamento', eDigitador, (req, res) => {
     const usuario = req.user
     if (usuario.perfil == 'AGENTE') {
         Agencia.findById(usuario.agencia).then((origem) => {
-            res.render('consultasRelatorios/guias_cargas/porEntrega', { origem })
+            res.render('consultasRelatorios/guias_cargas/porAgencia', { origem })
         }).catch((err) => {
             req.flash('error_msg', "Erro interno ao carregar agencias ERRO:", err)
             res.redirect('/error')
         })
     } else {
         Agencia.find().sort({ cidade: 1 }).then((agencias) => {
-            res.render('consultasRelatorios/guias_cargas/porEntrega', { agencias })
+            res.render('consultasRelatorios/guias_cargas/porAgencia', { agencias })
         }).catch((err) => {
             req.flash('error_msg', "Erro interno ao carregar agencias ERRO:", err)
             res.redirect('/error')
@@ -409,7 +411,7 @@ router.get('/por_agencia_por_pagamento', lOgado, (req, res) => {
 
 })
 
-router.get('/por_agencia_por_pagamento/pesquisar', lOgado, (req, res) => {
+router.get('/por_agencia_por_pagamento/pesquisar', eDigitador, (req, res) => {
     let error = []
     var { agencia, dateMin, dateMax, status } = req.query
 
@@ -557,7 +559,7 @@ router.get('/por_agencia_por_pagamento/pesquisar', lOgado, (req, res) => {
     }
 })
 
-router.get('/vendas_por_agencia', lOgado, (req, res) => {
+router.get('/vendas_por_agencia', eDigitador, (req, res) => {
 
     const { empresa, dateMin, dateMax } = req.query
     if (!empresa) {
@@ -640,7 +642,7 @@ router.get('/vendas_por_agencia', lOgado, (req, res) => {
 })
 
 //BUSCAR POR STATUS DE ENTREGA
-router.get('/por_entrega', lOgado, (req, res) => {
+router.get('/por_entrega', eDigitador, (req, res) => {
     const usuario = req.user
     if (usuario.perfil == 'AGENTE') {
         Agencia.findById(usuario.agencia).then((origem) => {
@@ -660,7 +662,7 @@ router.get('/por_entrega', lOgado, (req, res) => {
 
 })
 
-router.get('/por_entrega/pesquisar', lOgado, (req, res) => {
+router.get('/por_entrega/pesquisar', eDigitador, (req, res) => {
 
     let error = []
     var { agencia, dateMin, dateMax, status } = req.query
@@ -812,7 +814,7 @@ router.get('/por_entrega/pesquisar', lOgado, (req, res) => {
 
 
 //BUSCA POR CLIENTE
-router.get('/por_cliente', lOgado, (req, res) => {
+router.get('/por_cliente', eDigitador, (req, res) => {
     Cliente.find().then((clientes) => {
         let next = "disabled", prev = "disabled"
         res.render('consultasRelatorios/guias_cargas/porCliente', { next, prev, clientes })
@@ -823,7 +825,7 @@ router.get('/por_cliente', lOgado, (req, res) => {
 
 })
 
-router.get('/por_cliente/pesquisar', lOgado, (req, res) => {
+router.get('/por_cliente/pesquisar', eDigitador, (req, res) => {
 
     var { cliente, offset, page } = req.query
     //console.log(cliente)
@@ -917,7 +919,7 @@ router.get('/por_cliente/pesquisar', lOgado, (req, res) => {
 
 })
 
-router.get('/guias_do_cliente', lOgado, (req, res) => {
+router.get('/guias_do_cliente', eDigitador, (req, res) => {
 
     var { cliente, offset, page } = req.query
     //console.log(cliente)
@@ -971,7 +973,7 @@ router.get('/guias_do_cliente', lOgado, (req, res) => {
 
 })
 
-router.get('/guias_do_cliente/filtrar', lOgado, (req, res) => {
+router.get('/guias_do_cliente/filtrar', eDigitador, (req, res) => {
 
     var { cliente, dateMin, dateMax } = req.query
     if (!dateMin && !dateMax) {
@@ -1029,24 +1031,6 @@ router.get('/guias_do_cliente/filtrar', lOgado, (req, res) => {
 
 })
 
-router.get('/comissao', lOgado, (req, res) => {
-    Agencia.find().then((agencias) => {
-        let i = 0
-        while (agencias.length) {
-            GuiaCarga.find({ origem: agencias[i].nome }).then((guias) => {
-                console.log(guias)
-            })
-        }
-    }).catch((err) => {
-        req.flash('error_msg', "Erro ao carregar agencias" + err)
-        res.redirect('/painel')
-    })
-
-
-
-    res.render('consultasRelatorios/comissao')
-
-})
 
 
 module.exports = router

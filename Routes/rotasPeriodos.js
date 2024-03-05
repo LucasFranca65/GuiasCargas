@@ -3,7 +3,7 @@ const router = express.Router()
 const mongoose = require('mongoose')
 const moment = require('moment')
 const flash = require('connect-flash')
-const { lOgado, eAdmin } = require('../helpers/eAdmin')
+const { lOgado, eAdmin, eDigitador, eControle } = require('../helpers/eAdmin')
 
 //Mongoose Models
 require('../models/Empresa')
@@ -16,7 +16,7 @@ const GuiaCarga = mongoose.model('guiascargas')
 
 //Painel principal das guias
 //Falta fazer Paginação 
-router.get('/', eAdmin, (req, res) => {
+router.get('/', eDigitador, (req, res) => {
     Empresa.find().then((empresas) => {
         Periodo.find({ status: "FECHADO" }).populate('empresa').limit(5).sort({ _id: -1 }).then((periodosFechados) => {
             Periodo.find({ status: "ABERTO" }).populate('empresa').limit(5).sort({ _id: -1 }).then((periodosAbertos) => {
@@ -48,7 +48,7 @@ router.get('/', eAdmin, (req, res) => {
     })
 })
 
-router.post('/adicionar', eAdmin, (req, res) => {
+router.post('/adicionar', eControle, (req, res) => {
     const { empresa, mes, ano } = req.body
     var erros = []
     if (empresa == "selecione") {
@@ -142,7 +142,7 @@ router.post('/adicionar', eAdmin, (req, res) => {
 
 })
 
-router.get('/dadosPeriododeControle/:id', lOgado, (req, res) => {
+router.get('/dadosPeriododeControle/:id', eDigitador, (req, res) => {
     const id = req.params.id
     Periodo.findById(id).populate('empresa').then((periodo) => {
         if (periodo) {
@@ -209,7 +209,7 @@ router.get('/dadosPeriododeControle/:id', lOgado, (req, res) => {
     })
 })
 
-router.get('/dadosPeriododeControle/listar/:n/:id', lOgado, (req, res) => {
+router.get('/dadosPeriododeControle/listar/:n/:id', eDigitador, (req, res) => {
     const n = req.params.n
     const id = req.params.id
     console.log(n, id)
@@ -236,7 +236,7 @@ router.get('/dadosPeriododeControle/listar/:n/:id', lOgado, (req, res) => {
     }
 })
 
-router.get('/listarGuiasPagas/:id', lOgado, (req, res) => {
+router.get('/listarGuiasPagas/:id', eDigitador, (req, res) => {
     const id = req.params.id
     GuiaCarga.find({ periodo: id, baixaPag: true, $nor: [{ condPag: "CANCELADO" }] }).populate('origem').populate('destino').populate('empresa').populate('cliente').then((dados) => {
         var title = {
@@ -264,7 +264,7 @@ router.get('/listarGuiasPagas/:id', lOgado, (req, res) => {
     })
 })
 
-router.get('/listarGuiasPendentes/:id', lOgado, (req, res) => {
+router.get('/listarGuiasPendentes/:id', eDigitador, (req, res) => {
     const id = req.params.id
     GuiaCarga.find({ periodo: id, baixaPag: false, vencimento: { $gt: moment(new Date().format) } }).populate('origem').populate('destino').populate('empresa').populate('cliente').then((dados, tipo) => {
         var title = {
@@ -291,7 +291,7 @@ router.get('/listarGuiasPendentes/:id', lOgado, (req, res) => {
     })
 })
 
-router.get('/listarGuiasVencidas/:id', lOgado, (req, res) => {
+router.get('/listarGuiasVencidas/:id', eDigitador, (req, res) => {
     const id = req.params.id
     GuiaCarga.find({ periodo: id, baixaPag: false, vencimento: { $lt: moment(new Date().format) } }).populate('origem').populate('destino').populate('empresa').populate('cliente').then((dados, tipo) => {
         var title = {
@@ -319,7 +319,7 @@ router.get('/listarGuiasVencidas/:id', lOgado, (req, res) => {
     })
 })
 
-router.get('/listarGuiasCanceladas/:id', lOgado, (req, res) => {
+router.get('/listarGuiasCanceladas/:id', eDigitador, (req, res) => {
     const id = req.params.id
     GuiaCarga.find({ periodo: id, baixaPag: true, condPag: "CANCELADO" }).populate('origem').populate('destino').populate('empresa').populate('cliente').then((dados, tipo) => {
         var title = {
@@ -347,7 +347,7 @@ router.get('/listarGuiasCanceladas/:id', lOgado, (req, res) => {
     })
 })
 
-router.post('/encerrar', eAdmin, (req, res) => {
+router.post('/encerrar', eControle, (req, res) => {
     const ident = req.body.ident
     if (!ident) {
         req.flash('error_msg', "Selecione um periodo para encerramento")
@@ -390,11 +390,11 @@ router.post('/encerrar', eAdmin, (req, res) => {
 
                 }).catch((err) => {
                     req.flash('error_msg', "Erro ao Buscar  periodos encerrados para digitação, ERRO: " + err)
-                    res.redirect('/painel')
+                    res.redirect('/periodos')
                 })
             }).catch((err) => {
                 req.flash('error_msg', "erro ao buscar empresas, ERRO: " + err)
-                res.redirect('/painel')
+                res.redirect('/periodos')
             })
 
         } else {
@@ -421,7 +421,7 @@ router.post('/encerrar', eAdmin, (req, res) => {
     }
 })
 
-router.post('/reabrir', eAdmin, (req, res) => {
+router.post('/reabrir', eControle, (req, res) => {
     const ident = req.body.ident
     if (!ident) {
         req.flash('error_msg', "Selecione um periodo para reabertura")

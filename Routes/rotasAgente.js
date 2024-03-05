@@ -13,19 +13,22 @@ require('../models/Agencia')
 const Agencia = mongoose.model('agencias')
 require('../models/Periodo')
 const Periodo = mongoose.model('periodos')
-
+require('../models/Comissao')
+const Comissao = mongoose.model('comissoes')
 
 router.get('/', lOgado, (req, res) => {
     const usuario = req.user
     Agencia.findById(usuario.agencia).then((agencia) => {
-        const dataAtual = moment('01/15/2024', 'MM/DD/YYYY', true).format()
+        const dataAtual = moment(new Date()).format()
         const { empresa } = req.query
         if (!empresa) {
             Empresa.find().then(empresas => {
                 Periodo.findOne({ dateInit: { $lte: dataAtual }, dateFin: { $gte: dataAtual } }).populate('empresa').then(periodo => {
+                    //console.log(periodo)
                     if (!periodo) {
-                        var error = [{ texto: "Erro ao Buscar periodos" }]
-                        res.render('painelPrincipal/painelAgente', { error, empresas })
+                        var erros = []
+                        erros.push({ texto: "Ainda não foram inseridos dados referentes ao mês atual" })
+                        res.render('painelPrincipal/painelAgente', { erros, empresas })
                     } else {
                         GuiaCarga.find({ $and: [{ periodo: periodo._id }, { $or: [{ origem: usuario.agencia }, { destino: usuario.agencia }] }] }).sort({ vencimento: 1 }).populate('origem').populate('destino').populate('cliente').then((guias) => {
                             var graficos = {
@@ -103,7 +106,6 @@ router.get('/', lOgado, (req, res) => {
             Empresa.find().then(empresas => {
                 Periodo.findOne({ dateInit: { $lte: dataAtual }, dateFin: { $gte: dataAtual }, empresa: empresa }).populate('empresa').then(periodo => {
                     if (!periodo) {
-
                         req.flash('error_msg', "Não existe dados referentes a data atual para a empresa selecionalda!")
                         res.redirect('/agencias')
 
@@ -183,6 +185,69 @@ router.get('/', lOgado, (req, res) => {
         }
 
     })
+})
+
+router.get('/minhas_comissoes', lOgado, (req, res) => {
+    const { ano } = req.query
+    const usuario = req.user
+    if (usuario.perfil != "AGENTE") {
+        req.flash('error_msg', "Acesso Liberado somente para agentes")
+        res.redirect('/agencias')
+    } else {
+        if (!ano) {
+            Agencia.findById(usuario.agencia).then((agencia) => {
+                res.render('agencia/minha_comissao_cargas', { agencia })
+            }).catch((err) => {
+                req.flash('error_msg', "Erro ao tentar buscar agencia", err)
+                res.redirect('/error')
+            })
+        } else {
+            Agencia.findById(usuario.agencia).then((agencia) => {
+                Comissao.find({ agencia: agencia._id, ano: ano }).sort({ mes: 1 }).populate('empresa').then((dados) => {
+                    if (dados.length < 1) {
+                        var error = [{ text: "Não existem comissões claculadas para o ano selecionado" }]
+                        res.render('agencia/minha_comissao_cargas', { agencia, error })
+
+                    } else {
+                        var resumo = {
+                            ano: ano,
+                            qtdVendasAno: 0,
+                            valorVendasAno: 0,
+                            comssAno: 0,
+                            valorVendasAnoExib: "",
+                            comissAnoExib: ""
+                        }
+                        dados.forEach(dado => {
+                            dado["totalVendasExib"] = dado.totalVendas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                            dado["totalValidasExib"] = dado.totalValidas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                            dado["totalCanceladoExib"] = dado.totalCancelado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                            dado["valorExib"] = dado.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                            resumo.valorVendasAno += dado.totalValidas
+                            resumo.qtdVendasAno += dado.qtdValidos
+                            resumo.comssAno += dado.valor
+                        });
+
+                        resumo.valorVendasAnoExib = resumo.valorVendasAno.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                        resumo.comissAnoExib = resumo.comssAno.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                        res.render('agencia/minha_comissao_cargas', { agencia, dados, resumo })
+
+
+                    }
+
+                }).catch((err) => {
+                    req.flash('error_msg', "Erro ao tentar buscar comissoes", err)
+                    res.redirect('/error')
+                })
+
+            }).catch((err) => {
+                req.flash('error_msg', "Erro ao tentar buscar agencia", err)
+                res.redirect('/error')
+            })
+        }
+
+
+
+    }
 })
 
 module.exports = router

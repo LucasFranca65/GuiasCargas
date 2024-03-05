@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs')
-const { eAdmin, lOgado } = require('../helpers/eAdmin')
+const { eAdmin, lOgado, eControle, eDigitador } = require('../helpers/eAdmin')
 const moment = require('moment')
 
 //Models
@@ -20,7 +20,7 @@ require('../models/Cliente')
 const Cliente = mongoose.model('clientes')
 
 //Rotas de Administração de Usuarios
-//Rota Principal
+
 router.get('/users', eAdmin, (req, res) => {
     User.find().populate('agencia').then((users) => {
         Agencia.find().sort({ cidade: 1 }).then((agencias) => {
@@ -34,7 +34,6 @@ router.get('/users', eAdmin, (req, res) => {
         res.redirect('/painel')
     })
 })
-
 router.post('/users/add_user', eAdmin, (req, res) => {
     const { nome, login, agencia, senha1, senha2, perfil } = req.body
 
@@ -54,9 +53,6 @@ router.post('/users/add_user', eAdmin, (req, res) => {
     if (login.length < 3) {
         error.push({ texto: "Login Muito Curto minimo 3 caracteres" })
     }
-    if (agencia == "selecione") {
-        error.push({ texto: "Selecione uma agencia" })
-    }
     //  Validando Senha
     if (!senha1 || typeof senha1 == undefined || senha1 == null) {
         error.push({ texto: "Senha Invalida" })
@@ -66,6 +62,12 @@ router.post('/users/add_user', eAdmin, (req, res) => {
     }
     if (senha2 != req.body.senha1) {
         error.push({ texto: "As Senhas não conferem" })
+    }
+    if (agencia == 'selecione') {
+        error.push({ texto: "Selecione uma agencia" })
+    }
+    if (perfil == 'selecione') {
+        error.push({ texto: "Selecione um perfil de usuario" })
     }
     //  Verificando erros
     if (error.length > 0) {
@@ -83,127 +85,135 @@ router.post('/users/add_user', eAdmin, (req, res) => {
         })
 
     } else {
-        User.findOne({ login: login }).then((usuario) => {
-            if (usuario) {
-                req.flash('error_msg', "Já existe um usuario com esse login")
-                res.redirect('/administracao/users')
-            } else {
-                if (perfil == "ADMINISTRADOR") {
-                    const novoUsuario = new User({
-                        nome: nome,
-                        login: login,
-                        perfil: perfil,
-                        senha: senha1,
-                        agencia: agencia,
-                        eAdmin: true,
-                        eControle: true,
-                        eDigitador: true
-                    })
-                    bcrypt.genSalt(10, (erro, salt) => {
-                        bcrypt.hash(novoUsuario.senha, salt, (erro, hash) => {
-                            if (erro) {
-                                req.flash('error_msg', "Houve um erro ao salvar usuario Administrador")
-                                res.redirect('/administracao/users/add_user')
-                            }
-                            novoUsuario.senha = hash
-                            novoUsuario.save().then(() => {
-                                req.flash('success_msg', "Usuario Administrador Cadastrado com sucesso")
-                                res.redirect('/administracao/users')
-                            }).catch((err) => {
-                                req.flash('error_msg', "Erro ao criar usuario Administrador")
-                                res.redirect('/administracao/users/add_user')
-                            })
-                        })
-                    })
-                } else if (perfil == "FINANCEIRO" || "ARRECADACAO") {
-                    const novoUsuario = new User({
-                        nome: nome,
-                        login: login,
-                        perfil: perfil,
-                        senha: senha1,
-                        agencia: agencia,
-                        eControle: true,
-                        eDigitador: true
-                    })
-                    bcrypt.genSalt(10, (erro, salt) => {
-                        bcrypt.hash(novoUsuario.senha, salt, (erro, hash) => {
-                            if (erro) {
-                                req.flash('error_msg', "Houve um erro ao salvar usuario")
-                                res.redirect('/administracao/users')
-                            }
-                            novoUsuario.senha = hash
-                            novoUsuario.save().then(() => {
-                                req.flash('success_msg', "Usuario Cadastrado com sucesso")
-                                res.redirect('/administracao/users')
-                            }).catch((err) => {
-                                req.flash('error_msg', "Erro ao criar usuario")
-                                res.redirect('/administracao/users')
-                            })
-                        })
-                    })
-                } else if (perfil == "DIGITADOR") {
-                    const novoUsuario = new User({
-                        nome: nome,
-                        login: login,
-                        perfil: perfil,
-                        senha: senha1,
-                        agencia: agencia,
-                        eDigitador: true
-                    })
-                    bcrypt.genSalt(10, (erro, salt) => {
-                        bcrypt.hash(novoUsuario.senha, salt, (erro, hash) => {
-                            if (erro) {
-                                req.flash('error_msg', "Houve um erro ao salvar usuario")
-                                res.redirect('/administracao/users')
-                            }
-                            novoUsuario.senha = hash
-                            novoUsuario.save().then(() => {
-                                req.flash('success_msg', "Usuario Cadastrado com sucesso")
-                                res.redirect('/administracao/users')
-                            }).catch((err) => {
-                                req.flash('error_msg', "Erro ao criar usuario")
-                                res.redirect('/administracao/users')
-                            })
-                        })
-                    })
+        Agencia.findById(agencia).then((agc) => {
+            User.findOne({ login: login }).then((usuario) => {
+                if (usuario) {
+                    req.flash('error_msg', "Já existe um usuario com esse login")
+                    res.redirect('/administracao/users')
+                } else if (agc.cidade == 'Geral' && perfil == "AGENTE" || agc.numero == "9999" && perfil == "AGENTE") {
+                    req.flash('error_msg', "Usuarios com perfil de AGENTE não podem ser vinculados a agencia Geral")
+                    res.redirect('/administracao/users')
+                } else if (perfil != "AGENTE" && agc.cidade != 'Geral' || perfil != "AGENTE" && agc.numero != "9999") {
+                    req.flash('error_msg', "Usuarios com perfil " + perfil + " devem ser vinculados a agencia Geral")
+                    res.redirect('/administracao/users')
                 } else {
-                    const novoUsuario = new User({
-                        nome: nome,
-                        login: login,
-                        perfil: perfil,
-                        senha: senha1,
-                        agencia: agencia
-                    })
-
-                    bcrypt.genSalt(10, (erro, salt) => {
-                        bcrypt.hash(novoUsuario.senha, salt, (erro, hash) => {
-                            if (erro) {
-                                req.flash('error_msg', "Houve um erro ao salvar usuario")
-                                res.redirect('/administracao/users')
-                            }
-                            novoUsuario.senha = hash
-                            novoUsuario.save().then(() => {
-                                req.flash('success_msg', "Usuario Cadastrado com sucesso")
-                                res.redirect('/administracao/users')
-                            }).catch((err) => {
-                                req.flash('error_msg', "Erro ao criar usuario")
-                                res.redirect('/administracao/users')
+                    if (perfil == "ADMINISTRADOR") {
+                        const novoUsuario = new User({
+                            nome: nome,
+                            login: login,
+                            perfil: perfil,
+                            senha: senha1,
+                            agencia: agencia,
+                            eAdmin: true,
+                            eControle: true,
+                            eDigitador: true
+                        })
+                        bcrypt.genSalt(10, (erro, salt) => {
+                            bcrypt.hash(novoUsuario.senha, salt, (erro, hash) => {
+                                if (erro) {
+                                    req.flash('error_msg', "Houve um erro ao salvar usuario Administrador")
+                                    res.redirect('/administracao/users/add_user')
+                                }
+                                novoUsuario.senha = hash
+                                novoUsuario.save().then(() => {
+                                    req.flash('success_msg', "Usuario Administrador Cadastrado com sucesso")
+                                    res.redirect('/administracao/users')
+                                }).catch((err) => {
+                                    req.flash('error_msg', "Erro ao criar usuario Administrador", err)
+                                    res.redirect('/administracao/users/add_user')
+                                })
                             })
                         })
-                    })
+                    } else if (perfil == "FINANCEIRO" || "ARRECADACAO" || "CONTROLE") {
+                        const novoUsuario = new User({
+                            nome: nome,
+                            login: login,
+                            perfil: perfil,
+                            senha: senha1,
+                            agencia: agencia,
+                            eControle: true,
+                            eDigitador: true
+                        })
+                        bcrypt.genSalt(10, (erro, salt) => {
+                            bcrypt.hash(novoUsuario.senha, salt, (erro, hash) => {
+                                if (erro) {
+                                    req.flash('error_msg', "Houve um erro ao salvar usuario")
+                                    res.redirect('/administracao/users')
+                                }
+                                novoUsuario.senha = hash
+                                novoUsuario.save().then(() => {
+                                    req.flash('success_msg', "Usuario Cadastrado com sucesso")
+                                    res.redirect('/administracao/users')
+                                }).catch((err) => {
+                                    req.flash('error_msg', "Erro ao criar usuario", err)
+                                    res.redirect('/administracao/users')
+                                })
+                            })
+                        })
+                    } else if (perfil == "DIGITADOR") {
+                        const novoUsuario = new User({
+                            nome: nome,
+                            login: login,
+                            perfil: perfil,
+                            senha: senha1,
+                            agencia: agencia,
+                            eDigitador: true
+                        })
+                        bcrypt.genSalt(10, (erro, salt) => {
+                            bcrypt.hash(novoUsuario.senha, salt, (erro, hash) => {
+                                if (erro) {
+                                    req.flash('error_msg', "Houve um erro ao salvar usuario")
+                                    res.redirect('/administracao/users')
+                                }
+                                novoUsuario.senha = hash
+                                novoUsuario.save().then(() => {
+                                    req.flash('success_msg', "Usuario Cadastrado com sucesso")
+                                    res.redirect('/administracao/users')
+                                }).catch((err) => {
+                                    req.flash('error_msg', "Erro ao criar usuario", err)
+                                    res.redirect('/administracao/users')
+                                })
+                            })
+                        })
+                    } else {
+                        const novoUsuario = new User({
+                            nome: nome,
+                            login: login,
+                            perfil: perfil,
+                            senha: senha1,
+                            agencia: agencia
+                        })
+                        bcrypt.genSalt(10, (erro, salt) => {
+                            bcrypt.hash(novoUsuario.senha, salt, (erro, hash) => {
+                                if (erro) {
+                                    req.flash('error_msg', "Houve um erro ao salvar usuario")
+                                    res.redirect('/administracao/users')
+                                }
+                                novoUsuario.senha = hash
+                                novoUsuario.save().then(() => {
+                                    req.flash('success_msg', "Usuario Cadastrado com sucesso")
+                                    res.redirect('/administracao/users')
+                                }).catch((err) => {
+                                    req.flash('error_msg', "Erro ao criar usuario", err)
+                                    res.redirect('/administracao/users')
+                                })
+                            })
+                        })
+                    }
                 }
-            }
-        }).catch((err) => {
-            req.flash('error_msg', "Erro Interno", err)
-            res.redirect('/administracao/users')
+            }).catch((err) => {
+                req.flash('error_msg', "Erro Interno", err)
+                res.redirect('/administracao/users')
 
+            })
+        }).catch((err) => {
+            req.flash('error_msg', "Erro Interno na busca de uma agencia", err)
+            res.redirect('/administracao/users')
         })
+
     }
 
 })
-
-//Fim rota adição
-
 router.post('/users/dell_user', eAdmin, (req, res) => {
     if (req.body.ident == undefined) {
         req.flash('error_msg', "Nenhum Usuario Selecionado para exclusão")
@@ -219,7 +229,6 @@ router.post('/users/dell_user', eAdmin, (req, res) => {
         })
     }
 })
-
 router.get('/users/reset_pass/:id', eAdmin, (req, res) => {
     User.findOne({ _id: req.params.id }).then((usuario) => {
         res.render('administracao/users/admin_resetpass', { usuario })
@@ -228,7 +237,6 @@ router.get('/users/reset_pass/:id', eAdmin, (req, res) => {
         res.redirect('/administracao/users')
     })
 })
-
 router.post('/reset_pass/reset', eAdmin, (req, res) => {
     const { senha1, senha2, user_id } = req.body
     User.findOne({ _id: user_id }).then((usuario) => {
@@ -271,9 +279,9 @@ router.post('/reset_pass/reset', eAdmin, (req, res) => {
     })
 })
 
+
 //Rotas para Administrar Guias
-//excluir selecionados
-router.post('/guias/excluir', eAdmin, (req, res) => {
+router.post('/guias/excluir', eControle, (req, res) => {
     if (req.body.ident == undefined) {
         req.flash('error_msg', "Nenhuma Guia Selecionado para exclusão")
         res.redirect('/guias')
@@ -288,8 +296,7 @@ router.post('/guias/excluir', eAdmin, (req, res) => {
         })
     }
 })
-//excuir indicidualmente
-router.get('/guias/exclusao', eAdmin, (req, res) => {
+router.get('/guias/exclusao', eControle, (req, res) => {
     const { ident } = req.query
     if (ident == undefined) {
         req.flash('error_msg', "Nenhuma Guia Selecionado para exclusão")
@@ -307,7 +314,7 @@ router.get('/guias/exclusao', eAdmin, (req, res) => {
 })
 
 //Rotas Administração de agencias
-router.get('/agencias', eAdmin, (req, res) => {
+router.get('/agencias', eControle, (req, res) => {
 
     Agencia.find().sort({ cidade: 1 }).then((agencias) => {
         for (let i = 0; i < agencias.length; i++) {
@@ -325,8 +332,7 @@ router.get('/agencias', eAdmin, (req, res) => {
 
 
 })
-//Rota para cadastrar agencia no banco de dados 
-router.post('/agencias/add_agencia', eAdmin, (req, res) => {
+router.post('/agencias/add_agencia', eControle, (req, res) => {
     const { numero, cidade, indice, emite_cte } = req.body
     let error = []
     if (!cidade || typeof cidade == undefined || cidade == null) {
@@ -376,7 +382,7 @@ router.post('/agencias/add_agencia', eAdmin, (req, res) => {
         })
     }
 })
-router.get('/agencias/edit_agencia/:id', eAdmin, (req, res) => {
+router.get('/agencias/edit_agencia/:id', eControle, (req, res) => {
     const ident = req.params.id
     Agencia.findById(ident).then((agencia) => {
         if (agencia) {
@@ -396,7 +402,7 @@ router.get('/agencias/edit_agencia/:id', eAdmin, (req, res) => {
         res.redirect('/administracao/agencias')
     })
 })
-router.post('/agencias/edit_agencia/save', eAdmin, (req, res) => {
+router.post('/agencias/edit_agencia/save', eControle, (req, res) => {
     const { numero, cidade, indice, emite_cte, ident } = req.body
     let error = []
     if (!cidade || typeof cidade == undefined || cidade == null) {
@@ -451,8 +457,7 @@ router.post('/agencias/edit_agencia/save', eAdmin, (req, res) => {
     }
 
 })
-//Rota que exclui agencias selecionadas
-router.post('/agencias/excluir', eAdmin, (req, res) => {
+router.post('/agencias/excluir', eControle, (req, res) => {
     if (req.body.ident == undefined) {
         req.flash('error_msg', "Nenhuma Agencia Selecionado para exclusão")
         res.redirect('/administracao/agencias')
@@ -488,7 +493,6 @@ router.get('/empresas', eAdmin, (req, res) => {
         res.redirect('/painel')
     })
 })
-//Rota para cadastrar agencia no banco de dados 
 router.post('/empresas/save', eAdmin, (req, res) => {
 
     if (req.body.status == "selecione") {
@@ -518,7 +522,6 @@ router.post('/empresas/save', eAdmin, (req, res) => {
         })
     }
 })
-//Rota que exclui agencias selecionadas
 router.get('/empresas/excluir/:ident', eAdmin, (req, res) => {
     const ident = req.params.ident
     if (ident == undefined) {
@@ -566,8 +569,7 @@ router.get('/clientes', lOgado, (req, res) => {
         res.redirect('/painel')
     })
 })
-
-router.post('/clientes/add_cliente', lOgado, (req, res) => {
+router.post('/clientes/add_cliente', eDigitador, (req, res) => {
     const { name_client, tipo_doc, documento, contato, perm_fatura } = req.body
     if (!name_client || !tipo_doc || !documento || !contato || !perm_fatura) {
         req.flash('error_msg', "Todos os compos devem ser preenchidos")
@@ -592,8 +594,7 @@ router.post('/clientes/add_cliente', lOgado, (req, res) => {
     }
 
 })
-
-router.post('/clientes/excluir/', lOgado, (req, res) => {
+router.post('/clientes/excluir/', eDigitador, (req, res) => {
 
     const ident = req.body.ident
     if (ident == undefined) {
@@ -612,7 +613,6 @@ router.post('/clientes/excluir/', lOgado, (req, res) => {
 
     }
 })
-
 router.get('/clientes/ver_cliente/:ident', lOgado, (req, res) => {
     const ident = req.params.ident
     Cliente.findById(ident).then((client) => {
@@ -651,8 +651,7 @@ router.get('/clientes/ver_cliente/:ident', lOgado, (req, res) => {
         res.redirect('/administracao/clientes')
     })
 })
-
-router.post('/clientes/edit_client/editar', lOgado, (req, res) => {
+router.post('/clientes/edit_client/editar', eDigitador, (req, res) => {
     const { name_client, tipo_doc, documento, contato, perm_fatura, ident } = req.body
     Cliente.findById(ident).then((client) => {
 
@@ -679,8 +678,5 @@ router.post('/clientes/edit_client/editar', lOgado, (req, res) => {
 
 
 })
-
-
-
 
 module.exports = router

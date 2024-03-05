@@ -1,0 +1,89 @@
+{{#each success}}
+<div class="alert alert-success">{{text}}</div>
+{{else}}
+{{/each}}
+{{#each erros}}
+<div class="alert alert-danger">{{text}}</div>
+{{else}}
+{{/each}}
+
+
+
+<div class="table-responsive-xl">
+
+    <form action="/comissao/cargas/calcular" onsubmit="confirmAction(event, this)">
+        <h5>Calcular Comissão do periodo</h5>
+        <small>Calculos de uma agencia em especifico somente exibe as informações, os calculos não são
+            salvos, para salvar é necessario gerar e todas as agencias.</small>
+        <table class="table mt-2">
+
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">Periodo</th>
+                    <th scope="col">Agencia</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <select name="periodoBusca" class="form-select" id="floatingSelect2" aria-label="Empresa"
+                            required>
+                            <option value="1">---Selecione---</option>
+                            {{#each periodos}}
+                            <option value="{{_id}}">{{nome}}</option>
+                            {{else}}
+                            {{/each}}
+                        </select>
+                    </td>
+                    <td>
+                        <select name="agenciaBusca" class="form-select" id="floatingSelect2" aria-label="Empresa"
+                            required>
+                            <option value="1">Todas</option>
+                            {{#each agencias}}
+                            <option value="{{_id}}">{{cidade}}</option>
+                            {{else}}
+                            {{/each}}
+                        </select>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="btn btn-secondary btn-sm" type="submit">Calcular</button> <button
+            class="btn btn-outline-secondary btn-sm" type="reset">Limpar</button>
+    </form>
+</div>
+
+{{#if periodosCalculados}}
+<div class="table-responsive-xl">
+    <form action="/comissao/cargas/excluir" method="post">
+        <table class="table">
+            <hr>
+            <p style="font-weight: bold;">Comissões Calculadas</p>
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">Periodo</th>
+                    <th scope="col">Empresa</th>
+                    <th scope="col">De</th>
+                    <th scope="col">Até</th>
+                    <th scope="col">#</th>
+                </tr>
+            </thead>
+            {{#each periodosCalculados}}
+            <tbody>
+                <tr>
+                    <td><a href="/comissao/cargas/detalhado/{{_id}}">{{nome}}</a></td>
+                    <td>{{empresa.empresa}}</td>
+                    <td>{{dateMin}}</td>
+                    <td>{{dateMax}}</td>
+                    <td><input type="checkbox" name="periodo" value="{{_id}}"></td>
+                </tr>
+            </tbody>
+            {{else}}
+            {{/each}}
+        </table>
+        <button class="btn btn-outline-danger btn-sm" type="submit">Excluir</button>
+    </form>
+</div>
+</div>
+{{else}}
+{{/if}}

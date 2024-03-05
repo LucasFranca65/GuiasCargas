@@ -5,7 +5,7 @@
 
 <div class="table-responsive-xl">
 
-    <form action="/administracao/clientes/edit_client/editar" method="post">
+    <form action="/administracao/clientes/edit_client/editar" method="post" onsubmit="confirmAction(event, this)">
         <input type="hidden" name="ident" value="{{client._id}}">
         <table class="table">
             <p style="font-weight: bold;">Cadastrar Novo Cliente gencia</p>
@@ -51,7 +51,7 @@
     </form>
 </div>
 
-<form action="/administracao/guias/excluir" method="post" class="mt-4">
+<form action="/administracao/guias/excluir" method="post" class="mt-4" onsubmit="confirmDell(event, this)">
     <div class="table-responsive-xl fs-6 shadow p-2">
         <h6>Guias Encontradas</h6>
         <div style="max-height: 400px;overflow-y: scroll;">

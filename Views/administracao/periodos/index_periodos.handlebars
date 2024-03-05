@@ -1,15 +1,19 @@
 {{#each sucessos}}
-<div class="alert alert-success">{{texto}}</div>
+<div class="alert alert-success">{{texto}}
+    <a href="/periodos" role="button" class="btn btn-sm btn-outline-secondary">Atualizar!</a>
+</div>
+
 {{else}}
 {{/each}}
 {{#each erros}}
 <div class="alert alert-danger">{{texto}}</div>
 {{else}}
 {{/each}}
-
+<h5>Periodos de Controle de Digitação</h5>
+{{#if eControle}}
 <div class="table-responsive-xl">
 
-    <form action="/periodos/adicionar" method="post">
+    <form action="/periodos/adicionar" method="post" onsubmit="confirmAdd(event, this)">
 
         <table class="table shadow">
             <h4>Abrir periodo de digitação</h4>
@@ -60,14 +64,16 @@
             class="btn btn-outline-secondary btn-sm" type="reset">Limpar</button>
     </form>
 </div>
+{{else}}
+{{/if}}
 
 {{#if periodosAbertos}}
 <div class="table-responsive-xl ">
-    <form action="/periodos/encerrar" method="post">
+    <form action="/periodos/encerrar" method="post" onsubmit="confirmAction(event, this)">
         <table class="table shadow table-bordered">
             <hr>
             <p style="font-weight: bold;">Periodos Abertos</p>
-            <thead class="table-secondary">
+            <thead class="table-success">
                 <tr>
                     <th scope="col">Identificador</th>
                     <th scope="col">Empresa</th>
@@ -80,7 +86,7 @@
             {{#each periodosAbertos}}
             <tbody>
                 <tr>
-                    <td> <a href="/administracao/dadosPeriododeControle/{{_id}}">{{nome}}</a></td>
+                    <td> <a href="/periodos/dadosPeriododeControle/{{_id}}">{{nome}}</a></td>
                     <td>{{empresa.empresa}}</td>
                     <td>{{dateExibInit}}</td>
                     <td>{{dateExibFin}}</td>
@@ -98,12 +104,12 @@
 {{/if}}
 
 {{#if periodosFechados}}
-<form action="/periodos/reabrir" method="post">
+<form action="/periodos/reabrir" method="post" onsubmit="confirmAction(event, this)">
     <div class="table-responsive-xl">
-        <table class="table">
+        <table class="table shadow table-bordered">
             <hr>
             <p style="font-weight: bold;">Periodos Encerados</p>
-            <thead class="table-dark">
+            <thead class="table-danger ">
                 <tr>
                     <th scope="col">Nome</th>
                     <th scope="col">Empresa</th>
@@ -116,7 +122,7 @@
             {{#each periodosFechados}}
             <tbody>
                 <tr>
-                    <td> <a href="/administracao/dadosPeriododeControle/{{_id}}">{{nome}}</a></td>
+                    <td> <a href="/periodos/dadosPeriododeControle/{{_id}}">{{nome}}</a></td>
                     <td>{{empresa.empresa}}</td>
                     <td>{{dateExibInit}}</td>
                     <td>{{dateExibFin}}</td>

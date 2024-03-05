@@ -5,7 +5,7 @@
 
 <div class="table-responsive-xl">
 
-    <form action="/administracao/users/add_user" method="post">
+    <form action="/administracao/users/add_user" method="post" onsubmit="confirmAdd(event, this)">
         <table class="table">
             <p style="font-weight: bold;">Cadastrar novo Usuario</p>
             <thead class="table-dark">
@@ -31,6 +31,7 @@
                             <option value="selecione">-----selecione-----</option>
                             <option value="AGENTE">AGENTE</option>
                             <option value="ARRECADACAO">ARRECADACAO</option>
+                            <option value="CONTROLE">CONTROLE</option>
                             <option value="FINANCEIRO">FINANCEIRO</option>
                             <option value="DIGITADOR">DIGITADOR</option>
                             <option value="ADMINISTRADOR">ADMINISTRADOR</option>
@@ -45,7 +46,7 @@
                             {{else}}
                             {{/each}}
                         </select>
-                        <small>Selecione apenas para perfil de agentes</small>
+                        <small>Selecione geral para usuarios da garagem</small>
                     </td>
                     <td>
                         <input class="form-control" type="password" name="senha1">
@@ -61,7 +62,7 @@
 </div>
 
 <div class="table-responsive-xl">
-    <form action="/administracao/users/dell_user" method="post">
+    <form action="/administracao/users/dell_user" method="post" onsubmit="confirmDell(event, this)">
         <table class="table">
             <hr>
             <p style="font-weight: bold;">Usuarios Cadastrados</p>

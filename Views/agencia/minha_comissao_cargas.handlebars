@@ -1,0 +1,69 @@
+{{#each error}}
+<div class="alert alert-danger">{{text}}</div>
+{{else}}
+{{/each}}
+<h4>Minhas comissões</h4>
+<h5>{{agencia.cidade}}</h5>
+<div id="busca">
+    <small>
+        <form class="d-flex" action="" method="get">
+            <label for="ano">Selecione o ano: </label>
+            <input type="number" class="ms-2" name="ano" id="">
+            <button type="submit">Buscar</button>
+        </form>
+    </small>
+</div>
+<hr>
+{{#if dados}}
+<h6>Ano Referencia{{resumo.ano}}</h6>
+<small>Qtd Vendas Validas: {{resumo.qtdVendasAno}}</small><br>
+<small>Total Vendas Validas:{{resumo.valorVendasAnoExib}}</small><br>
+<small>Total Comissão: {{resumo.comissAnoExib}}</small>
+
+<div class="table-responsive-xl">
+    <input type="hidden" name="periodo" value="{{periodo.id}}">
+    <table class="table table-bordered shadow mt-2">
+        <thead class="table-dark">
+            <tr>
+                <th scope="col"></th>
+                <th scope="col"></th>
+
+                <th scope="col" colspan="2">Total Vendido</th>
+                <th scope="col" colspan="2">Guias Validas</th>
+                <th scope="col" colspan="2">Guias Canceladas</th>
+                <th scope="col"></th>
+            </tr>
+            <tr>
+                <th scope="col">Mes</th>
+                <th scope="col">Empresa</th>
+                <th scope="col">QTD</th>
+                <th scope="col">Valor</th>
+                <th scope="col">QTD</th>
+                <th scope="col">Valor</th>
+                <th scope="col">QTD</th>
+                <th scope="col">Valor</th>
+                <th scope="col">Comissão</th>
+            </tr>
+        </thead>
+        {{#each dados}}
+        <tbody>
+            <tr>
+                <td>{{mes}}</td>
+                <td>{{empresa.empresa}}</td>
+                <td>{{qtdVendas}}</td>
+                <td>{{totalVendasExib}}</td>
+                <td>{{qtdValidos}}</td>
+                <td>{{totalValidasExib}}</td>
+                <td>{{qtdCancelado}}</td>
+                <td>{{totalCanceladoExib}}</td>
+                <td>{{valorExib}}</td>
+            </tr>
+        </tbody>
+        {{else}}
+        {{/each}}
+    </table>
+    <a role="button" class="ms-2 btn btn-sm btn-secondary" onclick="window.print()">Imprimir</a>
+</div>
+{{else}}
+{{/if}}
+<br><br>

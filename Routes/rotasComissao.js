@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs')
-const { eAdmin, lOgado } = require('../helpers/eAdmin')
+const { eAdmin, lOgado, eDigitador, eControle } = require('../helpers/eAdmin')
 const moment = require('moment')
 
 //Models
@@ -223,7 +223,7 @@ router.post('/bilhetes/excluir', eAdmin, (req, res) => {
 })*/
 
 //Guias de Encomendas e Cargas periodosCalculados
-router.get('/cargas', lOgado, (req, res) => {
+router.get('/cargas', eControle, (req, res) => {
     const usuario = req.user
     if (usuario.perfil == "AGENTE") {
         req.flash('error_msg', "Rota não auorizada para o usuario")
@@ -253,7 +253,7 @@ router.get('/cargas', lOgado, (req, res) => {
 
 })
 
-router.get('/cargas/calcular', lOgado, (req, res) => {
+router.get('/cargas/calcular', eControle, (req, res) => {
     const usuario = req.user
     if (usuario.perfil == "AGENTE" || usuario.perfil == "DIGITADOR" || usuario.perfil == "ARRECADACAO") {
         req.flash('error_msg', "Usuario não autorizado para realizar essa ação")
@@ -388,7 +388,7 @@ router.get('/cargas/calcular', lOgado, (req, res) => {
 
 })
 
-router.get('/cargas/detalhado/:id', lOgado, (req, res) => {
+router.get('/cargas/detalhado/:id', eControle, (req, res) => {
 
     const usuario = req.user
     if (usuario.perfil == "AGENTE") {
@@ -453,7 +453,7 @@ router.get('/cargas/detalhado/:id', lOgado, (req, res) => {
 
 })
 
-router.get('/cargas/detalhadoAgencia/:id', lOgado, (req, res) => {
+router.get('/cargas/detalhadoAgencia/:id', eControle, (req, res) => {
     const usuario = req.user
     if (usuario.perfil == "AGENTE") {
         req.flash('error_msg', "Rota não auorizada para o usuario")
@@ -488,7 +488,7 @@ router.get('/cargas/detalhadoAgencia/:id', lOgado, (req, res) => {
 
 })
 
-router.get('/cargas/excluir_calculos', lOgado, (req, res) => {
+router.get('/cargas/excluir_calculos', eControle, (req, res) => {
     const usuario = req.user
     if (usuario.perfil == "AGENTE") {
         req.flash('error_msg', "Rota não auorizada para o usuario")
@@ -543,7 +543,7 @@ router.get('/cargas/excluir_calculos', lOgado, (req, res) => {
     })
 })*/
 
-router.post('/cargas/excluir', eAdmin, (req, res) => {
+router.post('/cargas/excluir', eControle, (req, res) => {
     const usuario = req.user
     if (usuario.perfil == "AGENTE") {
         req.flash('error_msg', "Rota não auorizada para o usuario")

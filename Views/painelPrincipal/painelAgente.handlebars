@@ -106,6 +106,12 @@
 </div>
 
 {{else}}
+{{#each erros}}
+<div class="alert alert-danger">
+    <h5>{{texto}}</h5>
+</div>
+{{else}}
+{{/each}}
 <div class="d-flex justify-content-center mt-4">
     <div class="p-4 mt-2" style="width: 60%;">
         <h5>Selecione uma Empresa</h5>
@@ -120,5 +126,4 @@
         </form>
     </div>
 </div>
-
 {{/if}}
