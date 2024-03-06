@@ -10,7 +10,8 @@
 {{else}}
 {{/each}}
 <h5>Periodos de Controle de Digitação</h5>
-{{#if eControle}}
+
+{{#if user.eControle}}
 <div class="table-responsive-xl">
 
     <form action="/periodos/adicionar" method="post" onsubmit="confirmAdd(event, this)">

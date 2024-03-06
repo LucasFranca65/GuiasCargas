@@ -70,7 +70,7 @@ router.get('/', lOgado, (req, res) => {
             Empresa.find().then((empresas) => {
                 Agencia.find().sort({ cidade: 1 }).then((agencias) => {
                     GuiaCarga.find({ origem: agencia._id }).populate('empresa').populate('origem').populate('destino').populate('cliente').limit(10).sort({ date: -1 }).then((guias) => {
-                        Cliente.find().sort({ nome: 1 }).then((clientes) => {
+                        Cliente.find().sort({ name_client: 1 }).then((clientes) => {
                             for (let i = 0; i < guias.length; i++) {
                                 guias[i]["date_entrada"] = moment(guias[i].dateEntrada).format('DD/MM/YYYY')
                                 guias[i]["date_vencimento"] = moment(guias[i].vencimento).format('DD/MM/YYYY')
@@ -824,7 +824,7 @@ router.get('/selectEdit/:id', lOgado, (req, res) => {
 
                     guia["date_entrada"] = moment(guia.dateEntrada).format('YYYY-MM-DD')
                     guia["date_vencimento"] = moment(guia.vencimento).format('YYYY-MM-DD')
-                    guia["date_pagamento"] = moment(guia.datePagamento).format('YYYY-MM-DD')
+                    guia["date_pagamento"] = moment(guia.datePagamento).format('DD/MM/YYYY')
                     guia["date_exib"] = moment(guia.date).format('DD/MM/YYYY HH:mm')
                     guia["date_entrega"] = moment(guia.dateEntrega).format('DD/MM/YYYY HH:mm')
 

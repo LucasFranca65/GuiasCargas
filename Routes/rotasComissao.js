@@ -224,32 +224,27 @@ router.post('/bilhetes/excluir', eAdmin, (req, res) => {
 
 //Guias de Encomendas e Cargas periodosCalculados
 router.get('/cargas', eControle, (req, res) => {
-    const usuario = req.user
-    if (usuario.perfil == "AGENTE") {
-        req.flash('error_msg', "Rota não auorizada para o usuario")
-        res.redirect('/agencias')
-    } else {
-        Agencia.find().then((agencias) => {
-            Periodo.find({ comissao: false }).then((periodos) => {
-                Periodo.find({ comissao: true }).populate('empresa').then((periodosCalculados) => {
-                    for (let i = 0; i < periodosCalculados.length; i++) {
-                        periodosCalculados[i]['dateMin'] = moment(periodosCalculados[i].dateInit).format('DD/MM/YYYY')
-                        periodosCalculados[i]['dateMax'] = moment(periodosCalculados[i].dateFin).format('DD/MM/YYYY')
-                    }
-                    res.render('comissao/comissao_cargas', { periodos, agencias, periodosCalculados })
-                }).catch((err) => {
-                    req.flash('error_msg', "Erro ao tentar buscar comissoes", err)
-                    res.redirect('/error')
-                })
+
+    Agencia.find().then((agencias) => {
+        Periodo.find({ comissao: false, status: "FECHADO" }).then((periodos) => {
+            Periodo.find({ comissao: true }).populate('empresa').then((periodosCalculados) => {
+                for (let i = 0; i < periodosCalculados.length; i++) {
+                    periodosCalculados[i]['dateMin'] = moment(periodosCalculados[i].dateInit).format('DD/MM/YYYY')
+                    periodosCalculados[i]['dateMax'] = moment(periodosCalculados[i].dateFin).format('DD/MM/YYYY')
+                }
+                res.render('comissao/comissao_cargas', { periodos, agencias, periodosCalculados })
             }).catch((err) => {
                 req.flash('error_msg', "Erro ao tentar buscar comissoes", err)
                 res.redirect('/error')
             })
         }).catch((err) => {
-            req.flash('error_msg', "Erro ao tentar buscar agencias", err)
+            req.flash('error_msg', "Erro ao tentar buscar comissoes", err)
             res.redirect('/error')
         })
-    }
+    }).catch((err) => {
+        req.flash('error_msg', "Erro ao tentar buscar agencias", err)
+        res.redirect('/error')
+    })
 
 })
 

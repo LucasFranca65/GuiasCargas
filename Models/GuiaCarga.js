@@ -81,7 +81,7 @@ const GuiaCarga = new Schema({
     },
     recebedor: {
         type: String,
-        default: "ENTREGA AUTOMATICA"
+        default: "BAIXA AUTOMATICA NA ENTREGA"
     },
     cpfRecebedor: {
         type: String,

@@ -12,12 +12,11 @@ const Agencia = mongoose.model('agencias')
 const { lOgado } = require('../helpers/eAdmin')
 
 router.get('/', (req, res) => {
-    System.find().then((info) => {
+    System.findOne().then((info) => {
         //console.log(info.length)
-        if (info.length == 0) {
-
+        if (!info) {
             const novoInfo = new System({
-                firt_conection: moment(new Date()).format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
+                firt_conection: moment(new Date()).format(),
                 version: "V1.1",
                 by: "Lucas Oliveira França",
                 nTalao: 0
@@ -25,25 +24,25 @@ router.get('/', (req, res) => {
 
             novoInfo.save().then(() => {
                 //console.log("Info Criado")
-
                 const newAgencia = new Agencia({
-                    numero: "99",
+                    numero: "9999",
                     cidade: "Geral",
                     indiceComissao: "0"
                 })
 
                 newAgencia.save().then(() => {
                     console.log("Agencia Criado")
-
-                    Agencia.find().then((agencia) => {
+                    Agencia.findOne().then((agencia) => {
                         console.log(agencia)
                         const novoUsuario = new User({
                             nome: "Administrador",
                             perfil: "ADMINISTRADOR",
                             login: "admin",
                             senha: "admin",
-                            agencia: agencia[0]._id,
-                            eAdmin: true
+                            agencia: agencia._id,
+                            eAdmin: true,
+                            eControle: true,
+                            eDigitador: true
                         })
 
                         bcrypt.genSalt(10, (erro, salt) => {
@@ -54,10 +53,10 @@ router.get('/', (req, res) => {
                                 }
                                 novoUsuario.senha = hash
                                 novoUsuario.save().then(() => {
-                                    req.flash('success_msg', "Usuario Administrador Cadastrado com sucesso utilise Usuario : admin, Senha: admin no seu primeiro acesso, recomendamos alterar a senha! ---->>>>" + msg)
+                                    req.flash('success_msg', "Usuario Administrador Cadastrado com sucesso utilise Usuario : admin, Senha: admin no seu primeiro acesso, recomendamos alterar a senha! ---->>>>")
                                     res.redirect('/validation/login')
                                 }).catch((err) => {
-                                    req.flash('error_msg', "Erro ao criar usuario Administrador")
+                                    req.flash('error_msg', "Erro ao criar usuario Administrador", err)
                                     res.redirect('/error')
                                 })
                             })

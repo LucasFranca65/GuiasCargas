@@ -1,9 +1,9 @@
 {{#each success}}
-<div class="alert alert-success">{{text}}</div>
+<div class="alert alert-success shadow">{{text}}</div>
 {{else}}
 {{/each}}
 {{#each erros}}
-<div class="alert alert-danger">{{text}}</div>
+<div class="alert alert-danger shadow">{{text}}</div>
 {{else}}
 {{/each}}
 
@@ -13,13 +13,13 @@
 
     <form action="/comissao/cargas/calcular" onsubmit="confirmAction(event, this)">
         <h5>Calcular Comissão do periodo</h5>
-        <small>Calculos de uma agencia em especifico somente exibe as informações, os calculos não são
+        <small>Calculos de uma agencia especifica somente exibe as informações, os calculos não serão
             salvos, para salvar é necessario gerar e todas as agencias.</small>
         <table class="table mt-2">
 
             <thead class="table-dark">
                 <tr>
-                    <th scope="col">Periodo</th>
+                    <th scope="col">Periodos disponiveis para calculo</th>
                     <th scope="col">Agencia</th>
                 </tr>
             </thead>
@@ -30,7 +30,7 @@
                             required>
                             <option value="1">---Selecione---</option>
                             {{#each periodos}}
-                            <option value="{{_id}}">{{nome}}</option>
+                            <option value="{{_id}}">{{mes}}/{{ano}} - {{nome}}</option>
                             {{else}}
                             {{/each}}
                         </select>
@@ -56,12 +56,12 @@
 {{#if periodosCalculados}}
 <div class="table-responsive-xl">
     <form action="/comissao/cargas/excluir" method="post">
-        <table class="table">
+        <table class="table table-striped">
             <hr>
             <p style="font-weight: bold;">Comissões Calculadas</p>
             <thead class="table-dark">
                 <tr>
-                    <th scope="col">Periodo</th>
+                    <th scope="col">Nome do Periodo</th>
                     <th scope="col">Empresa</th>
                     <th scope="col">De</th>
                     <th scope="col">Até</th>
@@ -81,7 +81,7 @@
             {{else}}
             {{/each}}
         </table>
-        <button class="btn btn-outline-danger btn-sm" type="submit">Excluir</button>
+        <button class="btn btn-outline-danger btn-sm" type="submit">Excluir Calculos</button>
     </form>
 </div>
 </div>

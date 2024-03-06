@@ -51,5 +51,12 @@
     </table>
 </div>
 
-<button onclick="window.print()" class="btn btn-outline-success btn-sm ms-2">Imprimir</button><a
-    href="/periodos"><button class="btn btn-secondary btn-sm ms-2">Retornar</button></a>
+<button onclick="window.print()" class="btn btn-outline-success btn-sm ms-2">Imprimir</button><a href="/periodos"
+    role="button" class="btn btn-secondary btn-sm ms-2"> Retornar</a>
+
+<hr>
+
+<form action="/periodos/excluir" method="get" onsubmit=" confirmDell(event, this)">
+    <input type="hidden" name="ident" value="{{periodo._id}}">
+    <button type="submit" class="btn btn-sm btn-outline-secondary">Excluir</button>
+</form>

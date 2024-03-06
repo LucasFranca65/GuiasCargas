@@ -112,14 +112,15 @@ router.post('/adicionar', eControle, (req, res) => {
                     }
 
                 }
-
+                console.log(mes + '-' + uDia + '-' + ano + " 23:59:59")
+                console.log(mes + '-01-' + ano + " 00:00:00")
                 const newPeriodo = {
                     nome: reference,
                     empresa: empresa,
-                    dateInit: moment(mes + '-01' + ano + " 00:00:00", 'MM-DD-YYYY HH:mm:ss', true).format(),
+                    dateInit: moment(mes + '-01-' + ano + " 00:00:00", 'MM-DD-YYYY HH:mm:ss', true).format(),
                     dateFin: moment(mes + '-' + uDia + '-' + ano + " 23:59:59", 'MM-DD-YYYY HH:mm:ss', true).format(),
-                    mes,
-                    ano
+                    mes: mes,
+                    ano: ano
                 }
 
                 new Periodo(newPeriodo).save().then(() => {
@@ -493,6 +494,36 @@ router.post('/reabrir', eControle, (req, res) => {
         }
 
     }
+})
+
+router.get('/excluir', eAdmin, (req, res) => {
+
+    const { ident } = req.query
+    //console.log(ident)
+    if (!ident) {
+        req.flash('error_msg', "periodo não informado para exclusão")
+        res.redirect('/periodos')
+    } else {
+        GuiaCarga.findOne({ periodo: ident }).then((guia) => {
+            if (guia) {
+                req.flash('error_msg', "Periodo não pode ser Excluido, já existem guias lançadas para o mesmo !")
+                res.redirect('/periodos')
+            } else {
+                Periodo.findByIdAndDelete(ident).then(() => {
+                    req.flash('success_msg', "Periodo Excluido com sucesso !")
+                    res.redirect('/periodos')
+                }).catch((err) => {
+                    req.flash('error_msg', "Erro ao excluir periodo!", err)
+                    res.redirect('/periodos')
+                })
+            }
+        }).catch((err) => {
+            req.flash('error_msg', "Erro ao buscar guias do periodo!", err)
+            res.redirect('/periodos')
+        })
+    }
+
+
 })
 
 module.exports = router
