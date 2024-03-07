@@ -31,7 +31,7 @@ router.get('/', (req, res) => {
                 })
 
                 newAgencia.save().then(() => {
-                    console.log("Agencia Criado")
+                    //console.log("Agencia Criado")
                     Agencia.findOne().then((agencia) => {
                         console.log(agencia)
                         const novoUsuario = new User({

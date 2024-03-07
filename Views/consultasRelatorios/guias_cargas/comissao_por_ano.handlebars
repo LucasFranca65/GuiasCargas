@@ -2,8 +2,9 @@
 <div class="alert alert-danger">{{text}}</div>
 {{else}}
 {{/each}}
+<h4>Relatorio anual de comissão da Agencia</h4>
+<h5>{{agencia.cidade}}</h5>
 <div id="busca">
-    <h4>Minhas comissões</h4>
     <small>
         <form class="d-flex" action="" method="get">
             <label for="ano">Selecione o ano: </label>
@@ -14,8 +15,7 @@
 </div>
 <hr>
 {{#if dados}}
-<small>{{agencia.cidade}}</small><br>
-<small>Ano Referencia{{resumo.ano}}</small><br>
+<h6>Ano Referencia{{resumo.ano}}</h6>
 <small>Qtd Vendas Validas: {{resumo.qtdVendasAno}}</small><br>
 <small>Total Vendas Validas:{{resumo.valorVendasAnoExib}}</small><br>
 <small>Total Comissão: {{resumo.comissAnoExib}}</small>

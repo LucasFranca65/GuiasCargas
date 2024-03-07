@@ -314,9 +314,9 @@ router.post('/adicionar', lOgado, (req, res) => {
     const usuario = req.user
     var erro = []
     if (condPag == "FATURADO" && !n_fatura) {
-        erro.push({ text: "Para venda Faturada o numero da Fatura é Obrigatorio" })
+        erro.push({ text: "Para guias Faturadas o numero da Fatura é Obrigatorio" })
     }
-    if (origem === destino) {
+    if (origem == destino) {
         erro.push({ text: "Cidade de oriegem não pode ser igual a cidade de destino" })
     }
     if (!dateEntrada || dateEntrada == undefined) {
@@ -385,13 +385,13 @@ router.post('/adicionar', lOgado, (req, res) => {
                     if (!periodo) {
                         req.flash('error_msg', "Não foi encontrado periodo para a data de entrada informada, favor criar um periodo para essa data")
                         res.redirect('/guias')
-                    } else if (periodo.status != "Aberto") {
+                    } else if (periodo.status != "ABERTO") {
                         req.flash('error_msg', "Periodo referente a data de entrada informada, Já está encerrado, caso necessario reabra o periodo")
                         res.redirect('/guias')
                     } else {
                         Talao.findOne({ numeroInicial: { $lte: numero }, numeroFinal: { $gte: numero }, tipo: "ENCOMENDAS", agencia: origem }).then((talao) => {
                             if (!talao) {
-                                req.flash('error_msg', "Não foi encontrado talão cadastrado para a numeração de guia ou agencia, a oriegem deve corresponder a agengia que foi destinado o talão, favor verificar")
+                                req.flash('error_msg', "Não foi encontrado talão cadastrado para a numeração de guia ou agencia, a oriegem deve corresponder a agenCia que foi destinado o talão, favor verificar")
                                 res.redirect('/guias')
                             } else {
                                 GuiaCarga.findOne({ $or: [{ numero: numero, empresa: empresa }, { n_fatura: n_fatura, empresa: empresa, condPag: "FATURADO" }] }).then((guia) => {
@@ -400,9 +400,8 @@ router.post('/adicionar', lOgado, (req, res) => {
                                         res.redirect('/guias')
                                     } else {
                                         if (condPag == "FATURADO") {
-
                                             if (client.perm_fatura == false || client.perm_fatura == "false") {
-                                                req.flash("Cliente não autorizado paravenda Faturada")
+                                                req.flash("Cliente não autorizado para venda Faturada")
                                                 res.redirect('/guias')
                                             } else {
                                                 const newGuia = {
@@ -428,10 +427,10 @@ router.post('/adicionar', lOgado, (req, res) => {
                                                     destino: destino,
                                                     cliente: client,
                                                     empresa: empresa,
-                                                    dateEntrada: dateEntrada,
-                                                    vencimento: vencimento,
+                                                    dateEntrada: moment(dateEntrada).format(),
+                                                    vencimento: moment(vencimento).format(),
                                                     condPag: condPag,
-                                                    valor: valor,
+                                                    valor: parseFloat(valor),
                                                     user: usuario._id,
                                                     user_conf_entr: usuario._id
                                                 }

@@ -124,7 +124,7 @@ router.post('/users/add_user', eAdmin, (req, res) => {
                                 })
                             })
                         })
-                    } else if (perfil == "FINANCEIRO" || "ARRECADACAO" || "CONTROLE") {
+                    } else if (perfil == "FINANCEIRO" || perfil == "ARRECADACAO" || perfil == "CONTROLE") {
                         const novoUsuario = new User({
                             nome: nome,
                             login: login,
