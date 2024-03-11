@@ -58,6 +58,10 @@ const Comissao = new Schema({
         type: Number,
         required: true
     },
+    indice: {
+        type: Number,
+        required: true
+    }
 
 })
 

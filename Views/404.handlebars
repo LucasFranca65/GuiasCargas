@@ -1,3 +1,12 @@
+{{#each erros}}
+<div class="alert alert-danger">{{texto}}</div>
+{{else}}
+{{/each}}
+{{#each success}}
+<div class="alert alert-success">{{texto}}</div>
+{{else}}
+{{/each}}
+
 <div class="alert-danger">
     <h1>Erro ao tentar executar ação!</h1>
 </div>

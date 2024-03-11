@@ -21,7 +21,7 @@ router.get('/', lOgado, (req, res) => {
     const usuario = req.user
     Agencia.find().sort({ cidade: 1 }).then((agencias) => {
         System.findOne().then((system) => {
-            Talao.find().populate("agencia").sort({ _id: -1 }).limit(20).then((taloes) => {
+            Talao.find({ disponiveis: { $gt: 0 } }).populate("agencia").sort({ numeroInicial: 1 }).then((taloes) => {
                 if (usuario.perfil == "AGENTE") {
                     const tAgencia = taloes.filter(t => String(t.agencia._id) == String(usuario.agencia))
                     for (let i = 0; i < tAgencia.length; i++) {
@@ -96,12 +96,16 @@ router.post('/adicionar', lOgado, (req, res) => {
                 res.redirect('/talao')
             } else {
                 System.findOne().then((system) => {
+                    var disp = numFin - numInit
+
                     const newTalao = {
                         numeroControle: numCont,
                         numeroInicial: numInit,
                         numeroFinal: numFin,
                         agencia: agencia,
-                        tipo: tipo
+                        tipo: tipo,
+                        disponiveis: disp,
+                        qtdGuias: disp
                     }
 
                     new Talao(newTalao).save().then(() => {
@@ -230,6 +234,41 @@ router.get('/guias', lOgado, (req, res) => {
         res.redirect('/talao')
     })
 
+})
+
+router.get('/calcular_disp', lOgado, (req, res) => {
+    Talao.find().then((taloes) => {
+        var success = []
+        var erros = []
+        taloes.forEach(talao => {
+            GuiaCarga.find({ talao: talao._id }).then((guias) => {
+
+                var qtdTal = talao.numeroFinal - talao.numeroInicial
+                var usados = guias.length
+                if (guias) {
+                    talao.qtdGuias = qtdTal
+                    talao.disponiveis = qtdTal - usados
+                    talao.save().then(() => {
+                        success.push({ texto: "Talão numero " + talao.numeroControle + " Calculado com sucesso" })
+                    }).catch((err) => {
+                        erros.push({ texto: "Talão numero " + talao.numeroControle + " Erros nos calculos", err })
+                    })
+                } else {
+                    talao.disponiveis = qtdTal
+                    talao.qtdGuias = qtdTal
+                    talao.save().then(() => {
+                        success.push({ texto: "Talão numero " + talao.numeroControle + " Calculado com sucesso" })
+                    }).catch((err) => {
+                        erros.push({ texto: "Talão numero " + talao.numeroControle + " Erros nos calculos", err })
+                    })
+                }
+            }).catch((err) => {
+                erros.push({ texto: "Erro ao buscar guias ", err })
+
+            })
+        });
+        res.render('diagnostico', { erros, success })
+    })
 })
 
 module.exports = router

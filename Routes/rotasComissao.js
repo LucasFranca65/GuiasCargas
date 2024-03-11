@@ -255,7 +255,6 @@ router.get('/cargas/calcular', eControle, (req, res) => {
         res.redirect('/comissao/cargas')
     } else {
         const { periodoBusca, agenciaBusca } = req.query
-
         var erros = []
         var success = []
         if (agenciaBusca == '1' || agenciaBusca == 1) {
@@ -296,7 +295,8 @@ router.get('/cargas/calcular', eControle, (req, res) => {
                                             qtdValidos: guiasValidas.length,
                                             qtdCancelado: guiasCancel.length,
                                             mes: moment(periodo.dateInit).format('MM'),
-                                            ano: moment(periodo.dateInit).format('YYYY')
+                                            ano: moment(periodo.dateInit).format('YYYY'),
+                                            indice: agencia.indiceComissao
                                         }
                                         new Comissao(newComissao).save()
                                     })
@@ -368,7 +368,8 @@ router.get('/cargas/calcular', eControle, (req, res) => {
                             total: total,
                             cancel: totalCancel,
                             valid: totalValidas,
-                            comiss: comissao
+                            comiss: comissao,
+                            indice: agencia.indiceComissao
                         }
                         res.render('comissao/cargas_comissao_agencia', { newComissao, agencia, periodo })
                     }).catch((err) => {

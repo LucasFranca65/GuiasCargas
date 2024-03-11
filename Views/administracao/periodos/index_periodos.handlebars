@@ -52,11 +52,8 @@
 
                     </td>
                     <td>
-
                         <input type="number" class="form-control" min="2000" max="2999" name="ano" placeholder="0000"
                             required>
-
-
                     </td>
                 </tr>
             </tbody>
@@ -69,6 +66,7 @@
 {{/if}}
 
 {{#if periodosAbertos}}
+{{#if user.eControle}}
 <div class="table-responsive-xl ">
     <form action="/periodos/encerrar" method="post" onsubmit="confirmAction(event, this)">
         <table class="table shadow table-bordered">
@@ -102,13 +100,42 @@
     </form>
 </div>
 {{else}}
+<div class="table-responsive-xl ">
+    <table class="table shadow table-bordered">
+        <hr>
+        <p style="font-weight: bold;">Periodos Abertos</p>
+        <thead class="table-success">
+            <tr>
+                <th scope="col">Identificador</th>
+                <th scope="col">Empresa</th>
+                <th scope="col">Inicio</th>
+                <th scope="col">Fim</th>
+                <th scope="col">Status</th>
+            </tr>
+        </thead>
+        {{#each periodosAbertos}}
+        <tbody>
+            <tr>
+                <td> <a href="/periodos/dadosPeriododeControle/{{_id}}">{{nome}}</a></td>
+                <td>{{empresa.empresa}}</td>
+                <td>{{dateExibInit}}</td>
+                <td>{{dateExibFin}}</td>
+                <td>{{status}}</td>
+            </tr>
+        </tbody>
+        {{else}}
+        {{/each}}
+    </table>
+</div>
+{{/if}}
+{{else}}
 {{/if}}
 
 {{#if periodosFechados}}
+{{#if user.eControle}}
 <form action="/periodos/reabrir" method="post" onsubmit="confirmAction(event, this)">
     <div class="table-responsive-xl">
         <table class="table shadow table-bordered">
-            <hr>
             <p style="font-weight: bold;">Periodos Encerados</p>
             <thead class="table-danger ">
                 <tr>
@@ -137,6 +164,36 @@
         <button class="btn btn-outline-success btn-sm" type="submit">Reabrir</button>
     </div>
 </form>
+{{else}}
+
+<div class="table-responsive-xl">
+    <table class="table shadow table-bordered">
+        <p style="font-weight: bold;">Periodos Encerados</p>
+        <thead class="table-danger ">
+            <tr>
+                <th scope="col">Nome</th>
+                <th scope="col">Empresa</th>
+                <th scope="col">Inicio</th>
+                <th scope="col">Fim</th>
+                <th scope="col">Status</th>
+            </tr>
+        </thead>
+        {{#each periodosFechados}}
+        <tbody>
+            <tr>
+                <td> <a href="/periodos/dadosPeriododeControle/{{_id}}">{{nome}}</a></td>
+                <td>{{empresa.empresa}}</td>
+                <td>{{dateExibInit}}</td>
+                <td>{{dateExibFin}}</td>
+                <td>{{status}}</td>
+            </tr>
+        </tbody>
+        {{else}}
+        {{/each}}
+    </table>
+</div>
+</form>
+{{/if}}
 {{else}}
 {{/if}}
 

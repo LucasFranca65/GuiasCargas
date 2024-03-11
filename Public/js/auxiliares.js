@@ -184,6 +184,8 @@ const obterDados = () => {
 const interval = setInterval(obterDados, 3000)
 
 
+
+
 /*const btn_imp = document.getElementById('btn_imp')
 
 btn_imp.addEventListener("click", (evt) => {

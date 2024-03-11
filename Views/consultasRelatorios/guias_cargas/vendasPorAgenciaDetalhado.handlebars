@@ -1,0 +1,161 @@
+{{#each error}}
+<div class="alert alert-danger">{{texto}}</div>
+{{else}}
+{{/each}}
+
+{{#if title}}
+<div class="mt-4">
+  <h5>{{title.empresa}}</h5>
+  <h5>{{title.agencia}}</h5>
+  <small>Pago: {{title.totalPgEx}} </small><br>
+  <small>Pendente: {{title.totalPdEx}}</small><br>
+  <small>Vencido: {{title.totalVcEx}}</small><br>
+  <small>Cancelado: {{title.totalClEx}}</small><br>
+
+</div>
+{{else}}
+{{/if}}
+
+<div class="table-responsive-xl fs-6 mt-4">
+
+  {{#if guiasPagas}}
+
+  <table data-js="table" class="table table-bordered table-striped shadow">
+    <thead class="table-dark  ">
+      <tr id="table-rowns" class="fs-6">
+        <th scope="col" colspan="5" class="bg-success bg-gradient">Guias Pagas</th>
+      </tr>
+    </thead>
+    <thead class="table-dark  ">
+      <tr id="table-rowns" class="fs-6">
+        <th scope="col">Número</th>
+        <th scope="col">Destino</th>
+        <th scope="col">Data Entrada</th>
+        <th scope="col">Data Vencimento</th>
+        <th scope="col">Valor</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each guiasPagas}}
+      <tr id="table-rowns" class="fs-6 fst-normal">
+        <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
+        <td>{{destino.cidade}}</td>
+        <td>{{date_entrada}}</td>
+        <td>{{date_vencimento}}</td>
+        <td>{{valorExib}}</td>
+      </tr>
+      {{else}}
+      {{/each}}
+    </tbody>
+  </table>
+  {{else}}
+  {{/if}}
+
+  {{#if guiasPendentes}}
+  <table data-js="table" class="table table-bordered table-striped shadow">
+    <thead class="table-dark  ">
+      <tr id="table-rowns" class="fs-6">
+        <th scope="col" colspan="5" class="bg-warning bg-gradient">Guias Pendentes</th>
+      </tr>
+    </thead>
+    <thead class="table-dark  ">
+      <tr id="table-rowns" class="fs-6">
+        <th scope="col">Número</th>
+        <th scope="col">Destino</th>
+        <th scope="col">Data Entrada</th>
+        <th scope="col">Data Vencimento</th>
+        <th scope="col">Valor</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each guiasPagas}}
+      <tr id="table-rowns" class="fs-6 fst-normal">
+        <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
+        <td>{{destino.cidade}}</td>
+        <td>{{date_entrada}}</td>
+        <td>{{date_vencimento}}</td>
+        <td>{{valorExib}}</td>
+      </tr>
+      {{else}}
+      {{/each}}
+    </tbody>
+  </table>
+  {{else}}
+  {{/if}}
+
+
+  {{#if guiasVencidas}}
+  <table data-js="table" class="table table-bordered table-striped shadow">
+    <thead class="table-dark  ">
+      <tr id="table-rowns" class="fs-6">
+        <th scope="col" colspan="5" class="bg-danger bg-gradient">Guias Vencidas</th>
+      </tr>
+    </thead>
+    <thead class="table-dark  ">
+      <tr id="table-rowns" class="fs-6">
+        <th scope="col">Número</th>
+        <th scope="col">Destino</th>
+        <th scope="col">Data Entrada</th>
+        <th scope="col">Data Vencimento</th>
+        <th scope="col">Valor</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each guiasPagas}}
+      <tr id="table-rowns" class="fs-6 fst-normal">
+        <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
+        <td>{{destino.cidade}}</td>
+        <td>{{date_entrada}}</td>
+        <td>{{date_vencimento}}</td>
+        <td>{{valorExib}}</td>
+      </tr>
+      {{else}}
+      {{/each}}
+    </tbody>
+  </table>
+  {{else}}
+  {{/if}}
+
+  {{#if guiasCanceladas}}
+  <table data-js="table" class="table table-bordered table-striped shadow">
+    <thead class="table-dark  ">
+      <tr id="table-rowns" class="fs-6">
+        <th scope="col" colspan="5" class="bg-dark bg-gradient">Guias Canceladas</th>
+      </tr>
+    </thead>
+    <thead class="table-dark  ">
+      <tr id="table-rowns" class="fs-6">
+        <th scope="col">Número</th>
+        <th scope="col">Destino</th>
+        <th scope="col">Data Entrada</th>
+        <th scope="col">Data Vencimento</th>
+        <th scope="col">Valor</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each guiasPagas}}
+      <tr id="table-rowns" class="fs-6 fst-normal">
+        <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
+        <td>{{destino.cidade}}</td>
+        <td>{{date_entrada}}</td>
+        <td>{{date_vencimento}}</td>
+        <td>{{valorExib}}</td>
+      </tr>
+      {{else}}
+      {{/each}}
+    </tbody>
+  </table>
+  {{else}}
+  {{/if}}
+</div>
+
+<a role="button" id="btn-export-csv" class="btn btn-secondary btn-sm mt-2">Exportar .CSV</a>
+<a role="button" onclick="window.print()" class="btn btn-sm btn-outline-secondary mt-2 ms-2">Imprimir</a>
+<a role="button" class="btn mt-2 ms-2 btn-outline-secondary btn-sm" id="backBtn">Voltar</a>
+<br><br>
+
+<script>
+  document.getElementById("backBtn").addEventListener("click", function () {
+    history.back();
+  });
+</script>

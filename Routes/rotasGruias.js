@@ -3,7 +3,7 @@ const router = express.Router()
 const mongoose = require('mongoose')
 const moment = require('moment')
 const flash = require('connect-flash')
-const { lOgado } = require('../helpers/eAdmin')
+const { lOgado, eDigitador } = require('../helpers/eAdmin')
 
 //Models
 require('../models/GuiaCarga')
@@ -28,6 +28,10 @@ router.get('/', lOgado, (req, res) => {
                 Agencia.find().sort({ cidade: 1 }).then((agencias) => {
                     GuiaCarga.find().populate('empresa').populate('origem').populate('destino').populate('cliente').limit(10).sort({ _id: -1 }).then((guias) => {
                         Cliente.find().sort({ nome: 1 }).then((clientes) => {
+                            for (let i = 0; i < empresas.length; i++) {
+                                empresas[i]["number"] = i + 1
+                            }
+
                             for (let i = 0; i < guias.length; i++) {
                                 guias[i]["date_entrada"] = moment(guias[i].dateEntrada).format('DD/MM/YYYY')
                                 guias[i]["date_vencimento"] = moment(guias[i].vencimento).format('DD/MM/YYYY')
@@ -71,6 +75,9 @@ router.get('/', lOgado, (req, res) => {
                 Agencia.find().sort({ cidade: 1 }).then((agencias) => {
                     GuiaCarga.find({ origem: agencia._id }).populate('empresa').populate('origem').populate('destino').populate('cliente').limit(10).sort({ date: -1 }).then((guias) => {
                         Cliente.find().sort({ name_client: 1 }).then((clientes) => {
+                            for (let i = 0; i < empresas.length; i++) {
+                                empresas[i]["number"] = i + 1
+                            }
                             for (let i = 0; i < guias.length; i++) {
                                 guias[i]["date_entrada"] = moment(guias[i].dateEntrada).format('DD/MM/YYYY')
                                 guias[i]["date_vencimento"] = moment(guias[i].vencimento).format('DD/MM/YYYY')
@@ -390,10 +397,14 @@ router.post('/adicionar', lOgado, (req, res) => {
                         res.redirect('/guias')
                     } else {
                         Talao.findOne({ numeroInicial: { $lte: numero }, numeroFinal: { $gte: numero }, tipo: "ENCOMENDAS", agencia: origem }).then((talao) => {
+
+
                             if (!talao) {
                                 req.flash('error_msg', "Não foi encontrado talão cadastrado para a numeração de guia ou agencia, a oriegem deve corresponder a agenCia que foi destinado o talão, favor verificar")
                                 res.redirect('/guias')
                             } else {
+                                talao.disponiveis -= 1
+                                talao.save()
                                 GuiaCarga.findOne({ $or: [{ numero: numero, empresa: empresa }, { n_fatura: n_fatura, empresa: empresa, condPag: "FATURADO" }] }).then((guia) => {
                                     if (guia) {
                                         req.flash('error_msg', "Numero de Guia informada já cadastrado para essa empresa, ou existe guia cadastrada com o mesmo numero de fatura")
@@ -869,7 +880,7 @@ router.get('/selectEdit/:id', lOgado, (req, res) => {
 })
 
 //Editando Guia
-router.post('/editar', lOgado, (req, res) => {
+router.post('/editar', eDigitador, (req, res) => {
 
     const { id, user, origem, destino, cliente, empresa, dateEntrada, vencimento, valor, condPag, baixa, n_fatura } = req.body
     if (condPag == 'FATURADO' && !n_fatura) {
@@ -1074,7 +1085,7 @@ router.post('/buscar', lOgado, (req, res) => {
     })
 })
 
-router.post('/informar_pagamento_guia', lOgado, (req, res) => {
+router.post('/informar_pagamento_guia', eDigitador, (req, res) => {
     const { ident, date_pagamento, formaPag, date_entrada } = req.body
 
     if (formaPag == "selecione") {
@@ -1156,7 +1167,7 @@ router.post('/informar_pagamento_guia', lOgado, (req, res) => {
     }
 })
 
-router.get('/baixar_em_lote', lOgado, (req, res) => {
+router.get('/baixar_em_lote', eDigitador, (req, res) => {
     const usuario = req.user
     const { ids, agencia, dateMin, dateMax, status } = req.query
     if (Array.isArray(ids)) {
@@ -1204,7 +1215,7 @@ router.get('/baixar_em_lote', lOgado, (req, res) => {
     }
 })
 
-router.get('/baixar_em_lote/periodo', lOgado, (req, res) => {
+router.get('/baixar_em_lote/periodo', eDigitador, (req, res) => {
     const usuario = req.user
     const { ids, periodo } = req.query
     if (Array.isArray(ids)) {

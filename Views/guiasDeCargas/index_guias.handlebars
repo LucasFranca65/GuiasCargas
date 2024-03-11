@@ -77,7 +77,7 @@
                   <select name="empresa" class="form-select" id="floatingSelect2" aria-label="Agencia Destino">
                     <option value="selecione">---Selecione---</option>
                     {{#each empresas}}
-                    <option value="{{_id}}">{{empresa}}</option>
+                    <option value="{{_id}}">{{number}} - {{empresa}}</option>
                     {{else}}
                     {{/each}}
                   </select>
@@ -175,6 +175,8 @@
 
   </div>
   <button class="btn btn-sm btn-outline-danger mt-2 shadow" type="submit">Excluir Selecionados</button>
+  <a role="button" onclick="window.print()" class="btn btn-sm btn-outline-secondary mt-2 ms-2">Imprimir</a>
+
   </form>
   {{else}}
   {{/if}}
@@ -182,3 +184,9 @@
 
 </div>
 <br><br>
+
+<script>
+  document.getElementById("backBtn").addEventListener("click", function () {
+    history.back();
+  });
+</script>

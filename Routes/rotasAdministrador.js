@@ -663,10 +663,10 @@ router.post('/clientes/edit_client/editar', eDigitador, (req, res) => {
         client.user = req.user._id
 
         client.save().then(() => {
-            req.flash('success_msg', "Cliente Cadastrado com sucesso")
+            req.flash('success_msg', "Edição Realizada com Sucesso")
             res.redirect('/administracao/clientes/ver_cliente/' + ident)
         }).catch((err) => {
-            req.flash('error_msg', "Erro ao cadastrar Cliente")
+            req.flash('error_msg', "Erro ao Editar Cliente ")
             res.redirect('/administracao/clientes/ver_cliente/' + ident)
         })
     }).catch((err) => {

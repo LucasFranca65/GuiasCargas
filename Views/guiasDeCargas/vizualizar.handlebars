@@ -246,7 +246,7 @@
       <button type="submit" class="btn btn-outline-danger btn-sm mt-2 ">Excluir</button>
     </form>
 
-    <a href="/guias" class="btn btn-outline-success btn-sm mt-2 ms-2 " role="button" aria-pressed="true">Retornar</a>
+    <a role="button" class="btn mt-2 ms-2 btn-outline-secondary btn-sm" id="backBtn">Voltar</a>
 
     <a role="button" class="btn btn-outline-secondary btn-sm mt-2 ms-2" onclick="window.print()">Imprimir</a>
 
@@ -255,3 +255,10 @@
 </div>
 
 <br><br>
+
+
+<script>
+  document.getElementById("backBtn").addEventListener("click", function () {
+    history.back();
+  });
+</script>

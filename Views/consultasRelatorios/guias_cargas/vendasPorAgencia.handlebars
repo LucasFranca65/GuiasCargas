@@ -76,7 +76,9 @@
       <tbody>
         {{#each dados}}
         <tr id="table-rowns" class="fs-6 fst-normal">
-          <th scope="row"><a href="/consultas/vendas_por_agencia/detalhado/{{_id}}">{{agencia}}</a></th>
+          <th scope="row"><a
+              href="/consultas/vendas_por_agencia/detalhado?agencia={{idAgencia}}&empresa={{empresa}}&dateMin={{dateMin}}&dateMax={{dateMax}}">{{agencia}}</a>
+          </th>
           <td>{{vendidosExib}}</td>
           <td>{{qtdVendidos}}</td>
           <td>{{cancelExib}}</td>

@@ -61,7 +61,7 @@ router.get('/', lOgado, (req, res) => {
                                 guiasPp[i]["date_vencimento"] = moment(guiasPp[i].vencimento).format('DD/MM/YYYY')
                                 guiasPp[i]["valorExib"] = guiasPp[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
-                                if (moment(guiasPp[i].vencimento).format("YYYY-MM-DD") >= moment(dataAtual).format("YYYY-MM-DD")) {
+                                if (moment(guiasPp[i].vencimento).format("YYYY-MM-DD") >= moment(new Date()).format("YYYY-MM-DD")) {
                                     guiasPp[i]["statusBaixa"] = "PENDENTE"
                                 } else {
                                     guiasPp[i]["statusBaixa"] = "VENCIDO"
@@ -144,7 +144,7 @@ router.get('/', lOgado, (req, res) => {
                                 guiasPp[i]["date_vencimento"] = moment(guiasPp[i].vencimento).format('DD/MM/YYYY')
                                 guiasPp[i]["valorExib"] = guiasPp[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
-                                if (moment(guiasPp[i].vencimento).format("YYYY-MM-DD") >= moment(dataAtual).format("YYYY-MM-DD")) {
+                                if (moment(guiasPp[i].vencimento).format("YYYY-MM-DD") >= moment(new Date()).format("YYYY-MM-DD")) {
                                     guiasPp[i]["statusBaixa"] = "PENDENTE"
                                 } else {
                                     guiasPp[i]["statusBaixa"] = "VENCIDO"

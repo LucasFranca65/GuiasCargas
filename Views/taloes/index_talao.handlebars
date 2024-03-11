@@ -110,7 +110,7 @@
 
   <br><br>
   <h4>Talões Cadastraddos</h4>
-  <div class="table-responsive-xl">
+  <div class="table-responsive-xl" style="overflow-y: scroll; max-height: 450px;">
     <table class="table table-bordered fs-6 shadow">
       <thead class="table-secondary">
         <tr>
@@ -118,6 +118,7 @@
           <th scope="col">Agencia</th>
           <th scope="col">Nº Inicial</th>
           <th scope="col">Nº Final</th>
+          <th scope="col">Disponiveis</th>
           <th scope="col">Tipo</th>
           <th scope="col">Data Cadastro</th>
           <th scope="col">#</th>
@@ -131,6 +132,7 @@
             <td>{{agencia.cidade}}</td>
             <td>{{numeroInicial}}</td>
             <td>{{numeroFinal}}</td>
+            <td>{{disponiveis}}</td>
             <td>{{tipo}}</td>
             <td>{{date_exib}}</td>
             <td><input type="checkbox" name="ident" value="{{_id}}"></td>
@@ -148,7 +150,7 @@
   </div>
   {{/if}}
   {{/if }}
-
+  <a href="/talao/calcular_disp" role="button">calcular disponiveis</a>
 
 
 

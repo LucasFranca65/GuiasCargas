@@ -602,7 +602,10 @@ router.get('/vendas_por_agencia', eDigitador, (req, res) => {
                                 pendentesExib: "",
                                 vencidos: 0,
                                 qtdVencidos: 0,
-                                vencidosExib: ""
+                                vencidosExib: "",
+                                empresa: aEmpresa._id,
+                                dateMin,
+                                dateMax
                             }
                             for (let i = 0; i < guias.length; i++) {
                                 if (String(guias[i].origem) == String(resumo.idAgencia)) {
@@ -642,6 +645,84 @@ router.get('/vendas_por_agencia', eDigitador, (req, res) => {
         })
     }
 })
+
+router.get('/vendas_por_agencia/detalhado', eDigitador, (req, res) => {
+
+    const { agencia, empresa, dateMin, dateMax } = req.query
+    //console.log(agencia, empresa, dateMin, dateMax)
+    var dataInit = moment(dateMin).format()
+    var dataFin = moment(dateMax).format()
+    Agencia.findById(agencia).then(agc => {
+        Empresa.findById(empresa).then(emp => {
+            GuiaCarga.find({ dateEntrada: { $gte: dataInit, $lte: dataFin }, empresa: empresa, origem: agencia }).populate('destino').then((guias) => {
+                //console.log(guias.length)
+                var title = {
+                    totalPg: 0,
+                    totalPgEx: "",
+                    totalPd: 0,
+                    totalPdEx: "",
+                    totalVc: 0,
+                    totalVcEx: "",
+                    totalCl: 0,
+                    totalClEx: "",
+                    empresa: emp.empresa,
+                    agencia: agc.cidade
+                }
+
+                var guiasPagas = guias.filter(g => g.baixaPag == true && g.condPag != 'CANCELADO')
+                //console.log(guiasPagas.length)
+                for (let i = 0; i < guiasPagas.length; i++) {
+                    title.totalPg += guiasPagas[i].valor
+                    guiasPagas[i]["date_entrada"] = moment(guiasPagas[i].dateEntrada).format('DD/MM/YYYY')
+                    guiasPagas[i]["date_vencimento"] = moment(guiasPagas[i].vencimento).format('DD/MM/YYYY')
+                    guiasPagas[i]["valorExib"] = guiasPagas[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                }
+
+                var guiasPendentes = guias.filter(g => g.baixaPag == false && moment(g.vencimento).format("MM-DD-YYYY") >= moment(new Date()).format("MM-DD-YYYY"))
+                for (let i = 0; i < guiasPendentes.length; i++) {
+                    title.totalPd += guiasPendentes[i].valor
+                    guiasPendentes[i]["date_entrada"] = moment(guiasPendentes[i].dateEntrada).format('DD/MM/YYYY')
+                    guiasPendentes[i]["date_vencimento"] = moment(guiasPendentes[i].vencimento).format('DD/MM/YYYY')
+                    guiasPendentes[i]["valorExib"] = guiasPendentes[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                }
+                var guiasVencidas = guias.filter(g => g.baixaPag == false && moment(g.vencimento).format("MM-DD-YYYY") > moment(new Date()).format("MM-DD-YYYY"))
+                for (let i = 0; i < guiasVencidas.length; i++) {
+                    title.totalVc += guiasVencidas[i].valor
+                    guiasVencidas[i]["date_entrada"] = moment(guiasVencidas[i].dateEntrada).format('DD/MM/YYYY')
+                    guiasVencidas[i]["date_vencimento"] = moment(guiasVencidas[i].vencimento).format('DD/MM/YYYY')
+                    guiasVencidas[i]["valorExib"] = guiasVencidas[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                }
+                var guiasCanceladas = guias.filter(g => g.baixaPag == true && g.condPag == "CANCELADO")
+                for (let i = 0; i < guiasCanceladas.length; i++) {
+                    title.totalCl += guiasCanceladas[i].valor
+                    guiasCanceladas[i]["date_entrada"] = moment(guiasCanceladas[i].dateEntrada).format('DD/MM/YYYY')
+                    guiasCanceladas[i]["date_vencimento"] = moment(guiasCanceladas[i].vencimento).format('DD/MM/YYYY')
+                    guiasCanceladas[i]["valorExib"] = guiasCanceladas[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                }
+
+                title.totalPdEx = title.totalPd.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                title.totalPgEx = title.totalPg.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                title.totalClEx = title.totalCl.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                title.totalVcEx = title.totalVc.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+
+                res.render('consultasRelatorios/guias_cargas/vendasPorAgenciaDetalhado', { guiasPagas, guiasCanceladas, guiasPendentes, guiasVencidas, title })
+
+            }).catch(err => {
+                req.flash('error_msg', "Erro interno" + err)
+                res.redirect('/error')
+            })
+        }).catch(err => {
+            req.flash('error_msg', "Erro interno" + err)
+            res.redirect('/error')
+        })
+    }).catch(err => {
+        req.flash('error_msg', "Erro interno" + err)
+        res.redirect('/error')
+    })
+
+
+})
+
 
 //BUSCAR POR STATUS DE ENTREGA
 router.get('/por_entrega', eDigitador, (req, res) => {
