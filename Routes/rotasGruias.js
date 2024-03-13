@@ -396,11 +396,9 @@ router.post('/adicionar', lOgado, (req, res) => {
                         req.flash('error_msg', "Periodo referente a data de entrada informada, Já está encerrado, caso necessario reabra o periodo")
                         res.redirect('/guias')
                     } else {
-                        Talao.findOne({ numeroInicial: { $lte: numero }, numeroFinal: { $gte: numero }, tipo: "ENCOMENDAS", agencia: origem }).then((talao) => {
-
-
+                        Talao.findOne({ numeroInicial: { $lte: numero }, numeroFinal: { $gte: numero }, tipo: "ENCOMENDAS", agencia: origem, empresa: empresa }).then((talao) => {
                             if (!talao) {
-                                req.flash('error_msg', "Não foi encontrado talão cadastrado para a numeração de guia ou agencia, a oriegem deve corresponder a agenCia que foi destinado o talão, favor verificar")
+                                req.flash('error_msg', "Não foi encontrado talão cadastrado para a numeração de guia! Ou Agencia de Oriegem ou Empresa selecionadas não correspondem a cadastrada no talão! Favor verificar")
                                 res.redirect('/guias')
                             } else {
                                 talao.disponiveis -= 1

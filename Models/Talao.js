@@ -35,6 +35,11 @@ const Talao = new Schema({
     qtdGuias: {
         type: Number,
         required: true
+    },
+    empresa: {
+        type: Schema.Types.ObjectId,
+        ref: "empresas",
+        required: true
     }
 })
 

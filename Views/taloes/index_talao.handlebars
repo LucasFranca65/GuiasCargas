@@ -48,6 +48,7 @@
           <tr>
             <th scope="col">NºControle</th>
             <th scope="col">Agencia</th>
+            <th scope="col">Empresa</th>
             <th scope="col">Nº Inicial</th>
             <th scope="col">Nº Final</th>
             <th scope="col">Tipo</th>
@@ -62,8 +63,8 @@
                 <input type="hidden" name="numCont" value="{{numCont}}">
               </div>
             </td>
-            <td>
 
+            <td>
               <div class="form-floating">
                 <select name="agencia" class="form-select" id="floatingSelect" aria-label="Agencia Origem">
                   <option value="selecione">---Selecione---</option>
@@ -74,10 +75,21 @@
                 </select>
                 <label for="floatingSelect">Agencia</label>
               </div>
-
-
-
             </td>
+
+            <td>
+              <div class="form-floating">
+                <select name="empresa" class="form-select" id="floatingSelect" aria-label="Empresa">
+                  <option value="selecione">---Selecione---</option>
+                  {{#each empresas}}
+                  <option value="{{_id}}">{{empresa}}</option>
+                  {{else}}
+                  {{/each}}
+                </select>
+                <label for="floatingSelect">Empresa</label>
+              </div>
+            </td>
+
             <td>
               <div class="form-floating mb-3">
                 <input type="number" class="form-control" name="numInit" min="10000" max="99999" placeholder="00000">

@@ -140,20 +140,107 @@ router.get('/guias_cadastradas', eDigitador, (req, res) => {
 
 })
 
-router.get('/por_empresa', eDigitador, (req, res) => {
-    const usuario = req.user
-    if (usuario.perfil == "AGENTE") {
-        req.flash('error_msg', "Rota não auorizada para o usuario")
-        res.redirect('/agencias')
-    } else {
-        Empresa.find().then((empresas) => {
-            let next = "disabled", prev = "disabled"
-            res.render('consultasRelatorios/guias_cargas/porEmpresa', { next, prev, empresas })
-        }).catch((err) => {
-            req.flash('error_msg', "Erro ao Buscar empresas")
-            res.redirect('/consultas/por_empresa')
+router.get('/guias_cadastradas/por_empresa', eDigitador, (req, res) => {
+    const { empresa } = req.query
+    if (!empresa) {
+        Empresa.find().then(empresas => {
+            res.render('consultasRelatorios/guias_cargas/guias_por_empresa', { empresas })
+        }).catch(err => {
+            req.flash('error_msg', "Erro interno ", err)
+            res.redirect('/erro')
         })
+    } else {
+        const empresaSelec = empresa
+        Empresa.find().then(empresas => {
+            GuiaCarga.count({ empresa: empresa }).then((qtd) => {
+
+                if (qtd < 1) {
+                    req.flash('error_msg', "Não existem guias cadastradas no sistema, para a empresa selecionada")
+                    res.redirect('/consultas/guias_cadastradas/por_empresa')
+                } else {
+                    var { offset, page } = req.query
+                    const limit = 20
+                    if (!offset) {
+                        offset = 0
+                    }
+                    if (offset < 0) {
+                        offset = 0
+                    }
+                    else {
+                        offset = parseInt(offset)
+                    }
+                    if (!page) {
+                        page = 1
+                    }
+                    if (page < 1) {
+                        page = 1
+                    } else {
+                        page = parseInt(page)
+                    }
+
+                    GuiaCarga.find({ empresa: empresa }).limit(limit).skip(offset).populate('cliente').populate('destino').populate('origem').populate('empresa').sort({ numero: 1 }).then((dados) => {
+                        var next = ""
+                        var prev = ""
+
+                        if (page == 1) {
+                            prev = "disabled"
+                        }
+                        if (limit > dados.length || offset + limit >= qtd) {
+                            next = "disabled"
+                        }
+                        var nextUrl = {
+                            ofst: offset + limit,
+                            pag: page + 1,
+                        }
+                        var prevUrl = {
+                            ofst: offset - limit,
+                            pag: page - 1
+                        }
+
+                        if (dados.length < 1) {
+                            req.flash('error_msg', "Não há mais guias cadastradas")
+                            res.redirect('/guias/guias_cadastradas')
+                        } else {
+                            var i = 0
+                            while (i < dados.length) {
+                                dados[i]["date_entrada"] = moment(dados[i].dateEntrada).format('DD/MM/YYYY')
+                                dados[i]["date_vencimento"] = moment(dados[i].vencimento).format('DD/MM/YYYY')
+                                dados[i]["valor_exib"] = dados[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                                dados[i]["n"] = (i + 1) + offset
+                                if (dados[i].baixaPag == true && dados[i].statusPag == "CANCELADO") {
+                                    dados[i]["statusBaixa"] = "CANCELADO"
+                                }
+                                else if (dados[i].baixaPag == true && dados[i].statusPag != "CANCELADO") {
+                                    dados[i]["statusBaixa"] = "PAGO"
+                                }
+                                else if (dados[i].baixaPag == false && moment(dados[i].vencimento).format("MM-DD-YYYY") >= moment(new Date()).format("MM-DD-YYYY")) {
+                                    dados[i]["statusBaixa"] = "PENDENTE"
+                                }
+                                else if (dados[i].baixaPag == false && moment(dados[i].vencimento).format("MM-DD-YYYY") < moment(new Date()).format("MM-DD-YYYY")) {
+                                    dados[i]["statusBaixa"] = "VENCIDO"
+                                }
+                                i++
+                            }
+                            res.render('consultasRelatorios/guias_cargas/guias_por_empresa', { dados, nextUrl, prevUrl, page, prev, next, empresaSelec, empresas })
+                        }
+
+                    }).catch((err) => {
+                        req.flash('error_msg', "Não foi encontrado guias para os parametros no periodo informado", err)
+                        res.redirect('/painel')
+                    })
+                }
+
+            }).catch((err) => {
+                req.flash('error_msg', "Impossivel contar guias", err)
+                res.redirect('/painel')
+            })
+        }).catch(err => {
+            req.flash('error_msg', "Erro interno ", err)
+            res.redirect('/erro')
+        })
+
     }
+
 
 })
 
@@ -568,6 +655,9 @@ router.get('/vendas_por_agencia', eDigitador, (req, res) => {
         Empresa.find().sort({ cidade: 1 }).then(empresas => {
             res.render('consultasRelatorios/guias_cargas/vendasPorAgencia', { empresas })
 
+        }).catch(err => {
+            req.flash('error_msg', "Erro interno ", err)
+            res.redirect('/error')
         })
     } else {
         Empresa.find().sort({ cidade: 1 }).then((empresas) => {
@@ -582,7 +672,7 @@ router.get('/vendas_por_agencia', eDigitador, (req, res) => {
                     dateFin: moment(dateFin).format('DD/MM/YYYY')
                 }
                 //console.log(title)
-                Agencia.find().then((agencias) => {
+                Agencia.find({ $nor: [{ cidade: "Geral" }, { numero: '9999' }] }).then((agencias) => {
                     GuiaCarga.find(query).then((guias) => {
                         agencias.forEach(agencia => {
                             var resumo = {
@@ -642,6 +732,9 @@ router.get('/vendas_por_agencia', eDigitador, (req, res) => {
                 })
             })
 
+        }).catch(err => {
+            req.flash('error_msg', "Erro interno ", err)
+            res.redirect('/error')
         })
     }
 })
