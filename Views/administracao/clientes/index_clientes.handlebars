@@ -50,7 +50,7 @@
     </form>
 </div>
 {{#if clientes}}
-<div class="table-responsive-xl fs-6">
+<div class="table-responsive-xl">
     <form action="/administracao/clientes/excluir" method="post">
         <hr>
         <h5>Clientes Cadastrados</h5>
@@ -69,7 +69,7 @@
                 </thead>
                 {{#each clientes}}
                 <tbody>
-                    <tr class="fs-6">
+                    <tr>
                         <th scope="row"><input type="checkbox" name="ident" value="{{_id}}"></th>
                         <td><a href="/administracao/clientes/ver_cliente/{{_id}}">{{name_client}}</a></td>
                         <td>{{tipo_doc}}</td>

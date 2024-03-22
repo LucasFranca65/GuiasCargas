@@ -3,14 +3,14 @@
 {{else}}
 {{/each}}
 
-<form action="/consultas/por_entrega/pesquisar" method="get">
-  <h3>Buscar por status de Entrega</h3>
+<form action="/consultas/por_agencia_por_pagamento/pesquisar" method="get">
+  <h3>Buscar por status de pagamento</h3>
   <div class="table-responsive-xl  ">
     <table class="table shadow p-2">
       <thead class="table-secondary">
         <tr>
           <th scope="col">Agencia</th>
-          <th scope="col">Entrega</th>
+          <th scope="col">Pagamento</th>
           <th scope="col">Data Inicial</th>
           <th scope="col">Data Final</th>
         </tr>
@@ -19,6 +19,7 @@
         <td>
           <select name="agencia" class="form-select" id="floatingSelect2" aria-label="agencia" required>
             <option value="selecione">---Selecione---</option>
+            <option value="1">Todas</option>
             {{#if origem}}
             <option value="{{origem._id}}">{{origem.cidade}} - {{origem.numero}}</option>
             {{else}}
@@ -32,9 +33,11 @@
         <td>
           <select name="status" class="form-select" id="floatingSelect2" aria-label="agencia" required>
             <option value="1">Todas</option>
-            <option value="2">Entregue</option>
+            <option value="2">Pagas</option>
             <option value="3">Pendente</option>
-            <option value="4">Canceladas</option>
+            <option value="4">Vencidas</option>
+            <option value="5">Canceladas</option>
+
           </select>
         </td>
         <td><input type="date" class="form-control" name="dateMin" required></td>
@@ -45,7 +48,7 @@
   </div>
   <button type="submit" class="btn btn-outline-success btn-sm">Buscar</button>
   <a role="button" class="btn ms-2 btn-outline-secondary btn-sm" id="backBtn">Voltar</a>
-	
+
 </form>
 <hr>
 <form action="/guias/baixar_em_lote" method="get" onsubmit="confirmBaixa(event, this)">
@@ -76,7 +79,6 @@
             <th scope="col">#</th>
           </tr>
         </thead>
-
         <tbody>
           {{#each dados}}
           <tr id="table-rowns" class="fs-6 fst-normal">
@@ -101,10 +103,6 @@
         <input type="hidden" name="dateMin" value="{{title.dateMin}}">
         <input type="hidden" name="dateMax" value="{{title.dateMax}}">
         <input type="hidden" name="status" value="{{title.status}}">
-
-
-
-
       </table>
     </div>
     <a role="button" id="btn-export-csv" class="btn btn-secondary btn-sm mt-2">Exportar .CSV</a>
@@ -113,7 +111,6 @@
 </form>
 
 <br><br>
-
 <script>
   document.getElementById("backBtn").addEventListener("click", function () {
     history.back();

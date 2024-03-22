@@ -666,11 +666,11 @@ router.post('/clientes/edit_client/editar', eDigitador, (req, res) => {
             req.flash('success_msg', "Edição Realizada com Sucesso")
             res.redirect('/administracao/clientes/ver_cliente/' + ident)
         }).catch((err) => {
-            req.flash('error_msg', "Erro ao Editar Cliente ")
+            req.flash('error_msg', "Erro ao realizar edição Cliente ERRO:" + err )
             res.redirect('/administracao/clientes/ver_cliente/' + ident)
         })
     }).catch((err) => {
-        req.flash('error_msg', "Erro ao buscar Cliente")
+        req.flash('error_msg', "Erro ao buscar Cliente ERRO: " + err)
         res.redirect('/administracao/clientes/ver_cliente/' + ident)
     })
 

@@ -112,8 +112,7 @@ router.post('/adicionar', eControle, (req, res) => {
                     }
 
                 }
-                console.log(mes + '-' + uDia + '-' + ano + " 23:59:59")
-                console.log(mes + '-01-' + ano + " 00:00:00")
+
                 const newPeriodo = {
                     nome: reference,
                     empresa: empresa,
@@ -525,5 +524,7 @@ router.get('/excluir', eAdmin, (req, res) => {
 
 
 })
+
+
 
 module.exports = router

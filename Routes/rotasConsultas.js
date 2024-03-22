@@ -140,6 +140,7 @@ router.get('/guias_cadastradas', eDigitador, (req, res) => {
 
 })
 
+
 router.get('/guias_cadastradas/por_empresa', eDigitador, (req, res) => {
     const { empresa } = req.query
     if (!empresa) {
@@ -243,6 +244,8 @@ router.get('/guias_cadastradas/por_empresa', eDigitador, (req, res) => {
 
 
 })
+
+
 
 router.get('/hitorico_de_comissao', eDigitador, (req, res) => {
     const usuario = req.user
@@ -490,7 +493,7 @@ router.get('/por_agencia_por_pagamento', eDigitador, (req, res) => {
             res.redirect('/error')
         })
     } else {
-        Agencia.find().sort({ cidade: 1 }).then((agencias) => {
+        Agencia.find({ $nor: [{ cidade: "Geral" }, { numero: '9999' }] }).sort({ cidade: 1 }).then((agencias) => {
             res.render('consultasRelatorios/guias_cargas/porAgencia', { agencias })
         }).catch((err) => {
             req.flash('error_msg', "Erro interno ao carregar agencias ERRO:", err)
@@ -515,7 +518,7 @@ router.get('/por_agencia_por_pagamento/pesquisar', eDigitador, (req, res) => {
         error.push({ texto: "Selecione uma agencia" })
     }
     if (error.length > 0) {
-        Agencia.find().sort({ cidade: 1 }).then((agencias) => {
+        Agencia.find( { $nor: [{ cidade: "Geral" }, { numero: '9999' }] }).sort({ cidade: 1 }).then((agencias) => {
             res.render('consultasRelatorios/guias_cargas/porAgencia', { agencias, error })
         }).catch((err) => {
             req.flash('error_msg', "Erro interno ao carregar agencias", err)
@@ -523,7 +526,7 @@ router.get('/por_agencia_por_pagamento/pesquisar', eDigitador, (req, res) => {
         })
     } else {
         if (agencia == "1") {
-            Agencia.find().sort({ cidade: 1 }).then((agencias) => {
+            Agencia.find({ $nor: [{ cidade: "Geral" }, { numero: '9999' }] } ).sort({ cidade: 1 }).then((agencias) => {
                 //console.log(status)
                 var query
                 if (status == 1 || status == "1") {
@@ -582,7 +585,7 @@ router.get('/por_agencia_por_pagamento/pesquisar', eDigitador, (req, res) => {
                 res.redirect('/painel')
             })
         } else {
-            Agencia.find().sort({ cidade: 1 }).then((agencias) => {
+            Agencia.find( { $nor: [{ cidade: "Geral" }, { numero: '9999' }] }).sort({ cidade: 1 }).then((agencias) => {
                 //console.log(status)
                 var query
                 if (status == 1 || status == "1") {
@@ -660,82 +663,85 @@ router.get('/vendas_por_agencia', eDigitador, (req, res) => {
             res.redirect('/error')
         })
     } else {
-        Empresa.find().sort({ cidade: 1 }).then((empresas) => {
-            Empresa.findById(empresa).then((aEmpresa) => {
-                const dateInit = moment(dateMin).format()
-                const dateFin = moment(dateMax).format()
-                let query = { dateEntrada: { $gte: dateInit, $lt: dateFin }, empresa: empresa }
-                var dados = []
-                const title = {
-                    empresa: aEmpresa.empresa,
-                    dateInit: moment(dateInit).format('DD/MM/YYYY'),
-                    dateFin: moment(dateFin).format('DD/MM/YYYY')
-                }
-                //console.log(title)
-                Agencia.find({ $nor: [{ cidade: "Geral" }, { numero: '9999' }] }).then((agencias) => {
-                    GuiaCarga.find(query).then((guias) => {
-                        agencias.forEach(agencia => {
-                            var resumo = {
-                                idAgencia: agencia._id,
-                                agencia: agencia.cidade,
-                                vendidos: 0,
-                                qtdVendidos: 0,
-                                vendidosExib: "",
-                                cancelados: 0,
-                                cancelExib: "",
-                                qtdCancelados: 0,
-                                pagos: 0,
-                                qtdPagos: 0,
-                                pagosExib: "",
-                                pendentes: 0,
-                                qtdPendentes: 0,
-                                pendentesExib: "",
-                                vencidos: 0,
-                                qtdVencidos: 0,
-                                vencidosExib: "",
-                                empresa: aEmpresa._id,
-                                dateMin,
-                                dateMax
-                            }
-                            for (let i = 0; i < guias.length; i++) {
-                                if (String(guias[i].origem) == String(resumo.idAgencia)) {
-                                    resumo.vendidos += guias[i].valor
-                                    resumo.qtdVendidos++
-                                    if (guias[i].baixaPag == true && guias[i].condPag == "CANCELADO") {
-                                        resumo.cancelados += guias[i].valor
-                                        resumo.qtdCancelados++
-                                    }
-                                    else if (guias[i].baixaPag == true && guias[i].condPag != "CANCELADO") {
-                                        resumo.pagos += guias[i].valor
-                                        resumo.qtdPagos++
-                                    }
-                                    else if (guias[i].baixaPag == false && moment(guias[i].vencimento).format('MM-DD-YYYY') < moment(new Date()).format('MM-DD-YYYY')) {
-                                        resumo.vencidos += guias[i].valor
-                                        resumo.qtdVencidos++
-                                    } else {
-                                        resumo.pendentes += guias[i].valor
-                                        resumo.qtdPendentes++
+        
+            Empresa.find().sort({ cidade: 1 }).then((empresas) => {
+                Empresa.findById(empresa).then((aEmpresa) => {
+                    const dateInit = moment(dateMin).format()
+                    const dateFin = moment(dateMax).format()
+                    let query = { dateEntrada: { $gte: dateInit, $lt: dateFin }, empresa: empresa}
+                    var dados = []
+                    const title = {
+                        empresa: aEmpresa.empresa,
+                        dateInit: moment(dateInit).format('DD/MM/YYYY'),
+                        dateFin: moment(dateFin).format('DD/MM/YYYY')
+                    }
+                    //console.log(title)
+                    Agencia.find({$nor:[{cidade: "Geral"},{numero:"9999"}]}).then((agencias) => {
+                        GuiaCarga.find(query).then((guias) => {
+                            agencias.forEach(agencia => {
+                                var resumo = {
+                                    idAgencia: agencia._id,
+                                    agencia: agencia.cidade,
+                                    vendidos: 0,
+                                    qtdVendidos: 0,
+                                    vendidosExib: "",
+                                    cancelados: 0,
+                                    cancelExib: "",
+                                    qtdCancelados: 0,
+                                    pagos: 0,
+                                    qtdPagos: 0,
+                                    pagosExib: "",
+                                    pendentes: 0,
+                                    qtdPendentes: 0,
+                                    pendentesExib: "",
+                                    vencidos: 0,
+                                    qtdVencidos: 0,
+                                    vencidosExib: "",
+                                    empresa: aEmpresa._id,
+                                    dateMin,
+                                    dateMax
+                                }
+                                for (let i = 0; i < guias.length; i++) {
+                                    if (String(guias[i].origem) == String(resumo.idAgencia)) {
+                                        resumo.vendidos += guias[i].valor
+                                        resumo.qtdVendidos++
+                                        if (guias[i].baixaPag == true && guias[i].condPag == "CANCELADO") {
+                                            resumo.cancelados += guias[i].valor
+                                            resumo.qtdCancelados++
+                                        }
+                                        else if (guias[i].baixaPag == true && guias[i].condPag != "CANCELADO") {
+                                            resumo.pagos += guias[i].valor
+                                            resumo.qtdPagos++
+                                        }
+                                        else if (guias[i].baixaPag == false && moment(guias[i].vencimento).format('MM-DD-YYYY') < moment(new Date()).format('MM-DD-YYYY')) {
+                                            resumo.vencidos += guias[i].valor
+                                            resumo.qtdVencidos++
+                                        } else {
+                                            resumo.pendentes += guias[i].valor
+                                            resumo.qtdPendentes++
+                                        }
                                     }
                                 }
-                            }
-                            resumo.vendidosExib = resumo.vendidos.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-                            resumo.pagosExib = resumo.pagos.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-                            resumo.cancelExib = resumo.cancelados.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-                            resumo.vencidosExib = resumo.vencidos.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-                            resumo.pendentesExib = resumo.pendentes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-                            dados.push(resumo)
-                        });
-                        //console.log(dados)
-                        res.render('consultasRelatorios/guias_cargas/vendasPorAgencia', { dados, empresas, title })
+                                resumo.vendidosExib = resumo.vendidos.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                                resumo.pagosExib = resumo.pagos.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                                resumo.cancelExib = resumo.cancelados.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                                resumo.vencidosExib = resumo.vencidos.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                                resumo.pendentesExib = resumo.pendentes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                                if (resumo.qtdVendidos > 0) {
+                                    dados.push(resumo)
+                            	}
+                            });
+                            //console.log(dados)
+                            res.render('consultasRelatorios/guias_cargas/vendasPorAgencia', { dados, empresas, title })
 
+                        })
                     })
                 })
-            })
 
-        }).catch(err => {
-            req.flash('error_msg', "Erro interno ", err)
-            res.redirect('/error')
-        })
+            }).catch(err => {
+                req.flash('error_msg', "Erro interno ", err)
+                res.redirect('/error')
+            })
     }
 })
 
@@ -828,7 +834,7 @@ router.get('/por_entrega', eDigitador, (req, res) => {
             res.redirect('/error')
         })
     } else {
-        Agencia.find().sort({ cidade: 1 }).then((agencias) => {
+        Agencia.find( { $nor: [{ cidade: "Geral" }, { numero: '9999' }] }).sort({ cidade: 1 }).then((agencias) => {
             res.render('consultasRelatorios/guias_cargas/porEntrega', { agencias })
         }).catch((err) => {
             req.flash('error_msg', "Erro interno ao carregar agencias ERRO:", err)
@@ -854,7 +860,7 @@ router.get('/por_entrega/pesquisar', eDigitador, (req, res) => {
         error.push({ texto: "Selecione uma agencia" })
     }
     if (error.length > 0) {
-        Agencia.find().sort({ cidade: 1 }).then((agencias) => {
+        Agencia.find( { $nor: [{ cidade: "Geral" }, { numero: '9999' }] }).sort({ cidade: 1 }).then((agencias) => {
             res.render('consultasRelatorios/guias_cargas/porAgencia', { agencias, error })
         }).catch((err) => {
             req.flash('error_msg', "Erro interno ao carregar agencias", err)
@@ -863,7 +869,7 @@ router.get('/por_entrega/pesquisar', eDigitador, (req, res) => {
     } else {
 
         if (agencia == "1") {
-            Agencia.find().sort({ cidade: 1 }).then((agencias) => {
+            Agencia.find( { $nor: [{ cidade: "Geral" }, { numero: '9999' }] }).sort({ cidade: 1 }).then((agencias) => {
                 //console.log(status)
                 var query
                 if (status == 1 || status == "1") {
@@ -922,7 +928,7 @@ router.get('/por_entrega/pesquisar', eDigitador, (req, res) => {
                 res.redirect('/painel')
             })
         } else {
-            Agencia.find().sort({ cidade: 1 }).then((agencias) => {
+            Agencia.find( { $nor: [{ cidade: "Geral" }, { numero: '9999' }] }).sort({ cidade: 1 }).then((agencias) => {
                 //console.log(status)
                 var query
                 if (status == 1 || status == "1") {
@@ -1153,6 +1159,7 @@ router.get('/guias_do_cliente/filtrar', eDigitador, (req, res) => {
 
     var { cliente, dateMin, dateMax } = req.query
     if (!dateMin && !dateMax) {
+        req.flash('error_msg', "Informe data inicial e final")
         res.redirect('/consultas/guias_do_cliente?cliente=' + cliente)
     } else if (!dateMin && dateMax) {
         req.flash('error_msg', "Informe data inicial e final")

@@ -1,12 +1,12 @@
 {
   "name": "guiascargas",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Digitação de Guias de encomendas Viação Regional e Jaua",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js",
-    "start": "node index.js"
+    "dev": "nodemon app-guias-index.js",
+    "start": "node app-guias-index.js"
   },
   "author": "Lucas França",
   "license": "ISC",

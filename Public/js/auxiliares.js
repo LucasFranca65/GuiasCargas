@@ -62,7 +62,7 @@ exportBtn.addEventListener('click', () => {
 
     const csvString = Array.from(tableRows)
         .map(row => Array.from(row.cells)
-            .map(cell => cell.textContent).join(',')
+            .map(cell => cell.textContent).join(';')
         ).join('\n')
     exportBtn.setAttribute('href',
         `data:text/csvcharset=utf-8,${encodeURIComponent(csvString)}`
@@ -182,8 +182,6 @@ const obterDados = () => {
 }
 
 const interval = setInterval(obterDados, 3000)
-
-
 
 
 /*const btn_imp = document.getElementById('btn_imp')

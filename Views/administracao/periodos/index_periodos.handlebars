@@ -60,6 +60,8 @@
         </table>
         <button class="btn btn-outline-success btn-sm" type="submit">Criar</button> <button
             class="btn btn-outline-secondary btn-sm" type="reset">Limpar</button>
+    <a role="button" class="btn btn-outline-secondary btn-sm" id="backBtn">Voltar</a>
+
     </form>
 </div>
 {{else}}
@@ -198,3 +200,10 @@
 {{/if}}
 
 <br><br><br>
+
+
+<script>
+  document.getElementById("backBtn").addEventListener("click", function () {
+    history.back();
+  });
+</script>

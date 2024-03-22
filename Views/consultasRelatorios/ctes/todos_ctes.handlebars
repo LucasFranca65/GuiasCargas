@@ -1,0 +1,90 @@
+{{#each error}}
+<div class="alert alert-danger">{{texto}}</div>
+{{else}}
+{{/each}}
+
+<h5>Ctes Cadastrados</h5>
+
+{{#if dados}}
+<form action="/administracao/guias/excluir" method="post">
+    <div class="table-responsive-xl fs-6 mt-5">
+        <table class="table table-bordered">
+            <thead class="table-dark ">
+                <tr class="fs-6">
+                    <th scope="col">CTE</th>
+                    <th scope="col">Origem</th>
+                    <th scope="col">Destino</th>
+                    <th scope="col">Empresa</th>
+                    <th scope="col">Entrada</th>
+                    <th scope="col">Valor</th>
+                </tr>
+            </thead>
+            {{#each dados}}
+            <tbody>
+                <tr class="fs-6 fst-normal">
+                    <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
+                    <td>{{origem.cidade}}</td>
+                    <td>{{destino.cidade}}</td>
+                    <td>{{empresa.empresa}}</td>
+                    <td>{{date_entrada}}</td>
+                    <td>{{valor_exib}}</td>
+                </tr>
+            </tbody>
+            {{else}}
+            {{/each}}
+        </table>
+    </div>
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+            <li class="page-item {{prev}}">
+                <a class="page-link "
+                    href="/consultas/ctes_importados_por_agencia?empresaBusca={{prevUrl.empresaBusca}}&agenciaBusca={{prevUrl.agenciaBusca}}&offset={{prevUrl.ofst}}&page={{prevUrl.pag}}">Anterior</a>
+            </li>
+            <li class="page-item"><a class="page-link">-- {{page}} --</a></li>
+            <li class="page-item {{next}}">
+                <a class="page-link "
+                    href="/consultas/ctes_importados_por_agencia?empresaBusca={{nextUrl.empresaBusca}}&agenciaBusca={{nextUrl.agenciaBusca}}&offset={{nextUrl.ofst}}&page={{nextUrl.pag}}">Proximo</a>
+            </li>
+        </ul>
+    </nav>
+    <button class="btn btn-sm btn-outline-danger" type="submit">Excluir Selecionados</button>
+</form>
+<a role="button" class="btn mt-2 ms-2 btn-outline-secondary btn-sm" id="backBtn">Voltar</a>
+
+{{else}}
+<form action="/consultas/ctes_importados_por_agencia" method="get">
+    <div class="d-flex">
+        <div class="container">
+            <label for="empresaBusca">Empresa</label>
+            <select class="form-select" name="empresaBusca" id="">
+                {{#each empresas}}
+                <option value="{{_id}}">{{empresa}}</option>
+                {{else}}
+                {{/each}}
+            </select>
+        </div>
+        <div class="container">
+            <label for="agenciaBusca">Agencia</label>
+            <select class="form-select" name="agenciaBusca" id="">
+                <option value="1">Todas</option>
+                {{#each agencias}}
+                <option value="{{_id}}">{{cidade}}</option>
+                {{else}}
+                {{/each}}
+            </select>
+        </div>
+
+    </div>
+    <button type="submit" class="btn mt-2  ms-2 btn-outline-secondary btn-sm">Buscar</button>
+    <a role="button" class="btn ms-2 mt-2 btn-outline-secondary btn-sm" id="backBtn">Voltar</a>
+
+</form>
+{{/if}}
+
+
+
+<script>
+    document.getElementById("backBtn").addEventListener("click", function () {
+        history.back();
+    });
+</script>

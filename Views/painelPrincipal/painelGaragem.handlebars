@@ -38,12 +38,63 @@
 </div>
 
 {{>_grafico}}
+<hr>
+<br><br>
 
-<h5>Guias com Pagamento Pendente </h5>
+<div class="d-flex justify-content-center">
+    <h4>Guias com Pagamento Pendente </h4>
+</div>
+
+{{#if guiasVencidas}}
+
+
+<h5>Guias Vencidas</h5>
+<p>Quantidade: {{graficos.qtdVenciados}}</p>
+<p>Total: {{graficos.vencidoExib}}</p>
+
+<div class="table-responsive" style="overflow-y: scroll; max-height: 360px; max-width: 98%;">
+    <table class="table table-striped-columns">
+        <thead>
+            <tr>
+                <th scope="col">Número</th>
+                <th scope="col">Origem</th>
+                <th scope="col">Destino</th>
+                <th scope="col">Cliente</th>
+                <th scope="col">Valor</th>
+                <th scope="col">Vencimento</th>
+                <th scope="col">Cond Pag.</th>
+                <th scope="col">Status Pag</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each guiasVencidas}}
+            <tr>
+                <th scope="row"><a href="/guias/selectEdit/{{_id}}">{{numero}}</a></th>
+                <td>{{origem.cidade}}</td>
+                <td>{{destino.cidade}}</td>
+                <td><a href="/consultas/guias_do_cliente?cliente={{cliente._id}}">{{cliente.name_client}}</a></td>
+                <td>{{valorExib}}</td>
+                <td>{{date_vencimento}}</td>
+                <td>{{condPag}}</td>
+                <td>{{statusBaixa}}</td>
+            </tr>
+            {{else}}
+            {{/each}}
+        </tbody>
+    </table>
+</div>
+<br>
+{{else}}
+<div class="d-flex mt-4 justify-content-center">
+    <h5>Não há guias vencidas para o mês atual</h5>
+</div>
+{{/if}}
+{{#if guiasPp}}
+<h5>Guias no Prazo</h5>
 <p>Quantidade: {{graficos.qtdPendente}}</p>
 <p>Total: {{graficos.pendenteExib}}</p>
 <div class="table-responsive" style="overflow-y: scroll; max-height: 360px; max-width: 98%;">
-    <table class="table">
+    <table class=" table table-striped-columns">
         <thead>
             <tr>
                 <th scope="col">Número</th>
@@ -73,8 +124,12 @@
         </tbody>
     </table>
 </div>
-<br><br>
-
+<br>
+{{else}}
+<div class="d-flex mt-4 justify-content-center">
+    <h5>Não há guias pedentes para o mês atual</h5>
+</div>
+{{/if}}
 {{else}}
 
 {{#each erros}}

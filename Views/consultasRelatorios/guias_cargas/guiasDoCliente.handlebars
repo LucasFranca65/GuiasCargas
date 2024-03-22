@@ -79,7 +79,29 @@
             </table>
         </div>
         <button class="btn btn-sm btn-outline-danger mt-2" type="submit">Excluir Selecionados</button>
+	    <a role="button" class="btn ms-2 mt-2 btn-outline-secondary btn-sm" id="backBtn">Voltar</a>
+
 </form>
 </div>
 
 <br><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+    document.getElementById("backBtn").addEventListener("click", function () {
+        history.back();
+    });
+</script>

@@ -14,7 +14,7 @@
                     <th scope="col">Nome</th>
                     <th scope="col">Tipo</th>
                     <th scope="col">CNPJ/CPF</th>
-                    <th scope="col">Contato</th>
+                    <th scope="col">Contato Tel</th>
                     <th scope="col">Permite Faturar</th>
                 </tr>
             </thead>
@@ -47,7 +47,7 @@
                 </tr>
             </tbody>
         </table>
-        <div class="d-flex">
+       <div class="d-flex">
             <button class="btn btn-secondary btn-sm" type="submit">Editar</button>
             <a href="/administracao/clientes" role="button" class="btn btn-sm btn-outline-secondary ms-2 ">Listagem</a>
         </div>
@@ -55,8 +55,9 @@
 </div>
 
 {{#if guias}}
+
 <form action="/administracao/guias/excluir" method="post" class="mt-4" onsubmit="confirmDell(event, this)">
-    <div class="table-responsive-xl fs-6 shadow p-2 fs-6">
+    <div class="table-responsive-xl fs-6 shadow p-2">
         <h6>Guias Encontradas</h6>
         <div style="max-height: 400px;overflow-y: scroll;">
             <table class="table table-bordered">
@@ -95,12 +96,13 @@
                 {{/each}}
             </table>
         </div>
-        {{#if user.eControle}}
+	{{#if user.eControle}}
         <button class="btn btn-sm btn-outline-danger mt-2" type="submit">Excluir Selecionados</button>
         {{else}}
         {{/if}}
-    </div>
 </form>
+
 {{else}}
 {{/if}}
+
 </div>

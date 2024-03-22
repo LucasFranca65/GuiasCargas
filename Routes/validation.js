@@ -12,9 +12,9 @@ const Agencia = mongoose.model('agencias')
 const { lOgado } = require('../helpers/eAdmin')
 
 router.get('/', (req, res) => {
-    System.findOne().then((info) => {
+    System.find().then((info) => {
         //console.log(info.length)
-        if (!info) {
+        if (info.length == 0) {
             const novoInfo = new System({
                 firt_conection: moment(new Date()).format(),
                 version: "V1.1",
@@ -24,6 +24,7 @@ router.get('/', (req, res) => {
 
             novoInfo.save().then(() => {
                 //console.log("Info Criado")
+
                 const newAgencia = new Agencia({
                     numero: "9999",
                     cidade: "Geral",
@@ -31,7 +32,8 @@ router.get('/', (req, res) => {
                 })
 
                 newAgencia.save().then(() => {
-                    //console.log("Agencia Criado")
+                    console.log("Agencia Criado")
+
                     Agencia.findOne().then((agencia) => {
                         console.log(agencia)
                         const novoUsuario = new User({
@@ -56,7 +58,7 @@ router.get('/', (req, res) => {
                                     req.flash('success_msg', "Usuario Administrador Cadastrado com sucesso utilise Usuario : admin, Senha: admin no seu primeiro acesso, recomendamos alterar a senha! ---->>>>")
                                     res.redirect('/validation/login')
                                 }).catch((err) => {
-                                    req.flash('error_msg', "Erro ao criar usuario Administrador", err)
+                                    req.flash('error_msg', "Erro ao criar usuario Administrador ERRO:" ,err)
                                     res.redirect('/error')
                                 })
                             })

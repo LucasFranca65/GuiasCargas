@@ -4,9 +4,10 @@ const passport = require('passport')
 const { lOgado } = require('../helpers/eAdmin')
 const { serializeUser } = require('passport')
 const { default: mongoose } = require('mongoose')
+const bcrypt = require('bcryptjs')
 require('../models/User')
 const Usuario = mongoose.model('users')
-//const bcrypt = require('bcryptjs')
+
 
 
 router.get('/reset_pass', lOgado, (req, res) => {
@@ -33,26 +34,23 @@ router.post('/reset_pass/reset', lOgado, (req, res) => {
 
             usuario.senha = req.body.senha1
             bcrypt.genSalt(10, (erro, salt) => {
-                if (erro) {
-                    req.flash('erro_msg', "Erro no hash " + erro)
-                    res.redirect('/user/reset_pass')
-                } else {
-                    bcrypt.hash(usuario.senha, salt, (erro, hash) => {
-                        if (erro) {
-                            req.flash('error_msg', "Houve um erro Interno no encriptador " + erro)
-                            res.redirect('/user/reset_pass')
-                        }
-                        usuario.senha = hash
-                        usuario.save().then(() => {
-                            req.flash('success_msg', "Senha alterada com sucesso")
-                            res.redirect('/user/reset_pass')
-                        }).catch((err) => {
-                            req.flash('error_msg', "Erro ao alterar senha " + err)
-                            res.redirect('/user/reset_pass')
-                        })
+                bcrypt.hash(usuario.senha, salt, (erro, hash) => {
+                    if (erro) {
+                        req.flash('error_msg', "Houve um erro Interno " + erro)
+                        res.redirect('/user/reset_pass')
+                    }
+                    usuario.senha = hash
+                    usuario.save().then(() => {
+                        req.flash('success_msg', "Senha alterada com sucesso")
+                        res.redirect('/user/reset_pass')
+                    }).catch((err) => {
+                        req.flash('error_msg', "Erro ao alterar senha", err)
+                        res.redirect('/user/reset_pass')
                     })
-                }
+                })
             })
+
+
         }
 
     }).catch((err) => {
@@ -60,6 +58,7 @@ router.post('/reset_pass/reset', lOgado, (req, res) => {
         res.redirect('/painel')
     })
 })
+
 
 router.post('/login', (req, res, next) => {
     passport.authenticate('local', {

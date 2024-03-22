@@ -51,21 +51,17 @@ router.get('/', lOgado, (req, res) => {
                                 valorVencido: 0,
                                 qtdPendente: 0,
                                 valorPendente: 0,
-                                pendenteExib: ""
+                                pendenteExib: "",
+                                vencidoExib:""
                             }
-                            const guiasPp = guias.filter(g => g.baixaPag == false)
+                            const guiasPp = guias.filter(g => g.baixaPag == false && moment(g.vencimento).format('MM-DD-YYYY') >= moment(new Date()).format('MM-DD-YYYY'))
                             graficos.qtdPendente = guiasPp.length
                             for (let i = 0; i < guiasPp.length; i++) {
                                 graficos.valorPendente += guiasPp[i].valor
                                 guiasPp[i]["date_entrada"] = moment(guiasPp[i].dateEntrada).format('DD/MM/YYYY')
                                 guiasPp[i]["date_vencimento"] = moment(guiasPp[i].vencimento).format('DD/MM/YYYY')
-                                guiasPp[i]["valorExib"] = guiasPp[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-
-                                if (moment(guiasPp[i].vencimento).format("YYYY-MM-DD") >= moment(new Date()).format("YYYY-MM-DD")) {
-                                    guiasPp[i]["statusBaixa"] = "PENDENTE"
-                                } else {
-                                    guiasPp[i]["statusBaixa"] = "VENCIDO"
-                                }
+                                guiasPp[i]["valorExib"] = guiasPp[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL'})
+				guiasPp[i]["statusBaixa"] = "PENDENTE"
 
                             }
                             graficos.pendenteExib = graficos.valorPendente.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -82,18 +78,24 @@ router.get('/', lOgado, (req, res) => {
                                 graficos.valorPago += guiasPagas[i].valor
                             }
 
-                            const guiasVencidas = guias.filter(g => moment(g.vencimento).format('MM-DD-YYYY') <= moment(new Date()).format('MM-DD-YYYY'))
+                            const guiasVencidas = guias.filter(g => g.baixaPag == false && moment(g.vencimento).format('MM-DD-YYYY') <= moment(new Date()).format('MM-DD-YYYY'))
                             graficos.qtdVenciados = guiasVencidas.length
                             for (let i = 0; i < guiasVencidas.length; i++) {
                                 graficos.valorVencido += guiasVencidas[i].valor
+                                guiasVencidas[i]["date_entrada"] = moment(guiasVencidas[i].dateEntrada).format('DD/MM/YYYY')
+                                guiasVencidas[i]["date_vencimento"] = moment(guiasVencidas[i].vencimento).format('DD/MM/YYYY')
+                                guiasVencidas[i]["valorExib"] = guiasVencidas[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                                guiasVencidas[i]["statusBaixa"] = "VENCIDA"
+
                             }
+			    graficos.vencidoExib = graficos.valorVencido.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
                             graficos.qtdTotal = guias.length
                             for (let i = 0; i < guias.length; i++) {
                                 graficos.valorTotal += guias[i].valor
                             }
 
-                            res.render('painelPrincipal/painelGaragem', { guiasPp, periodo, graficos, empresas, titulo })
+                            res.render('painelPrincipal/painelGaragem', { guiasPp, guiasVencidas, periodo, graficos, empresas, titulo })
                         }).catch((err) => {
                             req.flash('error_msg', "Painel principal, busca de guias ERRO: " + err)
                             res.redirect('/error')
@@ -134,21 +136,17 @@ router.get('/', lOgado, (req, res) => {
                                 valorVencido: 0,
                                 qtdPendente: 0,
                                 valorPendente: 0,
-                                pendenteExib: ""
+                                pendenteExib: "",
+				vencidoExib: ""
                             }
-                            const guiasPp = guias.filter(g => g.baixaPag == false)
+                           const guiasPp = guias.filter(g => g.baixaPag == false && moment(g.vencimento).format('MM-DD-YYYY') >= moment(new Date()).format('MM-DD-YYYY'))
                             graficos.qtdPendente = guiasPp.length
                             for (let i = 0; i < guiasPp.length; i++) {
                                 graficos.valorPendente += guiasPp[i].valor
                                 guiasPp[i]["date_entrada"] = moment(guiasPp[i].dateEntrada).format('DD/MM/YYYY')
                                 guiasPp[i]["date_vencimento"] = moment(guiasPp[i].vencimento).format('DD/MM/YYYY')
                                 guiasPp[i]["valorExib"] = guiasPp[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-
-                                if (moment(guiasPp[i].vencimento).format("YYYY-MM-DD") >= moment(new Date()).format("YYYY-MM-DD")) {
-                                    guiasPp[i]["statusBaixa"] = "PENDENTE"
-                                } else {
-                                    guiasPp[i]["statusBaixa"] = "VENCIDO"
-                                }
+				guiasPp[i]["statusBaixa"] = "PENDENTE"
 
                             }
                             graficos.pendenteExib = graficos.valorPendente.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -165,10 +163,15 @@ router.get('/', lOgado, (req, res) => {
                                 graficos.valorPago += guiasPagas[i].valor
                             }
 
-                            const guiasVencidas = guias.filter(g => moment(g.vencimento).format('MM-DD-YYYY') <= moment(new Date()).format('MM-DD-YYYY'))
+                            const guiasVencidas = guias.filter(g => moment(g.vencimento).format('MM-DD-YYYY') <= moment(new Date()).format('MM-DD-YYYY') && g.baixaPag == false)
                             graficos.qtdVenciados = guiasVencidas.length
                             for (let i = 0; i < guiasVencidas.length; i++) {
                                 graficos.valorVencido += guiasVencidas[i].valor
+                                guiasVencidas[i]["date_entrada"] = moment(guiasVencidas[i].dateEntrada).format('DD/MM/YYYY')
+                                guiasVencidas[i]["date_vencimento"] = moment(guiasVencidas[i].vencimento).format('DD/MM/YYYY')
+                                guiasVencidas[i]["valorExib"] = guiasVencidas[i].valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                                guiasVencidas[i]["statusBaixa"] = "VENCIDAS"
+
                             }
 
                             graficos.qtdTotal = guias.length
@@ -176,7 +179,7 @@ router.get('/', lOgado, (req, res) => {
                                 graficos.valorTotal += guias[i].valor
                             }
 
-                            res.render('painelPrincipal/painelGaragem', { guiasPp, periodo, graficos, empresas, titulo })
+                            res.render('painelPrincipal/painelGaragem', { guiasPp,guiasVencidas, periodo, graficos, empresas, titulo })
                         }).catch((err) => {
                             req.flash('error_msg', "Painel principal, busca de guias ERRO: " + err)
                             res.redirect('/error')

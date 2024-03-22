@@ -5,17 +5,17 @@
 
 <div class="mt-4 d-flex justify-content-center">
     <div class="font-weight-bold " style="max-width: 70%;">
-        <form action="/user/reset_pass/reset" method="post" onsubmit="confirmAction(event, this)">
+        <form action="/user/reset_pass/reset" method="post" onsubmit="confirmAction(event, this)" >
             <p>Alterar a senha do usuario: {{user.nome}}</p>
             <input type="hidden" name="user_id" value="{{user._id}}">
             <label for="senha1">Nova Senha:</label>
-            <input type="password" name="senha1" class="form-control" placeholder="*************" required>
+            <input type="password" name="senha1" class="form-control" placeholder="*************" required >
             <label for="senha2">Confirmar Nova Senha:</label>
-            <input type="password" name="senha2" class="form-control" placeholder="*************" required>
+            <input type="password" name="senha2" class="form-control" placeholder="*************" required >
             <hr>
             <button class="btn btn-outline-success btn-sm">Reset</button>
         </form>
         <hr>
-        <a role="button" class="btn btn-secondary btn-sm" href="/painel">Cancelar</a>
+       <a role="button" class="btn btn-secondary btn-sm" href="/painel">Cancelar</a>
     </div>
 </div>
